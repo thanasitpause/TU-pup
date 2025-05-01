@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>รายละเอียดกระทู้ - Pantip Clone</title>
+  <title>รายละเอียดกระทู้ - TU pansas</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Supabase JS -->
@@ -27,7 +27,7 @@
     <div class="container mx-auto px-4 py-3">
       <div class="flex justify-between items-center">
         <!-- Logo -->
-        <a href="index.html" class="font-bold text-2xl text-blue-600">Pantip Clone</a>
+        <a href="index.html" class="font-bold text-2xl text-blue-600">TU pansas</a>
         
         <!-- User Menu -->
         <div class="flex items-center space-x-4">
@@ -80,7 +80,14 @@
       
       <!-- Post Content -->
       <div id="post-content" class="hidden">
-        <h1 id="post-title" class="text-2xl font-bold text-gray-800 mb-4"></h1>
+        <div class="flex justify-between items-start mb-4">
+          <h1 id="post-title" class="text-2xl font-bold text-gray-800"></h1>
+          
+          <!-- Delete Post Button (จะแสดงเฉพาะเจ้าของกระทู้) -->
+          <button id="delete-post-btn" class="hidden bg-red-500 hover:bg-red-600 text-white font-medium py-1 px-3 rounded-lg text-sm transition duration-300">
+            ลบกระทู้
+          </button>
+        </div>
         
         <div class="flex items-center mb-4">
           <img id="post-author-avatar" src="img/default-avatar.png" alt="Author" class="w-10 h-10 rounded-full mr-3">
@@ -195,13 +202,29 @@
         </div>
       </div>
     </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <h3 class="text-xl font-bold mb-4">ยืนยันการลบกระทู้</h3>
+        <p class="mb-6 text-gray-600">คุณแน่ใจหรือไม่ว่าต้องการลบกระทู้นี้? การกระทำนี้ไม่สามารถย้อนกลับได้</p>
+        <div class="flex justify-end space-x-3">
+          <button id="cancel-delete-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300">
+            ยกเลิก
+          </button>
+          <button id="confirm-delete-btn" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+            ลบกระทู้
+          </button>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- Footer -->
   <footer class="bg-white border-t mt-12 py-6">
     <div class="container mx-auto px-4">
       <div class="text-center text-gray-600 text-sm">
-        <p>&copy; 2025 Pantip Clone. สงวนลิขสิทธิ์.</p>
+        <p>&copy; 2025 TU pansas. สงวนลิขสิทธิ์.</p>
       </div>
     </div>
   </footer>
@@ -253,7 +276,7 @@
       });
       
       // โหลดข้อมูลกระทู้
-      await loadPost(postId);
+      await loadPost(postId, user);
       
       // โหลดความคิดเห็น
       await loadComments(postId);
@@ -341,10 +364,48 @@
           submitBtn.textContent = 'ส่งความคิดเห็น';
         }
       });
+      
+      // ลบกระทู้ (Modal)
+      const deleteModal = document.getElementById('delete-modal');
+      const deletePostBtn = document.getElementById('delete-post-btn');
+      const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+      const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+      
+      // เปิด Modal ยืนยันการลบ
+      if (deletePostBtn) {
+        deletePostBtn.addEventListener('click', () => {
+          deleteModal.classList.remove('hidden');
+        });
+      }
+      
+      // ปิด Modal โดยไม่ลบ
+      cancelDeleteBtn.addEventListener('click', () => {
+        deleteModal.classList.add('hidden');
+      });
+      
+      // ยืนยันการลบกระทู้
+      confirmDeleteBtn.addEventListener('click', async () => {
+        try {
+          // ลบกระทู้
+          const { error } = await supabase
+            .from('posts')
+            .delete()
+            .eq('id', postId);
+          
+          if (error) throw error;
+          
+          alert('ลบกระทู้เรียบร้อยแล้ว');
+          window.location.href = 'index.html';
+        } catch (error) {
+          console.error('Error deleting post:', error);
+          alert('เกิดข้อผิดพลาดในการลบกระทู้ โปรดลองอีกครั้ง');
+          deleteModal.classList.add('hidden');
+        }
+      });
     });
     
     // โหลดข้อมูลกระทู้
-    async function loadPost(postId) {
+    async function loadPost(postId, currentUser) {
       try {
         // ดึงข้อมูลกระทู้
         const { data: post, error } = await supabase
@@ -371,7 +432,7 @@
         document.getElementById('post-content').classList.remove('hidden');
         
         // กำหนดเนื้อหากระทู้
-        document.title = `${post.title} - Pantip Clone`;
+        document.title = `${post.title} - TU pansas`;
         document.getElementById('post-title').textContent = post.title;
         document.getElementById('post-author').textContent = post.author_name;
         document.getElementById('post-date').textContent = formatTimestamp(post.created_at);
@@ -397,6 +458,12 @@
           });
         } else {
           postImages.classList.add('hidden');
+        }
+        
+        // ตรวจสอบสิทธิ์การลบกระทู้ (ต้องเป็นเจ้าของกระทู้)
+        if (currentUser && post.author_id === currentUser.id) {
+          const deletePostBtn = document.getElementById('delete-post-btn');
+          deletePostBtn.classList.remove('hidden');
         }
       } catch (error) {
         console.error('Error loading post:', error);
@@ -489,8 +556,26 @@
         
         if (error) throw error;
         
-        // อัปเดตจำนวนความคิดเห็นในกระทู้
-        await supabase.rpc('increment_comment_count', { post_id: postId });
+        // อัปเดตจำนวนความคิดเห็นในกระทู้โดยตรง
+        // ดึงข้อมูลกระทู้ก่อน
+        const { data: postData, error: postError } = await supabase
+          .from('posts')
+          .select('comment_count')
+          .eq('id', postId)
+          .single();
+          
+        if (postError) throw postError;
+        
+        // คำนวณจำนวนความคิดเห็นใหม่
+        const newCommentCount = (postData.comment_count || 0) + 1;
+        
+        // อัปเดตจำนวนความคิดเห็น
+        const { error: updateError } = await supabase
+          .from('posts')
+          .update({ comment_count: newCommentCount })
+          .eq('id', postId);
+          
+        if (updateError) throw updateError;
         
         return data;
       } catch (error) {
@@ -500,4 +585,4 @@
     }
   </script>
 </body>
-</html>
+</html> 
