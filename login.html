@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เข้าสู่ระบบ - Pantip Clone</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase Config -->
+  <script src="js/supabase-config.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+  <div class="container mx-auto px-4 py-8 max-w-md">
+    <div class="text-center mb-8">
+      <a href="index.html" class="inline-block">
+        <h1 class="text-3xl font-bold text-blue-600">Pantip Clone</h1>
+      </a>
+      <p class="text-gray-600 mt-2">เข้าสู่ระบบเพื่อเริ่มต้นการใช้งาน</p>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <!-- Login Form -->
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label for="email" class="block text-gray-700 font-medium mb-2">อีเมล</label>
+          <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="your@email.com" required>
+        </div>
+        
+        <div>
+          <label for="password" class="block text-gray-700 font-medium mb-2">รหัสผ่าน</label>
+          <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="••••••••" required>
+        </div>
+        
+        <div id="error-message" class="hidden p-3 bg-red-100 text-red-700 rounded-lg"></div>
+        
+        <button type="submit" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+          เข้าสู่ระบบ
+        </button>
+        
+        <div class="text-center">
+          <p class="text-gray-600">ยังไม่มีบัญชี? <a href="register.html" class="text-blue-600 hover:text-blue-800">สมัครสมาชิกใหม่</a></p>
+        </div>
+      </form>
+      
+      <!-- Divider -->
+      <div class="my-6 flex items-center">
+        <div class="flex-1 border-t border-gray-300"></div>
+        <div class="mx-4 text-gray-500">หรือ</div>
+        <div class="flex-1 border-t border-gray-300"></div>
+      </div>
+      
+      <!-- Social Login -->
+      <button id="google-login-btn" class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg flex items-center justify-center transition duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24">
+          <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#EA4335 #4285F4 #FBBC05 #34A853"></path>
+        </svg>
+        เข้าสู่ระบบด้วย Google
+      </button>
+      
+      <div class="mt-6 text-center">
+        <a href="index.html" class="text-gray-600 hover:text-gray-800">กลับไปหน้าหลัก</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      // ตรวจสอบว่าล็อกอินแล้วหรือไม่
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        // ถ้าล็อกอินแล้ว ให้ไปหน้าหลัก
+        window.location.href = 'index.html';
+      }
+      
+      // ล็อกอินด้วยอีเมลและรหัสผ่าน
+      const loginForm = document.getElementById('login-form');
+      const errorMessage = document.getElementById('error-message');
+      const loginBtn = document.getElementById('login-btn');
+      
+      loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        // ปิดปุ่มล็อกอินระหว่างที่กำลังล็อกอิน
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'กำลังเข้าสู่ระบบ...';
+        errorMessage.classList.add('hidden');
+        
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+          
+          if (error) throw error;
+          
+          // ล็อกอินสำเร็จ ไปหน้าหลัก
+          window.location.href = 'index.html';
+        } catch (error) {
+          console.error('Login error:', error);
+          
+          // แสดงข้อความผิดพลาด
+          let message = '';
+          switch (error.message) {
+            case 'Invalid login credentials':
+              message = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+              break;
+            case 'Email not confirmed':
+              message = 'กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ';
+              break;
+            default:
+              message = 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ: ' + error.message;
+          }
+          
+          errorMessage.textContent = message;
+          errorMessage.classList.remove('hidden');
+          
+          // เปิดปุ่มล็อกอินอีกครั้ง
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'เข้าสู่ระบบ';
+        }
+      });
+      
+      // ล็อกอินด้วย Google
+      document.getElementById('google-login-btn').addEventListener('click', async function() {
+        try {
+          const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: window.location.origin + '/index.html'
+            }
+          });
+          
+          if (error) throw error;
+        } catch (error) {
+          console.error('Google login error:', error);
+          errorMessage.textContent = 'เกิดข้อผิดพลาดในการเข้าสู่ระบบด้วย Google: ' + error.message;
+          errorMessage.classList.remove('hidden');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
