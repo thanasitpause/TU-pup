@@ -1,2 +1,2 @@
-# TU-pansas-project
+# TU-pup-project
 web app ระบบกระทู้โพสถาม ตอบ ทุกเรื่องของสัตว์เลี้ยง
