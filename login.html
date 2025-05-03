@@ -127,22 +127,35 @@
       });
       
       // ล็อกอินด้วย Google
+      // โค้ดสำหรับปุ่ม Google Login
       document.getElementById('google-login-btn').addEventListener('click', async function() {
-        try {
-          const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-              redirectTo: window.location.origin + '/index.html'
-            }
-          });
-          
-          if (error) throw error;
-        } catch (error) {
-          console.error('Google login error:', error);
-          errorMessage.textContent = 'เกิดข้อผิดพลาดในการเข้าสู่ระบบด้วย Google: ' + error.message;
-          errorMessage.classList.remove('hidden');
+      try {
+      // แสดงข้อความกำลังดำเนินการ
+      const errorMessage = document.getElementById('error-message');
+      errorMessage.classList.add('hidden');
+    
+      // เรียกใช้ signInWithOAuth โดยระบุ provider เป็น 'google'
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/auth-callback.html',
+          // ระบุ scopes เพิ่มเติมถ้าต้องการข้อมูลเพิ่มเติมจาก Google
+          scopes: 'email profile',
         }
       });
+    
+    if (error) throw error;
+    
+    // ถ้าไม่มี error การทำงานจะถูกเปลี่ยนเส้นทางโดยอัตโนมัติไปยัง redirectTo URL
+    
+  } catch (error) {
+    console.error('Google signup error:', error);
+    // แสดงข้อความผิดพลาด
+    const errorMessage = document.getElementById('error-message');
+    errorMessage.textContent = 'เกิดข้อผิดพลาดในการสมัครด้วย Google: ' + error.message;
+    errorMessage.classList.remove('hidden');
+  }
+});
     });
   </script>
 </body>
