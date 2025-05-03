@@ -46,11 +46,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         // รอสักครู่แล้วเปลี่ยนเส้นทางไปหน้าหลัก
         setTimeout(() => {
-          window.location.href = '/index.html';
+          window.location.href = window.location.origin + '/index.html';
         }, 1500);
       } else {
         // ถ้าไม่มี session ให้กลับไปหน้าล็อกอิน
-        window.location.href = '/login.html';
+        window.location.href = window.location.origin + '/login.html';
       }
     } catch (error) {
       console.error('Error handling auth callback:', error);
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       
       // รอสักครู่แล้วกลับไปหน้าล็อกอิน
       setTimeout(() => {
-        window.location.href = '/login.html';
+        window.location.href = window.location.origin + '/login.html';
       }, 3000);
     }
   });

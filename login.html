@@ -134,11 +134,13 @@
       const errorMessage = document.getElementById('error-message');
       errorMessage.classList.add('hidden');
     
+      const redirectUrl = window.location.origin + '/auth-callback.html';
+
       // เรียกใช้ signInWithOAuth โดยระบุ provider เป็น 'google'
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + '/auth-callback.html',
+          redirectTo: redirectUrl,
           // ระบุ scopes เพิ่มเติมถ้าต้องการข้อมูลเพิ่มเติมจาก Google
           scopes: 'email profile',
         }
