@@ -1,359 +1,258 @@
 <!DOCTYPE html>
 <html lang="th">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>สร้างกระทู้ใหม่ - TU-pup</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Supabase Config -->
-    <script src="js/supabase-config.js"></script>
-  </head>
-  <body class="bg-gray-50 min-h-screen">
-    <!-- Navbar -->
-    <nav class="bg-white shadow-md sticky top-0 z-10">
-      <div class="container mx-auto px-4 py-3">
-        <div class="flex justify-between items-center">
-          <!-- Logo -->
-          <a href="index.html" class="font-bold text-2xl text-blue-600"
-            >TU-PUP</a
-          >
-
-          <!-- User Menu -->
-          <div class="flex items-center space-x-4">
-            <div id="user-menu" class="flex items-center space-x-2">
-              <img
-                id="user-avatar"
-                src="img/default-avatar.png"
-                alt="User"
-                class="w-8 h-8 rounded-full"
-              />
-              <span
-                id="user-name"
-                class="hidden md:inline text-sm font-medium"
-              ></span>
-              <button
-                id="logout-btn"
-                class="text-sm text-gray-600 hover:text-gray-800"
-              >
-                ออกจากระบบ
-              </button>
-            </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สร้างกระทู้ใหม่ - TU-pup</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase Config -->
+  <script src="js/supabase-config.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md sticky top-0 z-10">
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex justify-between items-center">
+        <!-- Logo -->
+        <a href="index.html" class="font-bold text-2xl text-blue-600">TU-PUP</a>
+        
+        <!-- User Menu -->
+        <div class="flex items-center space-x-4">
+          <div id="user-menu" class="flex items-center space-x-2">
+            <img id="user-avatar" src="img/default-avatar.png" alt="User" class="w-8 h-8 rounded-full">
+            <span id="user-name" class="hidden md:inline text-sm font-medium"></span>
+            <button id="logout-btn" class="text-sm text-gray-600 hover:text-gray-800">ออกจากระบบ</button>
           </div>
         </div>
       </div>
-    </nav>
+    </div>
+  </nav>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
-      <!-- Back Button -->
-      <div class="mb-4">
-        <a
-          href="index.html"
-          class="flex items-center text-blue-600 hover:text-blue-800 transition duration-300"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 mr-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          กลับไปหน้าหลัก
-        </a>
-      </div>
-
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-6">สร้างกระทู้ใหม่</h1>
-
-        <form id="new-post-form" class="space-y-6">
-          <div>
-            <label for="post-title" class="block text-gray-700 font-medium mb-2"
-              >หัวข้อกระทู้</label
-            >
-            <input
-              type="text"
-              id="post-title"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300"
-              placeholder="ใส่หัวข้อกระทู้ของคุณที่นี่"
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              for="post-content"
-              class="block text-gray-700 font-medium mb-2"
-              >เนื้อหากระทู้</label
-            >
-            <textarea
-              id="post-content"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300"
-              rows="10"
-              placeholder="เล่าเรื่องของคุณที่นี่..."
-              required
-            ></textarea>
-          </div>
-
-          <!-- Image Upload -->
-          <div>
-            <label class="block text-gray-700 font-medium mb-2"
-              >รูปภาพประกอบ (ไม่บังคับ)</label
-            >
-            <div id="image-upload-container">
-              <div class="flex flex-wrap items-center mb-3">
-                <label
-                  class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5 inline-block mr-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  เลือกรูปภาพ
-                  <input
-                    type="file"
-                    id="image-upload"
-                    accept="image/*"
-                    class="hidden"
-                    multiple
-                  />
-                </label>
-                <span class="ml-3 text-gray-600 text-sm"
-                  >สามารถเลือกได้หลายรูป</span
-                >
-              </div>
-            </div>
-
-            <!-- Image Previews -->
-            <div
-              id="image-previews"
-              class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3"
-            ></div>
-          </div>
-
-          <div
-            id="error-message"
-            class="hidden p-3 bg-red-100 text-red-700 rounded-lg"
-          ></div>
-          <div
-            id="success-message"
-            class="hidden p-3 bg-green-100 text-green-700 rounded-lg"
-          ></div>
-
-          <div class="flex justify-end space-x-3">
-            <button
-              type="button"
-              id="cancel-btn"
-              class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-6 rounded-lg transition duration-300"
-            >
-              ยกเลิก
-            </button>
-            <button
-              type="submit"
-              id="submit-post-btn"
-              class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-300"
-            >
-              โพสต์กระทู้
-            </button>
-          </div>
-        </form>
-      </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-white border-t mt-12 py-6">
-      <div class="container mx-auto px-4">
-        <div class="text-center text-gray-600 text-sm">
-          <p>&copy; 2025 TU-pansas. สงวนลิขสิทธิ์.</p>
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8">
+    <!-- Back Button -->
+    <div class="mb-4">
+      <a href="index.html" class="flex items-center text-blue-600 hover:text-blue-800 transition duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        กลับไปหน้าหลัก
+      </a>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h1 class="text-2xl font-bold text-gray-800 mb-6">สร้างกระทู้ใหม่</h1>
+      
+      <form id="new-post-form" class="space-y-6">
+        <div>
+          <label for="post-title" class="block text-gray-700 font-medium mb-2">หัวข้อกระทู้</label>
+          <input type="text" id="post-title" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300" placeholder="ใส่หัวข้อกระทู้ของคุณที่นี่" required>
         </div>
+        
+        <div>
+          <label for="post-content" class="block text-gray-700 font-medium mb-2">เนื้อหากระทู้</label>
+          <textarea id="post-content" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300" rows="10" placeholder="เล่าเรื่องของคุณที่นี่..." required></textarea>
+        </div>
+        
+        <!-- Image Upload -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">รูปภาพประกอบ (ไม่บังคับ)</label>
+          <div id="image-upload-container">
+            <div class="flex flex-wrap items-center mb-3">
+              <label class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                เลือกรูปภาพ
+                <input type="file" id="image-upload" accept="image/*" class="hidden" multiple>
+              </label>
+              <span class="ml-3 text-gray-600 text-sm">สามารถเลือกได้หลายรูป</span>
+            </div>
+          </div>
+          
+          <!-- Image Previews -->
+          <div id="image-previews" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3"></div>
+        </div>
+        
+        <div id="error-message" class="hidden p-3 bg-red-100 text-red-700 rounded-lg"></div>
+        <div id="success-message" class="hidden p-3 bg-green-100 text-green-700 rounded-lg"></div>
+        
+        <div class="flex justify-end space-x-3">
+          <button type="button" id="cancel-btn" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-6 rounded-lg transition duration-300">
+            ยกเลิก
+          </button>
+          <button type="submit" id="submit-post-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+            โพสต์กระทู้
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t mt-12 py-6">
+    <div class="container mx-auto px-4">
+      <div class="text-center text-gray-600 text-sm">
+        <p>&copy; 2025 TU-pansas. สงวนลิขสิทธิ์.</p>
       </div>
-    </footer>
+    </div>
+  </footer>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", async function () {
-        // ตรวจสอบสถานะการล็อกอิน
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
-          // ถ้าไม่ได้ล็อกอิน ให้ไปหน้าล็อกอิน
-          window.location.href = "login.html";
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      // ตรวจสอบสถานะการล็อกอิน
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        // ถ้าไม่ได้ล็อกอิน ให้ไปหน้าล็อกอิน
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // แสดงข้อมูลผู้ใช้
+      const displayName = user.user_metadata?.display_name || user.email;
+      document.getElementById('user-name').textContent = displayName;
+      
+      // ตรวจสอบรูปโปรไฟล์
+      if (user.user_metadata?.avatar_url) {
+        document.getElementById('user-avatar').src = user.user_metadata.avatar_url;
+      }
+      
+      // Event listener สำหรับปุ่มล็อกเอาต์
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        const { error } = await supabase.auth.signOut();
+        if (!error) {
+          window.location.href = 'login.html';
+        }
+      });
+      
+      // จัดการรูปภาพที่อัปโหลด
+      const imageUpload = document.getElementById('image-upload');
+      const imagePreviews = document.getElementById('image-previews');
+      const selectedFiles = [];
+      
+      imageUpload.addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+        
+        files.forEach(file => {
+          // เพิ่มไฟล์ในรายการที่เลือก
+          selectedFiles.push(file);
+          
+          // สร้างตัวอย่างรูปภาพ
+          const previewContainer = document.createElement('div');
+          previewContainer.className = 'relative';
+          
+          const preview = document.createElement('img');
+          preview.className = 'w-full h-32 object-cover rounded-lg';
+          
+          const removeButton = document.createElement('button');
+          removeButton.className = 'absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center';
+          removeButton.innerHTML = '&times;';
+          removeButton.type = 'button';
+          
+          // อ่านไฟล์และแสดงตัวอย่าง
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            preview.src = e.target.result;
+          }
+          reader.readAsDataURL(file);
+          
+          // เพิ่ม event listener สำหรับปุ่มลบ
+          removeButton.addEventListener('click', function() {
+            const index = selectedFiles.indexOf(file);
+            if (index !== -1) {
+              selectedFiles.splice(index, 1);
+            }
+            previewContainer.remove();
+          });
+          
+          previewContainer.appendChild(preview);
+          previewContainer.appendChild(removeButton);
+          imagePreviews.appendChild(previewContainer);
+        });
+        
+        // รีเซ็ต input เพื่อให้สามารถเลือกไฟล์เดิมซ้ำได้
+        imageUpload.value = '';
+      });
+      
+      // Event listener สำหรับปุ่มยกเลิก
+      document.getElementById('cancel-btn').addEventListener('click', function() {
+        window.location.href = 'index.html';
+      });
+      
+      // Event listener สำหรับการส่งฟอร์ม
+      document.getElementById('new-post-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const title = document.getElementById('post-title').value.trim();
+        const content = document.getElementById('post-content').value.trim();
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+        const submitButton = document.getElementById('submit-post-btn');
+        
+        // ซ่อนข้อความแจ้งเตือนเก่า
+        errorMessage.classList.add('hidden');
+        successMessage.classList.add('hidden');
+        
+        if (!title || !content) {
+          errorMessage.textContent = 'โปรดกรอกหัวข้อและเนื้อหากระทู้';
+          errorMessage.classList.remove('hidden');
           return;
         }
-
-        // แสดงข้อมูลผู้ใช้
-        const displayName = user.user_metadata?.display_name || user.email;
-        document.getElementById("user-name").textContent = displayName;
-
-        // ตรวจสอบรูปโปรไฟล์
-        if (user.user_metadata?.avatar_url) {
-          document.getElementById("user-avatar").src =
-            user.user_metadata.avatar_url;
+        
+        // ปิดปุ่มส่งระหว่างที่กำลังสร้างกระทู้
+        submitButton.disabled = true;
+        submitButton.textContent = 'กำลังโพสต์...';
+        
+        try {
+          const imageURLs = [];
+          
+          // อัปโหลดรูปภาพทั้งหมด
+          for (let i = 0; i < selectedFiles.length; i++) {
+            const file = selectedFiles[i];
+            const imageUrl = await uploadImage(file, 'posts');
+            imageURLs.push(imageUrl);
+          }
+          
+          // สร้างกระทู้ใหม่
+          const { data, error } = await supabase
+            .from('posts')
+            .insert({
+              title,
+              content,
+              author_id: user.id,
+              author_name: displayName,
+              image_urls: imageURLs,
+              view_count: 0,
+              comment_count: 0
+            })
+            .select();
+          
+          if (error) throw error;
+          
+          // แสดงข้อความสำเร็จ
+          successMessage.textContent = 'สร้างกระทู้สำเร็จ! กำลังนำคุณไปยังหน้ากระทู้...';
+          successMessage.classList.remove('hidden');
+          
+          // ไปยังหน้ากระทู้ที่สร้าง
+          setTimeout(() => {
+            window.location.href = `post.html?id=${data[0].id}`;
+          }, 1500);
+        } catch (error) {
+          console.error('Error creating post:', error);
+          
+          errorMessage.textContent = 'เกิดข้อผิดพลาดในการสร้างกระทู้ โปรดลองอีกครั้ง';
+          errorMessage.classList.remove('hidden');
+          
+          // เปิดปุ่มส่งอีกครั้ง
+          submitButton.disabled = false;
+          submitButton.textContent = 'โพสต์กระทู้';
         }
-
-        // Event listener สำหรับปุ่มล็อกเอาต์
-        document
-          .getElementById("logout-btn")
-          .addEventListener("click", async () => {
-            const { error } = await supabase.auth.signOut();
-            if (!error) {
-              window.location.href = "login.html";
-            }
-          });
-
-        // จัดการรูปภาพที่อัปโหลด
-        const imageUpload = document.getElementById("image-upload");
-        const imagePreviews = document.getElementById("image-previews");
-        const selectedFiles = [];
-
-        imageUpload.addEventListener("change", function (e) {
-          const files = Array.from(e.target.files);
-
-          files.forEach((file) => {
-            // เพิ่มไฟล์ในรายการที่เลือก
-            selectedFiles.push(file);
-
-            // สร้างตัวอย่างรูปภาพ
-            const previewContainer = document.createElement("div");
-            previewContainer.className = "relative";
-
-            const preview = document.createElement("img");
-            preview.className = "w-full h-32 object-cover rounded-lg";
-
-            const removeButton = document.createElement("button");
-            removeButton.className =
-              "absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center";
-            removeButton.innerHTML = "&times;";
-            removeButton.type = "button";
-
-            // อ่านไฟล์และแสดงตัวอย่าง
-            const reader = new FileReader();
-            reader.onload = function (e) {
-              preview.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-
-            // เพิ่ม event listener สำหรับปุ่มลบ
-            removeButton.addEventListener("click", function () {
-              const index = selectedFiles.indexOf(file);
-              if (index !== -1) {
-                selectedFiles.splice(index, 1);
-              }
-              previewContainer.remove();
-            });
-
-            previewContainer.appendChild(preview);
-            previewContainer.appendChild(removeButton);
-            imagePreviews.appendChild(previewContainer);
-          });
-
-          // รีเซ็ต input เพื่อให้สามารถเลือกไฟล์เดิมซ้ำได้
-          imageUpload.value = "";
-        });
-
-        // Event listener สำหรับปุ่มยกเลิก
-        document
-          .getElementById("cancel-btn")
-          .addEventListener("click", function () {
-            window.location.href = "index.html";
-          });
-
-        // Event listener สำหรับการส่งฟอร์ม
-        document
-          .getElementById("new-post-form")
-          .addEventListener("submit", async function (e) {
-            e.preventDefault();
-
-            const title = document.getElementById("post-title").value.trim();
-            const content = document
-              .getElementById("post-content")
-              .value.trim();
-            const errorMessage = document.getElementById("error-message");
-            const successMessage = document.getElementById("success-message");
-            const submitButton = document.getElementById("submit-post-btn");
-
-            // ซ่อนข้อความแจ้งเตือนเก่า
-            errorMessage.classList.add("hidden");
-            successMessage.classList.add("hidden");
-
-            if (!title || !content) {
-              errorMessage.textContent = "โปรดกรอกหัวข้อและเนื้อหากระทู้";
-              errorMessage.classList.remove("hidden");
-              return;
-            }
-
-            // ปิดปุ่มส่งระหว่างที่กำลังสร้างกระทู้
-            submitButton.disabled = true;
-            submitButton.textContent = "กำลังโพสต์...";
-
-            try {
-              const imageURLs = [];
-
-              // อัปโหลดรูปภาพทั้งหมด
-              for (let i = 0; i < selectedFiles.length; i++) {
-                const file = selectedFiles[i];
-                const imageUrl = await uploadImage(file, "posts");
-                imageURLs.push(imageUrl);
-              }
-
-              // สร้างกระทู้ใหม่
-              const { data, error } = await supabase
-                .from("posts")
-                .insert({
-                  title,
-                  content,
-                  author_id: user.id,
-                  author_name: displayName,
-                  image_urls: imageURLs,
-                  view_count: 0,
-                  comment_count: 0,
-                })
-                .select();
-
-              if (error) throw error;
-
-              // แสดงข้อความสำเร็จ
-              successMessage.textContent =
-                "สร้างกระทู้สำเร็จ! กำลังนำคุณไปยังหน้ากระทู้...";
-              successMessage.classList.remove("hidden");
-
-              // ไปยังหน้ากระทู้ที่สร้าง
-              setTimeout(() => {
-                window.location.href = `post.html?id=${data[0].id}`;
-              }, 1500);
-            } catch (error) {
-              console.error("Error creating post:", error);
-
-              errorMessage.textContent =
-                "เกิดข้อผิดพลาดในการสร้างกระทู้ โปรดลองอีกครั้ง";
-              errorMessage.classList.remove("hidden");
-
-              // เปิดปุ่มส่งอีกครั้ง
-              submitButton.disabled = false;
-              submitButton.textContent = "โพสต์กระทู้";
-            }
-          });
       });
-    </script>
-  </body>
+    });
+  </script>
+</body>
 </html>
