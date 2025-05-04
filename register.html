@@ -1,304 +1,392 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>สมัครสมาชิก - TU-PUP</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Supabase Config -->
-  <script src="js/supabase-config.js"></script>
-</head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center">
-  <div class="container mx-auto px-4 py-8 max-w-md">
-    <div class="text-center mb-8">
-      <a href="index.html" class="inline-block">
-        <h1 class="text-3xl font-bold text-blue-600">TU-PUP</h1>
-      </a>
-      <p class="text-gray-600 mt-2">สร้างบัญชีใหม่เพื่อเริ่มต้นการใช้งาน</p>
-    </div>
-    
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <!-- Register Form -->
-      <form id="register-form" class="space-y-4">
-        <div>
-          <label for="display-name" class="block text-gray-700 font-medium mb-2">ชื่อที่แสดง</label>
-          <input type="text" id="display-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="ชื่อที่แสดงในกระทู้และความคิดเห็น" required>
-          <p id="display-name-error" class="text-red-500 text-sm mt-1 hidden">ชื่อต้องมีความยาวอย่างน้อย 3 ตัวอักษร</p>
-        </div>
-        
-        <div>
-          <label for="email" class="block text-gray-700 font-medium mb-2">อีเมล</label>
-          <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="your@email.com" required>
-          <p id="email-error" class="text-red-500 text-sm mt-1 hidden">กรุณาใส่อีเมลที่ถูกต้อง (ต้องมี @ และ .com เท่านั้น)</p>
-          <p id="email-exists-error" class="text-red-500 text-sm mt-1 hidden">อีเมลนี้ถูกใช้งานในระบบแล้ว กรุณาใช้อีเมลอื่น</p>
-        </div>
-        
-        <div>
-          <label for="password" class="block text-gray-700 font-medium mb-2">รหัสผ่าน</label>
-          <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="••••••••" required minlength="6">
-          <p class="text-gray-500 text-sm mt-1">รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร</p>
-          <p id="password-error" class="text-red-500 text-sm mt-1 hidden">รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร</p>
-        </div>
-        
-        <div>
-          <label for="confirm-password" class="block text-gray-700 font-medium mb-2">ยืนยันรหัสผ่าน</label>
-          <input type="password" id="confirm-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="••••••••" required minlength="6">
-          <p id="confirm-password-error" class="text-red-500 text-sm mt-1 hidden">รหัสผ่านไม่ตรงกัน</p>
-        </div>
-        
-        <div id="error-message" class="hidden p-3 bg-red-100 text-red-700 rounded-lg"></div>
-        <div id="success-message" class="hidden p-3 bg-green-100 text-green-700 rounded-lg"></div>
-        
-        <button type="submit" id="register-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
-          สมัครสมาชิก
-        </button>
-        
-        <div class="text-center">
-          <p class="text-gray-600">มีบัญชีอยู่แล้ว? <a href="login.html" class="text-blue-600 hover:text-blue-800">เข้าสู่ระบบ</a></p>
-        </div>
-      </form>
-      
-      <!-- Divider -->
-      <div class="my-6 flex items-center">
-        <div class="flex-1 border-t border-gray-300"></div>
-        <div class="mx-4 text-gray-500">หรือ</div>
-        <div class="flex-1 border-t border-gray-300"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>สมัครสมาชิก - TU-PUP</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase Config -->
+    <script src="js/supabase-config.js"></script>
+  </head>
+  <body class="bg-gray-50 min-h-screen flex items-center justify-center">
+    <div class="container mx-auto px-4 py-8 max-w-md">
+      <div class="text-center mb-8">
+        <a href="index.html" class="inline-block">
+          <h1 class="text-3xl font-bold text-blue-600">TU-PUP</h1>
+        </a>
+        <p class="text-gray-600 mt-2">สร้างบัญชีใหม่เพื่อเริ่มต้นการใช้งาน</p>
       </div>
-      
-      <!-- Social Login -->
-      <button id="google-login-btn" class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg flex items-center justify-center transition duration-300">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24">
-          <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#4285F4"></path>
-        </svg>
-        สมัครด้วย Google
-      </button>
-      
-      <div class="mt-6 text-center">
-        <a href="index.html" class="text-gray-600 hover:text-gray-800">กลับไปหน้าหลัก</a>
-      </div>
-    </div>
-  </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', async function() {
-      // ตรวจสอบว่าล็อกอินแล้วหรือไม่
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        // ถ้าล็อกอินแล้ว ให้ไปหน้าหลัก
-        window.location.href = 'index.html';
-      }
-      
-      // รับ elements ที่ต้องใช้
-      const displayNameInput = document.getElementById('display-name');
-      const emailInput = document.getElementById('email');
-      const passwordInput = document.getElementById('password');
-      const confirmPasswordInput = document.getElementById('confirm-password');
-      const registerBtn = document.getElementById('register-btn');
-      const displayNameError = document.getElementById('display-name-error');
-      const emailError = document.getElementById('email-error');
-      const emailExistsError = document.getElementById('email-exists-error');
-      const passwordError = document.getElementById('password-error');
-      const confirmPasswordError = document.getElementById('confirm-password-error');
-      const errorMessage = document.getElementById('error-message');
-      const successMessage = document.getElementById('success-message');
-      
-      // ฟังก์ชันตรวจสอบข้อมูลเมื่อส่งฟอร์ม
-      function validateForm() {
-        let isValid = true;
-        
-        // ตรวจสอบชื่อที่แสดง
-        if (displayNameInput.value.trim().length < 3) {
-          displayNameError.classList.remove('hidden');
-          isValid = false;
-        } else {
-          displayNameError.classList.add('hidden');
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- Register Form -->
+        <form id="register-form" class="space-y-4">
+          <div>
+            <label
+              for="display-name"
+              class="block text-gray-700 font-medium mb-2"
+              >ชื่อที่แสดง</label
+            >
+            <input
+              type="text"
+              id="display-name"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="ชื่อที่แสดงในกระทู้และความคิดเห็น"
+              required
+            />
+            <p id="display-name-error" class="text-red-500 text-sm mt-1 hidden">
+              ชื่อต้องมีความยาวอย่างน้อย 3 ตัวอักษร
+            </p>
+          </div>
+
+          <div>
+            <label for="email" class="block text-gray-700 font-medium mb-2"
+              >อีเมล</label
+            >
+            <input
+              type="email"
+              id="email"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="your@email.com"
+              required
+            />
+            <p id="email-error" class="text-red-500 text-sm mt-1 hidden">
+              กรุณาใส่อีเมลที่ถูกต้อง (ต้องมี @ และ .com เท่านั้น)
+            </p>
+            <p id="email-exists-error" class="text-red-500 text-sm mt-1 hidden">
+              อีเมลนี้ถูกใช้งานในระบบแล้ว กรุณาใช้อีเมลอื่น
+            </p>
+          </div>
+
+          <div>
+            <label for="password" class="block text-gray-700 font-medium mb-2"
+              >รหัสผ่าน</label
+            >
+            <input
+              type="password"
+              id="password"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="••••••••"
+              required
+              minlength="6"
+            />
+            <p class="text-gray-500 text-sm mt-1">
+              รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร
+            </p>
+            <p id="password-error" class="text-red-500 text-sm mt-1 hidden">
+              รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="confirm-password"
+              class="block text-gray-700 font-medium mb-2"
+              >ยืนยันรหัสผ่าน</label
+            >
+            <input
+              type="password"
+              id="confirm-password"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="••••••••"
+              required
+              minlength="6"
+            />
+            <p
+              id="confirm-password-error"
+              class="text-red-500 text-sm mt-1 hidden"
+            >
+              รหัสผ่านไม่ตรงกัน
+            </p>
+          </div>
+
+          <div
+            id="error-message"
+            class="hidden p-3 bg-red-100 text-red-700 rounded-lg"
+          ></div>
+          <div
+            id="success-message"
+            class="hidden p-3 bg-green-100 text-green-700 rounded-lg"
+          ></div>
+
+          <button
+            type="submit"
+            id="register-btn"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300"
+          >
+            สมัครสมาชิก
+          </button>
+
+          <div class="text-center">
+            <p class="text-gray-600">
+              มีบัญชีอยู่แล้ว?
+              <a href="login.html" class="text-blue-600 hover:text-blue-800"
+                >เข้าสู่ระบบ</a
+              >
+            </p>
+          </div>
+        </form>
+
+        <!-- Divider -->
+        <div class="my-6 flex items-center">
+          <div class="flex-1 border-t border-gray-300"></div>
+          <div class="mx-4 text-gray-500">หรือ</div>
+          <div class="flex-1 border-t border-gray-300"></div>
+        </div>
+
+        <!-- Social Login -->
+        <button
+          id="google-login-btn"
+          class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg flex items-center justify-center transition duration-300"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
+              fill="#4285F4"
+            ></path>
+          </svg>
+          สมัครด้วย Google
+        </button>
+
+        <div class="mt-6 text-center">
+          <a href="index.html" class="text-gray-600 hover:text-gray-800"
+            >กลับไปหน้าหลัก</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async function () {
+        // ตรวจสอบว่าล็อกอินแล้วหรือไม่
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          // ถ้าล็อกอินแล้ว ให้ไปหน้าหลัก
+          window.location.href = "index.html";
         }
-        
-        // ตรวจสอบอีเมล
-        const emailPattern = /^[^\s@]+@[^\s@]+\.com$/;
-        if (!emailPattern.test(emailInput.value.trim())) {
-          emailError.classList.remove('hidden');
-          isValid = false;
-        } else {
-          emailError.classList.add('hidden');
-        }
-        
-        // ตรวจสอบรหัสผ่าน
-        if (passwordInput.value.length < 6) {
-          passwordError.classList.remove('hidden');
-          isValid = false;
-        } else {
-          passwordError.classList.add('hidden');
-        }
-        
-        // ตรวจสอบการยืนยันรหัสผ่าน
-        if (passwordInput.value !== confirmPasswordInput.value) {
-          confirmPasswordError.classList.remove('hidden');
-          isValid = false;
-        } else {
-          confirmPasswordError.classList.add('hidden');
-        }
-        
-        return isValid;
-      }
-      
-      // ฟังก์ชันตรวจสอบว่าอีเมลมีอยู่ในระบบแล้วหรือไม่
-      async function checkEmailExists(email) {
-        try {
-          // ใช้ supabase admin function หรือ RPC function ในการตรวจสอบ
-          // ทดลองเรียกใช้ signIn เพื่อตรวจสอบว่าอีเมลนี้มีในระบบหรือไม่
-          const { error } = await supabase.auth.signInWithOtp({
-            email: email,
-            options: {
-              // บังคับให้เป็นการตรวจสอบเท่านั้น ไม่ส่ง OTP จริง
-              shouldCreateUser: false
-            }
-          });
-          
-          // ถ้ามี error "User not found" แสดงว่าอีเมลยังไม่มีในระบบ
-          if (error && error.message.includes("User not found")) {
-            return false; // อีเมลไม่มีในระบบ สามารถใช้ได้
+
+        // รับ elements ที่ต้องใช้
+        const displayNameInput = document.getElementById("display-name");
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+        const confirmPasswordInput =
+          document.getElementById("confirm-password");
+        const registerBtn = document.getElementById("register-btn");
+        const displayNameError = document.getElementById("display-name-error");
+        const emailError = document.getElementById("email-error");
+        const emailExistsError = document.getElementById("email-exists-error");
+        const passwordError = document.getElementById("password-error");
+        const confirmPasswordError = document.getElementById(
+          "confirm-password-error"
+        );
+        const errorMessage = document.getElementById("error-message");
+        const successMessage = document.getElementById("success-message");
+
+        // ฟังก์ชันตรวจสอบข้อมูลเมื่อส่งฟอร์ม
+        function validateForm() {
+          let isValid = true;
+
+          // ตรวจสอบชื่อที่แสดง
+          if (displayNameInput.value.trim().length < 3) {
+            displayNameError.classList.remove("hidden");
+            isValid = false;
+          } else {
+            displayNameError.classList.add("hidden");
           }
-          
-          // กรณีอื่นๆ (เช่น ไม่มี error หรือ error อื่นที่ไม่ใช่ User not found)
-          // สมมติว่าอีเมลมีในระบบแล้ว
-          return true;
-        } catch (error) {
-          console.error("Error checking email:", error);
-          return false; // กรณีมี error ให้สมมติว่าอีเมลไม่มีในระบบ (อนุญาตให้ลงทะเบียน)
+
+          // ตรวจสอบอีเมล
+          const emailPattern = /^[^\s@]+@[^\s@]+\.com$/;
+          if (!emailPattern.test(emailInput.value.trim())) {
+            emailError.classList.remove("hidden");
+            isValid = false;
+          } else {
+            emailError.classList.add("hidden");
+          }
+
+          // ตรวจสอบรหัสผ่าน
+          if (passwordInput.value.length < 6) {
+            passwordError.classList.remove("hidden");
+            isValid = false;
+          } else {
+            passwordError.classList.add("hidden");
+          }
+
+          // ตรวจสอบการยืนยันรหัสผ่าน
+          if (passwordInput.value !== confirmPasswordInput.value) {
+            confirmPasswordError.classList.remove("hidden");
+            isValid = false;
+          } else {
+            confirmPasswordError.classList.add("hidden");
+          }
+
+          return isValid;
         }
-      }
-      
-      // ลงทะเบียนผู้ใช้ใหม่
-      const registerForm = document.getElementById('register-form');
-      
-      registerForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        // ซ่อนข้อความเตือนเก่าทั้งหมดก่อน
-        displayNameError.classList.add('hidden');
-        emailError.classList.add('hidden');
-        emailExistsError.classList.add('hidden');
-        passwordError.classList.add('hidden');
-        confirmPasswordError.classList.add('hidden');
-        errorMessage.classList.add('hidden');
-        successMessage.classList.add('hidden');
-        
-        // ตรวจสอบข้อมูลและแสดงข้อความเตือนถ้าไม่ถูกต้อง
-        if (!validateForm()) {
-          return;
+
+        // ฟังก์ชันตรวจสอบว่าอีเมลมีอยู่ในระบบแล้วหรือไม่
+        async function checkEmailExists(email) {
+          try {
+            // ใช้ supabase admin function หรือ RPC function ในการตรวจสอบ
+            // ทดลองเรียกใช้ signIn เพื่อตรวจสอบว่าอีเมลนี้มีในระบบหรือไม่
+            const { error } = await supabase.auth.signInWithOtp({
+              email: email,
+              options: {
+                // บังคับให้เป็นการตรวจสอบเท่านั้น ไม่ส่ง OTP จริง
+                shouldCreateUser: false,
+              },
+            });
+
+            // ถ้ามี error "User not found" แสดงว่าอีเมลยังไม่มีในระบบ
+            if (error && error.message.includes("User not found")) {
+              return false; // อีเมลไม่มีในระบบ สามารถใช้ได้
+            }
+
+            // กรณีอื่นๆ (เช่น ไม่มี error หรือ error อื่นที่ไม่ใช่ User not found)
+            // สมมติว่าอีเมลมีในระบบแล้ว
+            return true;
+          } catch (error) {
+            console.error("Error checking email:", error);
+            return false; // กรณีมี error ให้สมมติว่าอีเมลไม่มีในระบบ (อนุญาตให้ลงทะเบียน)
+          }
         }
-        
-        const displayName = displayNameInput.value.trim();
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
-        
-        // ปิดปุ่มลงทะเบียนระหว่างที่กำลังตรวจสอบและลงทะเบียน
-        registerBtn.disabled = true;
-        registerBtn.textContent = 'กำลังตรวจสอบ...';
-        
-        try {
-          // ตรวจสอบว่าอีเมลมีอยู่ในระบบแล้วหรือไม่
-          const emailExists = await checkEmailExists(email);
-          
-          if (emailExists) {
-            // ถ้าอีเมลมีอยู่แล้ว ให้แสดงข้อความเตือน
-            emailExistsError.classList.remove('hidden');
-            registerBtn.disabled = false;
-            registerBtn.textContent = 'สมัครสมาชิก';
+
+        // ลงทะเบียนผู้ใช้ใหม่
+        const registerForm = document.getElementById("register-form");
+
+        registerForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // ซ่อนข้อความเตือนเก่าทั้งหมดก่อน
+          displayNameError.classList.add("hidden");
+          emailError.classList.add("hidden");
+          emailExistsError.classList.add("hidden");
+          passwordError.classList.add("hidden");
+          confirmPasswordError.classList.add("hidden");
+          errorMessage.classList.add("hidden");
+          successMessage.classList.add("hidden");
+
+          // ตรวจสอบข้อมูลและแสดงข้อความเตือนถ้าไม่ถูกต้อง
+          if (!validateForm()) {
             return;
           }
-          
-          // อัปเดตข้อความปุ่ม
-          registerBtn.textContent = 'กำลังสมัครสมาชิก...';
-          
-          // ลงทะเบียนผู้ใช้ใหม่
-          const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              data: {
-                display_name: displayName
-              }
+
+          const displayName = displayNameInput.value.trim();
+          const email = emailInput.value.trim();
+          const password = passwordInput.value;
+
+          // ปิดปุ่มลงทะเบียนระหว่างที่กำลังตรวจสอบและลงทะเบียน
+          registerBtn.disabled = true;
+          registerBtn.textContent = "กำลังตรวจสอบ...";
+
+          try {
+            // ตรวจสอบว่าอีเมลมีอยู่ในระบบแล้วหรือไม่
+            const emailExists = await checkEmailExists(email);
+
+            if (emailExists) {
+              // ถ้าอีเมลมีอยู่แล้ว ให้แสดงข้อความเตือน
+              emailExistsError.classList.remove("hidden");
+              registerBtn.disabled = false;
+              registerBtn.textContent = "สมัครสมาชิก";
+              return;
+            }
+
+            // อัปเดตข้อความปุ่ม
+            registerBtn.textContent = "กำลังสมัครสมาชิก...";
+
+            // ลงทะเบียนผู้ใช้ใหม่
+            const { data, error } = await supabase.auth.signUp({
+              email,
+              password,
+              options: {
+                data: {
+                  display_name: displayName,
+                },
+              },
+            });
+
+            if (error) throw error;
+
+            // ตรวจสอบว่าต้องยืนยันอีเมลหรือไม่
+            if (data?.user && !data?.session) {
+              // ต้องยืนยันอีเมล
+              successMessage.textContent =
+                "ลงทะเบียนสำเร็จ! กรุณาตรวจสอบอีเมลของคุณเพื่อยืนยันบัญชี";
+              successMessage.classList.remove("hidden");
+
+              // เคลียร์ฟอร์ม
+              registerForm.reset();
+            } else if (data?.user && data?.session) {
+              // ลงทะเบียนสำเร็จและล็อกอินอัตโนมัติ
+              window.location.href = "index.html";
+            } else {
+              throw new Error("เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ");
+            }
+          } catch (error) {
+            console.error("Registration error:", error);
+
+            // แสดงข้อความผิดพลาด
+            let message = "";
+            switch (error.message) {
+              case "User already registered":
+                message = "อีเมลนี้ถูกใช้งานแล้ว";
+                emailExistsError.classList.remove("hidden");
+                break;
+              case "Password should be at least 6 characters":
+                message = "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร";
+                break;
+              default:
+                message = "เกิดข้อผิดพลาดในการลงทะเบียน: " + error.message;
+            }
+
+            errorMessage.textContent = message;
+            errorMessage.classList.remove("hidden");
+          } finally {
+            // เปิดปุ่มลงทะเบียนอีกครั้ง
+            registerBtn.disabled = false;
+            registerBtn.textContent = "สมัครสมาชิก";
+          }
+        });
+
+        // ลงทะเบียนด้วย Google
+        document
+          .getElementById("google-login-btn")
+          .addEventListener("click", async function () {
+            try {
+              // แสดงข้อความกำลังดำเนินการ
+              const errorMessage = document.getElementById("error-message");
+              errorMessage.classList.add("hidden");
+
+              // เรียกใช้ signInWithOAuth โดยระบุ provider เป็น 'google'
+              const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: "google",
+                options: {
+                  redirectTo: window.location.origin + "/auth-callback.html",
+                  // ระบุ scopes เพิ่มเติมถ้าต้องการข้อมูลเพิ่มเติมจาก Google
+                  scopes: "email profile",
+                },
+              });
+
+              if (error) throw error;
+
+              // ถ้าไม่มี error การทำงานจะถูกเปลี่ยนเส้นทางโดยอัตโนมัติไปยัง redirectTo URL
+            } catch (error) {
+              console.error("Google signup error:", error);
+              // แสดงข้อความผิดพลาด
+              const errorMessage = document.getElementById("error-message");
+              errorMessage.textContent =
+                "เกิดข้อผิดพลาดในการสมัครด้วย Google: " + error.message;
+              errorMessage.classList.remove("hidden");
             }
           });
-          
-          if (error) throw error;
-          
-          // ตรวจสอบว่าต้องยืนยันอีเมลหรือไม่
-          if (data?.user && !data?.session) {
-            // ต้องยืนยันอีเมล
-            successMessage.textContent = 'ลงทะเบียนสำเร็จ! กรุณาตรวจสอบอีเมลของคุณเพื่อยืนยันบัญชี';
-            successMessage.classList.remove('hidden');
-            
-            // เคลียร์ฟอร์ม
-            registerForm.reset();
-          } else if (data?.user && data?.session) {
-            // ลงทะเบียนสำเร็จและล็อกอินอัตโนมัติ
-            window.location.href = 'index.html';
-          } else {
-            throw new Error('เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ');
-          }
-        } catch (error) {
-          console.error('Registration error:', error);
-          
-          // แสดงข้อความผิดพลาด
-          let message = '';
-          switch (error.message) {
-            case 'User already registered':
-              message = 'อีเมลนี้ถูกใช้งานแล้ว';
-              emailExistsError.classList.remove('hidden');
-              break;
-            case 'Password should be at least 6 characters':
-              message = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
-              break;
-            default:
-              message = 'เกิดข้อผิดพลาดในการลงทะเบียน: ' + error.message;
-          }
-          
-          errorMessage.textContent = message;
-          errorMessage.classList.remove('hidden');
-        } finally {
-          // เปิดปุ่มลงทะเบียนอีกครั้ง
-          registerBtn.disabled = false;
-          registerBtn.textContent = 'สมัครสมาชิก';
-        }
       });
-      
-      // ลงทะเบียนด้วย Google
-      document.getElementById('google-login-btn').addEventListener('click', async function() {
-        try {
-          // แสดงข้อความกำลังดำเนินการ
-          const errorMessage = document.getElementById('error-message');
-          errorMessage.classList.add('hidden');
-    
-          // เรียกใช้ signInWithOAuth โดยระบุ provider เป็น 'google'
-          const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-              redirectTo: window.location.origin + '/auth-callback.html',
-              // ระบุ scopes เพิ่มเติมถ้าต้องการข้อมูลเพิ่มเติมจาก Google
-              scopes: 'email profile',
-            }
-          });
-    
-          if (error) throw error;
-    
-          // ถ้าไม่มี error การทำงานจะถูกเปลี่ยนเส้นทางโดยอัตโนมัติไปยัง redirectTo URL
-    
-        } catch (error) {
-          console.error('Google signup error:', error);
-          // แสดงข้อความผิดพลาด
-          const errorMessage = document.getElementById('error-message');
-          errorMessage.textContent = 'เกิดข้อผิดพลาดในการสมัครด้วย Google: ' + error.message;
-          errorMessage.classList.remove('hidden');
-        }
-      });
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>

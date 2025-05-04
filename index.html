@@ -1,413 +1,532 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TU-PUP - หน้าหลัก</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Supabase Config -->
-  <script src="js/supabase-config.js"></script>
-</head>
-<body class="bg-gray-50 min-h-screen">
-  <!-- Navbar -->
-  <nav class="bg-white shadow-md sticky top-0 z-10">
-    <div class="container mx-auto px-4 py-3">
-      <div class="flex justify-between items-center">
-        <!-- Logo -->
-        <a href="index.html" class="font-bold text-2xl text-blue-600">TU-PUP
-        </a>
-        
-        <!-- Search Bar -->
-        <div class="hidden md:block flex-1 mx-8">
-          <div class="relative">
-            <input type="text" id="search-input" 
-              class="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400" 
-              placeholder="ค้นหากระทู้...">
-            <button id="search-btn" class="absolute right-3 top-2 text-gray-500">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TU-PUP - หน้าหลัก</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase Config -->
+    <script src="js/supabase-config.js"></script>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md sticky top-0 z-10">
+      <div class="container mx-auto px-4 py-3">
+        <div class="flex justify-between items-center">
+          <!-- Logo -->
+          <a href="index.html" class="font-bold text-2xl text-blue-600"
+            >TU-PUP
+          </a>
+
+          <!-- Search Bar -->
+          <div class="hidden md:block flex-1 mx-8">
+            <div class="relative">
+              <input
+                type="text"
+                id="search-input"
+                class="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="ค้นหากระทู้..."
+              />
+              <button
+                id="search-btn"
+                class="absolute right-3 top-2 text-gray-500"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- User Menu -->
+          <div class="flex items-center space-x-4">
+            <button
+              id="new-post-btn"
+              class="hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition duration-300"
+            >
+              สร้างกระทู้ใหม่
             </button>
+
+            <div id="user-menu" class="hidden flex items-center space-x-2">
+              <img
+                id="user-avatar"
+                src="img/default-avatar.png"
+                alt="User"
+                class="w-8 h-8 rounded-full"
+              />
+              <span
+                id="user-name"
+                class="hidden md:inline text-sm font-medium"
+              ></span>
+              <button
+                id="logout-btn"
+                class="text-sm text-gray-600 hover:text-gray-800"
+              >
+                ออกจากระบบ
+              </button>
+            </div>
+
+            <div id="login-menu">
+              <a
+                href="login.html"
+                class="text-blue-600 hover:text-blue-800 font-medium"
+                >เข้าสู่ระบบ</a
+              >
+              <span class="text-gray-400 mx-2">|</span>
+              <a
+                href="register.html"
+                class="text-blue-600 hover:text-blue-800 font-medium"
+                >สมัครสมาชิก</a
+              >
+            </div>
           </div>
         </div>
-        
-        <!-- User Menu -->
-        <div class="flex items-center space-x-4">
-          <button id="new-post-btn" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition duration-300">
-            สร้างกระทู้ใหม่
-          </button>
-          
-          <div id="user-menu" class="hidden flex items-center space-x-2">
-            <img id="user-avatar" src="img/default-avatar.png" alt="User" class="w-8 h-8 rounded-full">
-            <span id="user-name" class="hidden md:inline text-sm font-medium"></span>
-            <button id="logout-btn" class="text-sm text-gray-600 hover:text-gray-800">ออกจากระบบ</button>
+      </div>
+    </nav>
+
+    <!-- Search for Mobile -->
+    <div class="md:hidden container mx-auto px-4 py-3">
+      <div class="relative">
+        <input
+          type="text"
+          id="mobile-search-input"
+          class="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          placeholder="ค้นหากระทู้..."
+        />
+        <button
+          id="mobile-search-btn"
+          class="absolute right-3 top-2 text-gray-500"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold text-gray-800">กระทู้ล่าสุด</h1>
+        <button
+          id="mobile-new-post-btn"
+          class="md:hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition duration-300"
+        >
+          สร้างกระทู้
+        </button>
+      </div>
+
+      <!-- Posts List -->
+      <div
+        id="posts-container"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        <!-- Posts will be dynamically inserted here -->
+        <div class="animate-pulse bg-white rounded-lg shadow-md p-4">
+          <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+          <div class="flex justify-between">
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
           </div>
-          
-          <div id="login-menu">
-            <a href="login.html" class="text-blue-600 hover:text-blue-800 font-medium">เข้าสู่ระบบ</a>
-            <span class="text-gray-400 mx-2">|</span>
-            <a href="register.html" class="text-blue-600 hover:text-blue-800 font-medium">สมัครสมาชิก</a>
+        </div>
+        <div class="animate-pulse bg-white rounded-lg shadow-md p-4">
+          <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+          <div class="flex justify-between">
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+          </div>
+        </div>
+        <div class="animate-pulse bg-white rounded-lg shadow-md p-4">
+          <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+          <div class="flex justify-between">
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
           </div>
         </div>
       </div>
-    </div>
-  </nav>
 
-  <!-- Search for Mobile -->
-  <div class="md:hidden container mx-auto px-4 py-3">
-    <div class="relative">
-      <input type="text" id="mobile-search-input" 
-        class="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400" 
-        placeholder="ค้นหากระทู้...">
-      <button id="mobile-search-btn" class="absolute right-3 top-2 text-gray-500">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      </button>
-    </div>
-  </div>
+      <!-- No Posts Message -->
+      <div id="no-posts-message" class="hidden text-center py-8 text-gray-500">
+        ยังไม่มีกระทู้ เริ่มสร้างกระทู้แรกของคุณเลย!
+      </div>
 
-  <!-- Main Content -->
-  <main class="container mx-auto px-4 py-8">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="text-2xl font-bold text-gray-800">กระทู้ล่าสุด</h1>
-      <button id="mobile-new-post-btn" class="md:hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition duration-300">
-        สร้างกระทู้
-      </button>
-    </div>
-    
-    <!-- Posts List -->
-    <div id="posts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Posts will be dynamically inserted here -->
-      <div class="animate-pulse bg-white rounded-lg shadow-md p-4">
-        <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
-        <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
-        <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
-        <div class="flex justify-between">
-          <div class="h-3 bg-gray-200 rounded w-1/4"></div>
-          <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+      <!-- Load More Button -->
+      <div class="mt-8 text-center">
+        <button
+          id="load-more-btn"
+          class="bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 font-medium px-6 py-2 rounded-full transition duration-300"
+        >
+          โหลดเพิ่มเติม
+        </button>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12 py-6">
+      <div class="container mx-auto px-4">
+        <div class="text-center text-gray-600 text-sm">
+          <p>&copy; 2025 TU-PUP. สงวนลิขสิทธิ์.</p>
         </div>
       </div>
-      <div class="animate-pulse bg-white rounded-lg shadow-md p-4">
-        <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
-        <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
-        <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
-        <div class="flex justify-between">
-          <div class="h-3 bg-gray-200 rounded w-1/4"></div>
-          <div class="h-3 bg-gray-200 rounded w-1/4"></div>
-        </div>
-      </div>
-      <div class="animate-pulse bg-white rounded-lg shadow-md p-4">
-        <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
-        <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
-        <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
-        <div class="flex justify-between">
-          <div class="h-3 bg-gray-200 rounded w-1/4"></div>
-          <div class="h-3 bg-gray-200 rounded w-1/4"></div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- No Posts Message -->
-    <div id="no-posts-message" class="hidden text-center py-8 text-gray-500">
-      ยังไม่มีกระทู้ เริ่มสร้างกระทู้แรกของคุณเลย!
-    </div>
-    
-    <!-- Load More Button -->
-    <div class="mt-8 text-center">
-      <button id="load-more-btn" class="bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 font-medium px-6 py-2 rounded-full transition duration-300">
-        โหลดเพิ่มเติม
-      </button>
-    </div>
-  </main>
+    </footer>
 
-  <!-- Footer -->
-  <footer class="bg-white border-t mt-12 py-6">
-    <div class="container mx-auto px-4">
-      <div class="text-center text-gray-600 text-sm">
-        <p>&copy; 2025 TU-PUP. สงวนลิขสิทธิ์.</p>
-      </div>
-    </div>
-  </footer>
+    <script>
+            // ตัวแปรสำหรับการโหลดกระทู้แบบแบ่งหน้า
+            let lastPostId = null;
+            const postsPerPage = 9;
 
-  <script>
-    // ตัวแปรสำหรับการโหลดกระทู้แบบแบ่งหน้า
-    let lastPostId = null;
-    const postsPerPage = 9;
-    
-    document.addEventListener('DOMContentLoaded', async function() {
-      // ตรวจสอบสถานะการล็อกอิน
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      // แสดงหรือซ่อนเมนูตามสถานะล็อกอิน
-      if (user) {
-        document.getElementById('login-menu').classList.add('hidden');
-        document.getElementById('user-menu').classList.remove('hidden');
-        document.getElementById('new-post-btn').classList.remove('hidden');
-        
-        const displayName = user.user_metadata?.display_name || user.email;
-        document.getElementById('user-name').textContent = displayName;
-        
-        // ตรวจสอบรูปโปรไฟล์
-        if (user.user_metadata?.avatar_url) {
-          document.getElementById('user-avatar').src = user.user_metadata.avatar_url;
-        }
-        
-        // Event listener สำหรับปุ่มล็อกเอาต์
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-          const { error } = await supabase.auth.signOut();
+            document.addEventListener("DOMContentLoaded", async function () {
+              // ตรวจสอบสถานะการล็อกอิน
+              const {
+                data: { user },
+              } = await supabase.auth.getUser();
+
+              // แสดงหรือซ่อนเมนูตามสถานะล็อกอิน
+              if (user) {
+                document.getElementById("login-menu").classList.add("hidden");
+                document.getElementById("user-menu").classList.remove("hidden");
+                document.getElementById("new-post-btn").classList.remove("hidden");
+
+                const displayName = user.user_metadata?.display_name || user.email;
+                document.getElementById("user-name").textContent = displayName;
+
+                // ตรวจสอบรูปโปรไฟล์
+                if (user.user_metadata?.avatar_url) {
+                  document.getElementById("user-avatar").src =
+                    user.user_metadata.avatar_url;
+                }
+
+                // Event listener สำหรับปุ่มล็อกเอาต์
+                document
+                  .getElementById("logout-btn")
+                  .addEventListener("click", async () => {
+                    const { error } = await supabase.auth.signOut();
+                    if (!error) {
+                      window.location.reload();
+                    }
+                  });
+              }
+
+              // Event listeners สำหรับปุ่มสร้างกระทู้ใหม่
+              document
+                .getElementById("new-post-btn")
+                .addEventListener("click", () => {
+                  window.location.href = "new-post.html";
+                });
+
+              document
+                .getElementById("mobile-new-post-btn")
+                .addEventListener("click", () => {
+                  if (user) {
+                    window.location.href = "new-post.html";
+                  } else {
+                    window.location.href = "login.html";
+                  }
+                });
+
+              // โหลดกระทู้
+              await loadPosts();
+
+              // Event listener สำหรับปุ่มโหลดเพิ่มเติม
+              document
+                .getElementById("load-more-btn")
+                .addEventListener("click", async () => {
+                  await loadMorePosts();
+                });
+
+              // Event listeners สำหรับการค้นหา
+              document
+                .getElementById("search-btn")
+                .addEventListener("click", async () => {
+                  const query = document.getElementById("search-input").value.trim();
+                  if (query) {
+                    await searchPosts(query);
+                  }
+                });
+
+              document
+                .getElementById("mobile-search-btn")
+                .addEventListener("click", async () => {
+                  const query = document
+                    .getElementById("mobile-search-input")
+                    .value.trim();
+                  if (query) {
+                    await searchPosts(query);
+                  }
+                });
+
+              // Event listeners สำหรับค้นหาด้วยการกด Enter
+              document
+                .getElementById("search-input")
+                .addEventListener("keypress", async (e) => {
+                  if (e.key === "Enter") {
+                    const query = e.target.value.trim();
+                    if (query) {
+                      await searchPosts(query);
+                    }
+                  }
+                });
+
+              document
+                .getElementById("mobile-search-input")
+                .addEventListener("keypress", async (e) => {
+                  if (e.key === "Enter") {
+                    const query = e.target.value.trim();
+                    if (query) {
+                      await searchPosts(query);
+                    }
+                  }
+                });
+            });
+
+            // โหลดกระทู้
+            async function loadPosts() {
+              try {
+                const postsContainer = document.getElementById("posts-container");
+                const noPostsMessage = document.getElementById("no-posts-message");
+                const loadMoreBtn = document.getElementById("load-more-btn");
+
+                // ดึงกระทู้ล่าสุด
+                let query = supabase
+                  .from("posts")
+                  .select("*")
+                  .order("created_at", { ascending: false })
+                  .limit(postsPerPage);
+
+                const { data: posts, error } = await query;
+
+                // ล้างคอนเทนเนอร์
+                postsContainer.innerHTML = "";
+
+                if (error) {
+                  throw error;
+                }
+
+                if (!posts || posts.length === 0) {
+                  // ซ่อนปุ่มโหลดเพิ่มเติม
+                  loadMoreBtn.classList.add("hidden");
+
+                  // แสดงข้อความไม่มีกระทู้
+                  noPostsMessage.classList.remove("hidden");
+                  return;
+                }
+
+                // ซ่อนข้อความไม่มีกระทู้
+                noPostsMessage.classList.add("hidden");
+
+                // เลือกกระทู้สุดท้ายเพื่อใช้ในการโหลดหน้าถัดไป
+                lastPostId = posts[posts.length - 1].id;
+
+                // แสดงกระทู้
+                renderPosts(posts);
+
+                // แสดงหรือซ่อนปุ่มโหลดเพิ่มเติม
+                if (posts.length < postsPerPage) {
+                  loadMoreBtn.classList.add("hidden");
+                } else {
+                  loadMoreBtn.classList.remove("hidden");
+                }
+              } catch (error) {
+                console.error("Error loading posts:", error);
+              }
+            }
+
+            // โหลดกระทู้เพิ่มเติม
+            async function loadMorePosts() {
+              try {
+                if (!lastPostId) return;
+
+                const postsContainer = document.getElementById("posts-container");
+                const loadMoreBtn = document.getElementById("load-more-btn");
+
+                // ดึงกระทู้ถัดไป
+                const { data: posts, error } = await supabase
+                  .from("posts")
+                  .select("*")
+                  .order("created_at", { ascending: false })
+                  .lt("id", lastPostId) // กระทู้ที่มี id น้อยกว่ากระทู้สุดท้ายที่โหลดมาแล้ว
+                  .limit(postsPerPage);
+
+                if (error) {
+                  throw error;
+                }
+
+                if (!posts || posts.length === 0) {
+                  // ซ่อนปุ่มโหลดเพิ่มเติม
+                  loadMoreBtn.classList.add("hidden");
+                  return;
+                }
+
+                // เลือกกระทู้สุดท้ายเพื่อใช้ในการโหลดหน้าถัดไป
+                lastPostId = posts[posts.length - 1].id;
+
+                // แสดงกระทู้
+                renderPosts(posts);
+
+                // ซ่อนปุ่มโหลดเพิ่มเติมถ้าไม่มีกระทู้เพิ่มเติม
+                if (posts.length < postsPerPage) {
+                  loadMoreBtn.classList.add("hidden");
+                }
+              } catch (error) {
+                console.error("Error loading more posts:", error);
+              }
+            }
+
+            // ค้นหากระทู้
+            async function searchPosts(query) {
+              try {
+                const postsContainer = document.getElementById("posts-container");
+                const noPostsMessage = document.getElementById("no-posts-message");
+                const loadMoreBtn = document.getElementById("load-more-btn");
+
+                // ดึงกระทู้ที่มีคำค้นหาในชื่อหรือเนื้อหา
+                const { data: posts, error } = await supabase
+                  .from("posts")
+                  .select("*")
+                  .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
+                  .order("created_at", { ascending: false })
+                  .limit(postsPerPage);
+
+                // ล้างคอนเทนเนอร์
+                postsContainer.innerHTML = "";
+
+                if (error) {
+                  throw error;
+                }
+
+                if (!posts || posts.length === 0) {
+                  // ซ่อนปุ่มโหลดเพิ่มเติม
+                  loadMoreBtn.classList.add("hidden");
+
+                  // แสดงข้อความไม่มีกระทู้
+                  noPostsMessage.textContent = `ไม่พบกระทู้ที่เกี่ยวข้องกับ "${query}"`;
+                  noPostsMessage.classList.remove("hidden");
+                  return;
+                }
+
+                // ซ่อนข้อความไม่มีกระทู้
+                noPostsMessage.classList.add("hidden");
+
+                // แสดงกระทู้
+                renderPosts(posts);
+
+                // ซ่อนปุ่มโหลดเพิ่มเติมในโหมดค้นหา
+                loadMoreBtn.classList.add("hidden");
+              } catch (error) {
+                console.error("Error searching posts:", error);
+              }
+            }
+
+
+              // เพิ่มฟังก์ชันนี้เพื่อดึงจำนวนการเข้าชมสำหรับหลายๆ กระทู้
+      async function getPostsViewCounts(posts) {
+        if (!posts || posts.length === 0) return {};
+
+        const viewCounts = {};
+
+        // ดึงจำนวนการเข้าชมทีละกระทู้
+        for (const post of posts) {
+          const { count, error } = await supabase
+            .from('posts_view')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', post.id);
+
           if (!error) {
-            window.location.reload();
+            viewCounts[post.id] = count || 0;
           }
+        }
+
+        return viewCounts;
+      }
+
+      // แก้ไขฟังก์ชัน renderPosts ให้ดึงจำนวนการเข้าชมจากตาราง posts_view
+      async function renderPosts(posts) {
+        const postsContainer = document.getElementById('posts-container');
+
+        // ดึงจำนวนการเข้าชมของกระทู้ทั้งหมด
+        const viewCounts = await getPostsViewCounts(posts);
+
+        posts.forEach((post) => {
+          // สร้าง URL สำหรับหน้ารายละเอียดกระทู้
+          const postUrl = `post.html?id=${post.id}`;
+
+          // ตัดเนื้อหาให้สั้นลงถ้ายาวเกินไป
+          const shortContent = post.content.length > 100
+            ? post.content.substring(0, 100) + '...'
+            : post.content;
+
+          // ฟอร์แมตเวลา
+          const formattedDate = formatTimestamp(post.created_at);
+
+          // ใช้จำนวนการเข้าชมจากตาราง posts_view หรือใช้ 0 ถ้าไม่มีข้อมูล
+          const viewCount = viewCounts[post.id] || 0;
+
+          // สร้างการ์ดกระทู้
+          const postCard = document.createElement('div');
+          postCard.className = 'bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition duration-300';
+          postCard.innerHTML = `
+            <a href="${postUrl}" class="block">
+              <h2 class="text-lg font-semibold text-gray-800 mb-2">${post.title}</h2>
+              <p class="text-gray-600 mb-3">${shortContent}</p>
+              <div class="flex justify-between items-center text-sm text-gray-500">
+                <span>${post.author_name || 'ไม่ระบุชื่อ'}</span>
+                <div class="flex items-center space-x-3">
+                  <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    ${viewCount}
+                  </span>
+                  <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    </svg>
+                    ${post.comment_count || 0}
+                  </span>
+                </div>
+              </div>
+              <div class="mt-2 text-xs text-gray-400 text-right">${formattedDate}</div>
+            </a>
+          `;
+
+          postsContainer.appendChild(postCard);
         });
       }
-      
-      // Event listeners สำหรับปุ่มสร้างกระทู้ใหม่
-      document.getElementById('new-post-btn').addEventListener('click', () => {
-        window.location.href = 'new-post.html';
-      });
-      
-      document.getElementById('mobile-new-post-btn').addEventListener('click', () => {
-        if (user) {
-          window.location.href = 'new-post.html';
-        } else {
-          window.location.href = 'login.html';
-        }
-      });
-      
-      // โหลดกระทู้
-      await loadPosts();
-      
-      // Event listener สำหรับปุ่มโหลดเพิ่มเติม
-      document.getElementById('load-more-btn').addEventListener('click', async () => {
-        await loadMorePosts();
-      });
-      
-      // Event listeners สำหรับการค้นหา
-      document.getElementById('search-btn').addEventListener('click', async () => {
-        const query = document.getElementById('search-input').value.trim();
-        if (query) {
-          await searchPosts(query);
-        }
-      });
-      
-      document.getElementById('mobile-search-btn').addEventListener('click', async () => {
-        const query = document.getElementById('mobile-search-input').value.trim();
-        if (query) {
-          await searchPosts(query);
-        }
-      });
-      
-      // Event listeners สำหรับค้นหาด้วยการกด Enter
-      document.getElementById('search-input').addEventListener('keypress', async (e) => {
-        if (e.key === 'Enter') {
-          const query = e.target.value.trim();
-          if (query) {
-            await searchPosts(query);
-          }
-        }
-      });
-      
-      document.getElementById('mobile-search-input').addEventListener('keypress', async (e) => {
-        if (e.key === 'Enter') {
-          const query = e.target.value.trim();
-          if (query) {
-            await searchPosts(query);
-          }
-        }
-      });
-    });
-    
-    // โหลดกระทู้
-    async function loadPosts() {
-      try {
-        const postsContainer = document.getElementById('posts-container');
-        const noPostsMessage = document.getElementById('no-posts-message');
-        const loadMoreBtn = document.getElementById('load-more-btn');
-        
-        // ดึงกระทู้ล่าสุด
-        let query = supabase
-          .from('posts')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(postsPerPage);
-        
-        const { data: posts, error } = await query;
-        
-        // ล้างคอนเทนเนอร์
-        postsContainer.innerHTML = '';
-        
-        if (error) {
-          throw error;
-        }
-        
-        if (!posts || posts.length === 0) {
-          // ซ่อนปุ่มโหลดเพิ่มเติม
-          loadMoreBtn.classList.add('hidden');
-          
-          // แสดงข้อความไม่มีกระทู้
-          noPostsMessage.classList.remove('hidden');
-          return;
-        }
-        
-        // ซ่อนข้อความไม่มีกระทู้
-        noPostsMessage.classList.add('hidden');
-        
-        // เลือกกระทู้สุดท้ายเพื่อใช้ในการโหลดหน้าถัดไป
-        lastPostId = posts[posts.length - 1].id;
-        
-        // แสดงกระทู้
-        renderPosts(posts);
-        
-        // แสดงหรือซ่อนปุ่มโหลดเพิ่มเติม
-        if (posts.length < postsPerPage) {
-          loadMoreBtn.classList.add('hidden');
-        } else {
-          loadMoreBtn.classList.remove('hidden');
-        }
-      } catch (error) {
-        console.error('Error loading posts:', error);
-      }
-    }
-    
-    // โหลดกระทู้เพิ่มเติม
-    async function loadMorePosts() {
-      try {
-        if (!lastPostId) return;
-        
-        const postsContainer = document.getElementById('posts-container');
-        const loadMoreBtn = document.getElementById('load-more-btn');
-        
-        // ดึงกระทู้ถัดไป
-        const { data: posts, error } = await supabase
-          .from('posts')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .lt('id', lastPostId) // กระทู้ที่มี id น้อยกว่ากระทู้สุดท้ายที่โหลดมาแล้ว
-          .limit(postsPerPage);
-        
-        if (error) {
-          throw error;
-        }
-        
-        if (!posts || posts.length === 0) {
-          // ซ่อนปุ่มโหลดเพิ่มเติม
-          loadMoreBtn.classList.add('hidden');
-          return;
-        }
-        
-        // เลือกกระทู้สุดท้ายเพื่อใช้ในการโหลดหน้าถัดไป
-        lastPostId = posts[posts.length - 1].id;
-        
-        // แสดงกระทู้
-        renderPosts(posts);
-        
-        // ซ่อนปุ่มโหลดเพิ่มเติมถ้าไม่มีกระทู้เพิ่มเติม
-        if (posts.length < postsPerPage) {
-          loadMoreBtn.classList.add('hidden');
-        }
-      } catch (error) {
-        console.error('Error loading more posts:', error);
-      }
-    }
-    
-    // ค้นหากระทู้
-    async function searchPosts(query) {
-      try {
-        const postsContainer = document.getElementById('posts-container');
-        const noPostsMessage = document.getElementById('no-posts-message');
-        const loadMoreBtn = document.getElementById('load-more-btn');
-        
-        // ดึงกระทู้ที่มีคำค้นหาในชื่อหรือเนื้อหา
-        const { data: posts, error } = await supabase
-          .from('posts')
-          .select('*')
-          .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
-          .order('created_at', { ascending: false })
-          .limit(postsPerPage);
-        
-        // ล้างคอนเทนเนอร์
-        postsContainer.innerHTML = '';
-        
-        if (error) {
-          throw error;
-        }
-        
-        if (!posts || posts.length === 0) {
-          // ซ่อนปุ่มโหลดเพิ่มเติม
-          loadMoreBtn.classList.add('hidden');
-          
-          // แสดงข้อความไม่มีกระทู้
-          noPostsMessage.textContent = `ไม่พบกระทู้ที่เกี่ยวข้องกับ "${query}"`;
-          noPostsMessage.classList.remove('hidden');
-          return;
-        }
-        
-        // ซ่อนข้อความไม่มีกระทู้
-        noPostsMessage.classList.add('hidden');
-        
-        // แสดงกระทู้
-        renderPosts(posts);
-        
-        // ซ่อนปุ่มโหลดเพิ่มเติมในโหมดค้นหา
-        loadMoreBtn.classList.add('hidden');
-      } catch (error) {
-        console.error('Error searching posts:', error);
-      }
-    }
-    
-    // แสดงกระทู้
-    function renderPosts(posts) {
-      const postsContainer = document.getElementById('posts-container');
-      
-      posts.forEach(post => {
-        // สร้าง URL สำหรับหน้ารายละเอียดกระทู้
-        const postUrl = `post.html?id=${post.id}`;
-        
-        // ตัดเนื้อหาให้สั้นลงถ้ายาวเกินไป
-        const shortContent = post.content.length > 100 
-          ? post.content.substring(0, 100) + '...' 
-          : post.content;
-        
-        // ฟอร์แมตเวลา
-        const formattedDate = formatTimestamp(post.created_at);
-        
-        // สร้างการ์ดกระทู้
-        const postCard = document.createElement('div');
-        postCard.className = 'bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition duration-300';
-        postCard.innerHTML = `
-          <a href="${postUrl}" class="block">
-            <h2 class="text-lg font-semibold text-gray-800 mb-2">${post.title}</h2>
-            <p class="text-gray-600 mb-3">${shortContent}</p>
-            <div class="flex justify-between items-center text-sm text-gray-500">
-              <span>${post.author_name || 'ไม่ระบุชื่อ'}</span>
-              <div class="flex items-center space-x-3">
-                <span class="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  ${post.view_count || 0}
-                </span>
-                <span class="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                  </svg>
-                  ${post.comment_count || 0}
-                </span>
-              </div>
-            </div>
-            <div class="mt-2 text-xs text-gray-400 text-right">${formattedDate}</div>
-          </a>
-        `;
-        
-        postsContainer.appendChild(postCard);
-      });
-    }
-  </script>
-</body>
+
+            
+    </script>
+  </body>
 </html>
