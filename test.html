@@ -11,6 +11,70 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Supabase Config -->
     <script src="js/supabase-config.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
+  
+      .upload-label {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+  
+      .upload-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+  
+      .custom-upload {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background-color: #f1f1f1;
+        border-radius: 8px;
+        cursor: pointer;
+        color: #333;
+        border: 1px solid #ddd;
+        transition: background-color 0.2s;
+      }
+  
+      .custom-upload:hover {
+        background-color: #e0e0e0;
+      }
+  
+      .custom-upload i {
+        font-size: 16px;
+      }
+  
+      .hidden-input {
+        display: none;
+      }
+  
+      .note-text {
+        color: #666;
+        font-size: 14px;
+      }
+  
+      .preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+  
+      .preview-container img {
+        max-width: 150px;
+        max-height: 150px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+
+      
+    </style>
 </head>
 
 <body class="bg-gray-50 min-h-screen">
@@ -58,11 +122,17 @@
         </div>
     </nav>
 
-    <div class="main">
-      <label for="file-input" class="custom-file-upload">เลือกรูปภาพ</label>
-      <input id="file-input" type="file" accept="image/*" onchange="">
-      <img id="preview" class="preview" src="#" alt="Preview" style="display: none;">
+    <div class="upload-label">รูปภาพประกอบ <span style="color: gray;">(ไม่บังคับ)</span></div>
+
+    <div class="upload-container">
+      <label for="image-upload" class="custom-upload">
+        <i class="fa-regular fa-image"></i> เลือกรูปภาพ
+      </label>
+      <input type="file" id="image-upload" class="hidden-input" accept="image/*" multiple>
+      <div class="note-text">สามารถเลือกได้หลายรูป</div>
     </div>
+
+    <div class="preview-container" id="preview-container"></div>
 
 
 
@@ -79,6 +149,24 @@
 
 
     <script>
+        const imageInput = document.getElementById('image-upload');
+        const previewContainer = document.getElementById('preview-container');
+
+        imageInput.addEventListener('change', () => {
+          // previewContainer.innerHTML = ''; // ล้างภาพเดิมออกก่อน
+          const files = imageInput.files;
+
+          Array.from(files).forEach(file => {
+            if (file.type.startsWith('image/')) {
+              const img = document.createElement('img');
+              img.src = URL.createObjectURL(file);
+              previewContainer.appendChild(img);
+            }
+          });
+        });
+
+
+
         // ตัวแปรสำหรับการโหลดกระทู้แบบแบ่งหน้า
         let lastPostId = null;
         const postsPerPage = 9;
