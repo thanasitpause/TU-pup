@@ -1,588 +1,900 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>รายละเอียดกระทู้ - TU-PUP</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Supabase Config -->
-  <script src="js/supabase-config.js"></script>
-  <style>
-    .image-container img {
-      max-height: 500px;
-      object-fit: contain;
-    }
-    .comment-image img {
-      max-height: 300px;
-      object-fit: contain;
-    }
-  </style>
-</head>
-<body class="bg-gray-50 min-h-screen">
-  <!-- Navbar -->
-  <nav class="bg-white shadow-md sticky top-0 z-10">
-    <div class="container mx-auto px-4 py-3">
-      <div class="flex justify-between items-center">
-        <!-- Logo -->
-        <a href="index.html" class="font-bold text-2xl text-blue-600">TU-PUP</a>
-        
-        <!-- User Menu -->
-        <div class="flex items-center space-x-4">
-          <button id="new-post-btn" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition duration-300">
-            สร้างกระทู้ใหม่
-          </button>
-          
-          <div id="user-menu" class="hidden flex items-center space-x-2">
-            <img id="user-avatar" src="img/default-avatar.png" alt="User" class="w-8 h-8 rounded-full">
-            <span id="user-name" class="hidden md:inline text-sm font-medium"></span>
-            <button id="logout-btn" class="text-sm text-gray-600 hover:text-gray-800">ออกจากระบบ</button>
-          </div>
-          
-          <div id="login-menu">
-            <a href="login.html" class="text-blue-600 hover:text-blue-800 font-medium">เข้าสู่ระบบ</a>
-            <span class="text-gray-400 mx-2">|</span>
-            <a href="register.html" class="text-blue-600 hover:text-blue-800 font-medium">สมัครสมาชิก</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </nav>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>รายละเอียดกระทู้ - TU-PUP</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase Config -->
+    <script src="js/supabase-config.js"></script>
+    <style>
+      .image-container img {
+        max-height: 500px;
+        object-fit: contain;
+      }
+      .comment-image img {
+        max-height: 300px;
+        object-fit: contain;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md sticky top-0 z-10">
+      <div class="container mx-auto px-4 py-3">
+        <div class="flex justify-between items-center">
+          <!-- Logo -->
+          <a href="index.html" class="font-bold text-2xl text-blue-600"
+            >TU-PUP</a
+          >
 
-  <!-- Main Content -->
-  <main class="container mx-auto px-4 py-8">
-    <!-- Back Button -->
-    <div class="mb-4">
-      <a href="index.html" class="flex items-center text-blue-600 hover:text-blue-800">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        กลับไปหน้าหลัก
-      </a>
-    </div>
-    
-    <!-- Post Container -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-      <!-- Post Loading Placeholder -->
-      <div id="post-loading" class="animate-pulse">
-        <div class="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-        <div class="flex items-center mb-4">
-          <div class="rounded-full bg-gray-200 h-10 w-10 mr-3"></div>
-          <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-        </div>
-        <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
-        <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
-        <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
-        <div class="h-64 bg-gray-200 rounded w-full mb-4"></div>
-      </div>
-      
-      <!-- Post Content -->
-      <div id="post-content" class="hidden">
-        <div class="flex justify-between items-start mb-4">
-          <h1 id="post-title" class="text-2xl font-bold text-gray-800"></h1>
-          
-          <!-- Delete Post Button (จะแสดงเฉพาะเจ้าของกระทู้) -->
-          <button id="delete-post-btn" class="hidden bg-red-500 hover:bg-red-600 text-white font-medium py-1 px-3 rounded-lg text-sm transition duration-300">
-            ลบกระทู้
-          </button>
-        </div>
-        
-        <div class="flex items-center mb-4">
-          <img id="post-author-avatar" src="img/default-avatar.png" alt="Author" class="w-10 h-10 rounded-full mr-3">
-          <div>
-            <div id="post-author" class="font-medium"></div>
-            <div id="post-date" class="text-gray-500 text-sm"></div>
-          </div>
-        </div>
-        
-        <div id="post-body" class="text-gray-700 mb-6 whitespace-pre-line"></div>
-        
-        <!-- Post Images -->
-        <div id="post-images" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
-        
-        <div class="flex items-center text-gray-500 text-sm">
-          <div class="flex items-center mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            <span id="post-views">0 ครั้ง</span>
-          </div>
-          
-          <div class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-            </svg>
-            <span id="post-comments-count">0 ความคิดเห็น</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Comments Section -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-xl font-bold text-gray-800 mb-4">ความคิดเห็น</h2>
-      
-      <!-- Comments List -->
-      <div id="comments-container" class="mb-6">
-        <!-- Comments Loading Placeholder -->
-        <div id="comments-loading" class="animate-pulse">
-          <div class="flex items-center mb-3">
-            <div class="rounded-full bg-gray-200 h-8 w-8 mr-3"></div>
-            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-          </div>
-          <div class="ml-11 mb-6">
-            <div class="h-3 bg-gray-200 rounded w-full mb-2"></div>
-            <div class="h-3 bg-gray-200 rounded w-5/6 mb-2"></div>
-            <div class="h-3 bg-gray-200 rounded w-3/4"></div>
-          </div>
-          
-          <div class="flex items-center mb-3">
-            <div class="rounded-full bg-gray-200 h-8 w-8 mr-3"></div>
-            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-          </div>
-          <div class="ml-11 mb-6">
-            <div class="h-3 bg-gray-200 rounded w-full mb-2"></div>
-            <div class="h-3 bg-gray-200 rounded w-4/6"></div>
-          </div>
-        </div>
-        
-        <!-- No Comments Message -->
-        <div id="no-comments" class="hidden text-center py-4 text-gray-500">
-          ยังไม่มีความคิดเห็น เป็นคนแรกที่แสดงความคิดเห็น!
-        </div>
-        
-        <!-- Comments Content -->
-        <div id="comments-content"></div>
-      </div>
-      
-      <!-- Comment Form -->
-      <div id="comment-form-container" class="border-t pt-6">
-        <div id="login-to-comment" class="hidden text-center py-4">
-          <p class="mb-4 text-gray-600">โปรด <a href="login.html" class="text-blue-600 hover:text-blue-800">เข้าสู่ระบบ</a> เพื่อแสดงความคิดเห็น</p>
-        </div>
-        
-        <div id="comment-form" class="hidden">
-          <h3 class="text-lg font-semibold mb-4">แสดงความคิดเห็น</h3>
-          
-          <div class="mb-4">
-            <textarea id="comment-text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" rows="4" placeholder="พิมพ์ความคิดเห็นของคุณที่นี่..."></textarea>
-          </div>
-          
-          <!-- Image Upload -->
-          <div class="mb-4">
-            <label class="block text-gray-700 mb-2">แนบรูปภาพ (ไม่บังคับ)</label>
-            <div class="flex items-center">
-              <label class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                เลือกรูปภาพ
-                <input type="file" id="comment-image" accept="image/*" class="hidden">
-              </label>
-              <span id="selected-image-name" class="ml-3 text-gray-600"></span>
+          <!-- User Menu -->
+          <div class="flex items-center space-x-4">
+            <button
+              id="new-post-btn"
+              class="hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition duration-300"
+            >
+              สร้างกระทู้ใหม่
+            </button>
+
+            <div id="user-menu" class="hidden flex items-center space-x-2">
+              <img
+                id="user-avatar"
+                src="img/default-avatar.png"
+                alt="User"
+                class="w-8 h-8 rounded-full"
+              />
+              <span
+                id="user-name"
+                class="hidden md:inline text-sm font-medium"
+              ></span>
+              <button
+                id="logout-btn"
+                class="text-sm text-gray-600 hover:text-gray-800"
+              >
+                ออกจากระบบ
+              </button>
             </div>
-            
-            <!-- Selected Image Preview -->
-            <div id="comment-image-preview-container" class="hidden mt-3">
-              <img id="comment-image-preview" src="#" alt="Preview" class="max-h-40 rounded">
-              <button id="remove-image-btn" class="text-sm text-red-600 hover:text-red-800 mt-1">
-                ลบรูปภาพ
+
+            <div id="login-menu">
+              <a
+                href="login.html"
+                class="text-blue-600 hover:text-blue-800 font-medium"
+                >เข้าสู่ระบบ</a
+              >
+              <span class="text-gray-400 mx-2">|</span>
+              <a
+                href="register.html"
+                class="text-blue-600 hover:text-blue-800 font-medium"
+                >สมัครสมาชิก</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+      <!-- Back Button -->
+      <div class="mb-4">
+        <a
+          href="index.html"
+          class="flex items-center text-blue-600 hover:text-blue-800"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          กลับไปหน้าหลัก
+        </a>
+      </div>
+
+      <!-- Post Container -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <!-- Post Loading Placeholder -->
+        <div id="post-loading" class="animate-pulse">
+          <div class="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div class="flex items-center mb-4">
+            <div class="rounded-full bg-gray-200 h-10 w-10 mr-3"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+          </div>
+          <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+          <div class="h-64 bg-gray-200 rounded w-full mb-4"></div>
+        </div>
+
+        <!-- Post Content -->
+        <div id="post-content" class="hidden">
+          <div class="flex justify-between items-start mb-4">
+            <h1 id="post-title" class="text-2xl font-bold text-gray-800"></h1>
+
+            <!-- Delete Post Button (จะแสดงเฉพาะเจ้าของกระทู้) -->
+            <button
+              id="delete-post-btn"
+              class="hidden bg-red-500 hover:bg-red-600 text-white font-medium py-1 px-3 rounded-lg text-sm transition duration-300"
+            >
+              ลบกระทู้
+            </button>
+          </div>
+
+          <div class="flex items-center mb-4">
+            <img
+              id="post-author-avatar"
+              src="img/default-avatar.png"
+              alt="Author"
+              class="w-10 h-10 rounded-full mr-3"
+            />
+            <div>
+              <div id="post-author" class="font-medium"></div>
+              <div id="post-date" class="text-gray-500 text-sm"></div>
+            </div>
+          </div>
+
+          <div
+            id="post-body"
+            class="text-gray-700 mb-6 whitespace-pre-line"
+          ></div>
+
+          <!-- Post Images -->
+          <div
+            id="post-images"
+            class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"
+          ></div>
+
+          <div class="flex items-center text-gray-500 text-sm">
+            <div class="flex items-center mr-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              <span id="post-views">0 ครั้ง</span>
+            </div>
+
+            <div class="flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                />
+              </svg>
+              <span id="post-comments-count">0 ความคิดเห็น</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comments Section -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">ความคิดเห็น</h2>
+
+        <!-- Comments List -->
+        <div id="comments-container" class="mb-6">
+          <!-- Comments Loading Placeholder -->
+          <div id="comments-loading" class="animate-pulse">
+            <div class="flex items-center mb-3">
+              <div class="rounded-full bg-gray-200 h-8 w-8 mr-3"></div>
+              <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+            </div>
+            <div class="ml-11 mb-6">
+              <div class="h-3 bg-gray-200 rounded w-full mb-2"></div>
+              <div class="h-3 bg-gray-200 rounded w-5/6 mb-2"></div>
+              <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+            </div>
+
+            <div class="flex items-center mb-3">
+              <div class="rounded-full bg-gray-200 h-8 w-8 mr-3"></div>
+              <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+            </div>
+            <div class="ml-11 mb-6">
+              <div class="h-3 bg-gray-200 rounded w-full mb-2"></div>
+              <div class="h-3 bg-gray-200 rounded w-4/6"></div>
+            </div>
+          </div>
+
+          <!-- No Comments Message -->
+          <div id="no-comments" class="hidden text-center py-4 text-gray-500">
+            ยังไม่มีความคิดเห็น เป็นคนแรกที่แสดงความคิดเห็น!
+          </div>
+
+          <!-- Comments Content -->
+          <div id="comments-content"></div>
+        </div>
+
+        <!-- Comment Form -->
+        <div id="comment-form-container" class="border-t pt-6">
+          <div id="login-to-comment" class="hidden text-center py-4">
+            <p class="mb-4 text-gray-600">
+              โปรด
+              <a href="login.html" class="text-blue-600 hover:text-blue-800"
+                >เข้าสู่ระบบ</a
+              >
+              เพื่อแสดงความคิดเห็น
+            </p>
+          </div>
+
+          <div id="comment-form" class="hidden">
+            <h3 class="text-lg font-semibold mb-4">แสดงความคิดเห็น</h3>
+
+            <div class="mb-4">
+              <textarea
+                id="comment-text"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                rows="4"
+                placeholder="พิมพ์ความคิดเห็นของคุณที่นี่..."
+              ></textarea>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2"
+                >แนบรูปภาพ (ไม่บังคับ)</label
+              >
+              <div class="flex items-center">
+                <label
+                  class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 inline-block mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  เลือกรูปภาพ
+                  <input
+                    type="file"
+                    id="comment-image"
+                    accept="image/*"
+                    class="hidden"
+                  />
+                </label>
+                <span
+                  id="selected-image-name"
+                  class="ml-3 text-gray-600"
+                ></span>
+              </div>
+
+              <!-- Selected Image Preview -->
+              <div id="comment-image-preview-container" class="hidden mt-3">
+                <img
+                  id="comment-image-preview"
+                  src="#"
+                  alt="Preview"
+                  class="max-h-40 rounded"
+                />
+                <button
+                  id="remove-image-btn"
+                  class="text-sm text-red-600 hover:text-red-800 mt-1"
+                >
+                  ลบรูปภาพ
+                </button>
+              </div>
+            </div>
+
+            <div class="text-right">
+              <button
+                id="submit-comment-btn"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition duration-300"
+              >
+                ส่งความคิดเห็น
               </button>
             </div>
           </div>
-          
-          <div class="text-right">
-            <button id="submit-comment-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition duration-300">
-              ส่งความคิดเห็น
+        </div>
+      </div>
+
+      <!-- Delete Confirmation Modal -->
+      <div
+        id="delete-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      >
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+          <h3 class="text-xl font-bold mb-4">ยืนยันการลบกระทู้</h3>
+          <p class="mb-6 text-gray-600">
+            คุณแน่ใจหรือไม่ว่าต้องการลบกระทู้นี้?
+            การกระทำนี้ไม่สามารถย้อนกลับได้
+          </p>
+          <div class="flex justify-end space-x-3">
+            <button
+              id="cancel-delete-btn"
+              class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300"
+            >
+              ยกเลิก
+            </button>
+            <button
+              id="confirm-delete-btn"
+              class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300"
+            >
+              ลบกระทู้
             </button>
           </div>
         </div>
       </div>
-    </div>
-    
-    <!-- Delete Confirmation Modal -->
-    <div id="delete-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 class="text-xl font-bold mb-4">ยืนยันการลบกระทู้</h3>
-        <p class="mb-6 text-gray-600">คุณแน่ใจหรือไม่ว่าต้องการลบกระทู้นี้? การกระทำนี้ไม่สามารถย้อนกลับได้</p>
-        <div class="flex justify-end space-x-3">
-          <button id="cancel-delete-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300">
-            ยกเลิก
-          </button>
-          <button id="confirm-delete-btn" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
-            ลบกระทู้
-          </button>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12 py-6">
+      <div class="container mx-auto px-4">
+        <div class="text-center text-gray-600 text-sm">
+          <p>&copy; 2025 TU-PUP. สงวนลิขสิทธิ์.</p>
         </div>
       </div>
-    </div>
-  </main>
+    </footer>
 
-  <!-- Footer -->
-  <footer class="bg-white border-t mt-12 py-6">
-    <div class="container mx-auto px-4">
-      <div class="text-center text-gray-600 text-sm">
-        <p>&copy; 2025 TU-PUP. สงวนลิขสิทธิ์.</p>
-      </div>
-    </div>
-  </footer>
+    <script>
+      document.addEventListener("DOMContentLoaded", async function () {
+        // ดึง Post ID จาก URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get("id");
 
-  <script>
-    document.addEventListener('DOMContentLoaded', async function() {
-      // ดึง Post ID จาก URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const postId = urlParams.get('id');
-      
-      if (!postId) {
-        window.location.href = 'index.html';
-        return;
-      }
-      
-      // ตรวจสอบสถานะการล็อกอิน
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      // แสดงหรือซ่อนเมนูตามสถานะล็อกอิน
-      if (user) {
-        document.getElementById('login-menu').classList.add('hidden');
-        document.getElementById('user-menu').classList.remove('hidden');
-        document.getElementById('new-post-btn').classList.remove('hidden');
-        document.getElementById('login-to-comment').classList.add('hidden');
-        document.getElementById('comment-form').classList.remove('hidden');
-        
-        const displayName = user.user_metadata?.display_name || user.email;
-        document.getElementById('user-name').textContent = displayName;
-        
-        // ตรวจสอบรูปโปรไฟล์
-        if (user.user_metadata?.avatar_url) {
-          document.getElementById('user-avatar').src = user.user_metadata.avatar_url;
-        }
-        
-        // Event listener สำหรับปุ่มล็อกเอาต์
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-          const { error } = await supabase.auth.signOut();
-          if (!error) {
-            window.location.reload();
-          }
-        });
-      } else {
-        document.getElementById('login-to-comment').classList.remove('hidden');
-      }
-      
-      // Event listeners สำหรับปุ่มสร้างกระทู้ใหม่
-      document.getElementById('new-post-btn').addEventListener('click', () => {
-        window.location.href = 'new-post.html';
-      });
-      
-      // โหลดข้อมูลกระทู้
-      await loadPost(postId, user);
-      
-      // โหลดความคิดเห็น
-      await loadComments(postId);
-      
-      // จัดการรูปภาพที่แนบกับความคิดเห็น
-      document.getElementById('comment-image').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-          document.getElementById('selected-image-name').textContent = file.name;
-          document.getElementById('comment-image-preview-container').classList.remove('hidden');
-          
-          // แสดงตัวอย่างรูปภาพ
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            document.getElementById('comment-image-preview').src = e.target.result;
-          }
-          reader.readAsDataURL(file);
-        }
-      });
-      
-      // ลบรูปภาพที่เลือก
-      document.getElementById('remove-image-btn').addEventListener('click', function() {
-        document.getElementById('comment-image').value = '';
-        document.getElementById('selected-image-name').textContent = '';
-        document.getElementById('comment-image-preview-container').classList.add('hidden');
-      });
-      
-      // ส่งความคิดเห็น
-      document.getElementById('submit-comment-btn').addEventListener('click', async function() {
-        if (!user) {
-          window.location.href = 'login.html';
+        if (!postId) {
+          window.location.href = "index.html";
           return;
         }
-        
-        const commentText = document.getElementById('comment-text').value.trim();
-        const commentImageInput = document.getElementById('comment-image');
-        
-        if (!commentText && !commentImageInput.files[0]) {
-          alert('โปรดใส่ข้อความหรือรูปภาพ');
-          return;
-        }
-        
-        // ปิดปุ่มส่งความคิดเห็นระหว่างที่กำลังส่ง
-        const submitBtn = this;
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'กำลังส่ง...';
-        
-        try {
-          let imageUrl = null;
-          
-          // อัปโหลดรูปภาพ (ถ้ามี)
-          if (commentImageInput.files[0]) {
-            const file = commentImageInput.files[0];
-            imageUrl = await uploadImage(file, 'comments');
+
+        // ตรวจสอบสถานะการล็อกอิน
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        // แสดงหรือซ่อนเมนูตามสถานะล็อกอิน
+        if (user) {
+          document.getElementById("login-menu").classList.add("hidden");
+          document.getElementById("user-menu").classList.remove("hidden");
+          document.getElementById("new-post-btn").classList.remove("hidden");
+          document.getElementById("login-to-comment").classList.add("hidden");
+          document.getElementById("comment-form").classList.remove("hidden");
+
+          const displayName = user.user_metadata?.display_name || user.email;
+          document.getElementById("user-name").textContent = displayName;
+
+          // ตรวจสอบรูปโปรไฟล์
+          if (user.user_metadata?.avatar_url) {
+            document.getElementById("user-avatar").src =
+              user.user_metadata.avatar_url;
           }
-          
-          // สร้างความคิดเห็นใหม่
-          await createComment(postId, commentText, imageUrl);
-          
-          // รีเซ็ตฟอร์ม
-          document.getElementById('comment-text').value = '';
-          document.getElementById('comment-image').value = '';
-          document.getElementById('selected-image-name').textContent = '';
-          document.getElementById('comment-image-preview-container').classList.add('hidden');
-          
-          // โหลดความคิดเห็นใหม่
-          await loadComments(postId);
-          
-          // อัปเดตจำนวนความคิดเห็น
-          const { data: post } = await supabase
-            .from('posts')
-            .select('comment_count')
-            .eq('id', postId)
-            .single();
-            
-          if (post) {
-            document.getElementById('post-comments-count').textContent = `${post.comment_count || 0} ความคิดเห็น`;
-          }
-        } catch (error) {
-          console.error('Error submitting comment:', error);
-          alert('เกิดข้อผิดพลาดในการส่งความคิดเห็น โปรดลองอีกครั้ง');
-        } finally {
-          // เปิดปุ่มส่งความคิดเห็นอีกครั้ง
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'ส่งความคิดเห็น';
-        }
-      });
-      
-      // ลบกระทู้ (Modal)
-      const deleteModal = document.getElementById('delete-modal');
-      const deletePostBtn = document.getElementById('delete-post-btn');
-      const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-      const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-      
-      // เปิด Modal ยืนยันการลบ
-      if (deletePostBtn) {
-        deletePostBtn.addEventListener('click', () => {
-          deleteModal.classList.remove('hidden');
-        });
-      }
-      
-      // ปิด Modal โดยไม่ลบ
-      cancelDeleteBtn.addEventListener('click', () => {
-        deleteModal.classList.add('hidden');
-      });
-      
-      // ยืนยันการลบกระทู้
-      confirmDeleteBtn.addEventListener('click', async () => {
-        try {
-          // ลบกระทู้
-          const { error } = await supabase
-            .from('posts')
-            .delete()
-            .eq('id', postId);
-          
-          if (error) throw error;
-          
-          alert('ลบกระทู้เรียบร้อยแล้ว');
-          window.location.href = 'index.html';
-        } catch (error) {
-          console.error('Error deleting post:', error);
-          alert('เกิดข้อผิดพลาดในการลบกระทู้ โปรดลองอีกครั้ง');
-          deleteModal.classList.add('hidden');
-        }
-      });
-    });
-    
-    // โหลดข้อมูลกระทู้
-    async function loadPost(postId, currentUser) {
-      try {
-        // ดึงข้อมูลกระทู้
-        const { data: post, error } = await supabase
-          .from('posts')
-          .select('*')
-          .eq('id', postId)
-          .single();
-        
-        if (error) throw error;
-        
-        if (!post) {
-          window.location.href = 'index.html';
-          return;
-        }
-        
-        // อัปเดตจำนวนการเข้าชม
-        await supabase
-          .from('posts')
-          .update({ view_count: (post.view_count || 0) + 1 })
-          .eq('id', postId);
-        
-        // ซ่อน loading
-        document.getElementById('post-loading').classList.add('hidden');
-        document.getElementById('post-content').classList.remove('hidden');
-        
-        // กำหนดเนื้อหากระทู้
-        document.title = `${post.title} - TU-PUP`;
-        document.getElementById('post-title').textContent = post.title;
-        document.getElementById('post-author').textContent = post.author_name;
-        document.getElementById('post-date').textContent = formatTimestamp(post.created_at);
-        document.getElementById('post-body').textContent = post.content;
-        document.getElementById('post-views').textContent = `${(post.view_count || 0) + 1} ครั้ง`;
-        document.getElementById('post-comments-count').textContent = `${post.comment_count || 0} ความคิดเห็น`;
-        
-        // แสดงรูปภาพ (ถ้ามี)
-        const postImages = document.getElementById('post-images');
-        
-        if (post.image_urls && post.image_urls.length > 0) {
-          post.image_urls.forEach(imageUrl => {
-            const imageContainer = document.createElement('div');
-            imageContainer.className = 'image-container';
-            
-            const image = document.createElement('img');
-            image.src = imageUrl;
-            image.alt = 'Post image';
-            image.className = 'rounded-lg w-full';
-            
-            imageContainer.appendChild(image);
-            postImages.appendChild(imageContainer);
-          });
+
+          // Event listener สำหรับปุ่มล็อกเอาต์
+          document
+            .getElementById("logout-btn")
+            .addEventListener("click", async () => {
+              const { error } = await supabase.auth.signOut();
+              if (!error) {
+                window.location.reload();
+              }
+            });
         } else {
-          postImages.classList.add('hidden');
+          document
+            .getElementById("login-to-comment")
+            .classList.remove("hidden");
         }
-        
-        // ตรวจสอบสิทธิ์การลบกระทู้ (ต้องเป็นเจ้าของกระทู้)
-        if (currentUser && post.author_id === currentUser.id) {
-          const deletePostBtn = document.getElementById('delete-post-btn');
-          deletePostBtn.classList.remove('hidden');
+
+        // Event listeners สำหรับปุ่มสร้างกระทู้ใหม่
+        document
+          .getElementById("new-post-btn")
+          .addEventListener("click", () => {
+            window.location.href = "new-post.html";
+          });
+
+        // โหลดข้อมูลกระทู้
+        await loadPost(postId, user);
+
+        // โหลดความคิดเห็น
+        await loadComments(postId);
+
+        // จัดการรูปภาพที่แนบกับความคิดเห็น
+        document
+          .getElementById("comment-image")
+          .addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (file) {
+              document.getElementById("selected-image-name").textContent =
+                file.name;
+              document
+                .getElementById("comment-image-preview-container")
+                .classList.remove("hidden");
+
+              // แสดงตัวอย่างรูปภาพ
+              const reader = new FileReader();
+              reader.onload = function (e) {
+                document.getElementById("comment-image-preview").src =
+                  e.target.result;
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+
+        // ลบรูปภาพที่เลือก
+        document
+          .getElementById("remove-image-btn")
+          .addEventListener("click", function () {
+            document.getElementById("comment-image").value = "";
+            document.getElementById("selected-image-name").textContent = "";
+            document
+              .getElementById("comment-image-preview-container")
+              .classList.add("hidden");
+          });
+
+        // ส่งความคิดเห็น
+        document
+          .getElementById("submit-comment-btn")
+          .addEventListener("click", async function () {
+            if (!user) {
+              window.location.href = "login.html";
+              return;
+            }
+
+            const commentText = document
+              .getElementById("comment-text")
+              .value.trim();
+            const commentImageInput = document.getElementById("comment-image");
+
+            if (!commentText && !commentImageInput.files[0]) {
+              alert("โปรดใส่ข้อความหรือรูปภาพ");
+              return;
+            }
+
+            // ปิดปุ่มส่งความคิดเห็นระหว่างที่กำลังส่ง
+            const submitBtn = this;
+            submitBtn.disabled = true;
+            submitBtn.textContent = "กำลังส่ง...";
+
+            try {
+              let imageUrl = null;
+
+              // อัปโหลดรูปภาพ (ถ้ามี)
+              if (commentImageInput.files[0]) {
+                const file = commentImageInput.files[0];
+                imageUrl = await uploadImage(file, "comments");
+              }
+
+              // สร้างความคิดเห็นใหม่
+              await createComment(postId, commentText, imageUrl);
+
+              // รีเซ็ตฟอร์ม
+              document.getElementById("comment-text").value = "";
+              document.getElementById("comment-image").value = "";
+              document.getElementById("selected-image-name").textContent = "";
+              document
+                .getElementById("comment-image-preview-container")
+                .classList.add("hidden");
+
+              // โหลดความคิดเห็นใหม่
+              await loadComments(postId);
+
+              // อัปเดตจำนวนความคิดเห็น
+              const { data: post } = await supabase
+                .from("posts")
+                .select("comment_count")
+                .eq("id", postId)
+                .single();
+
+              if (post) {
+                document.getElementById("post-comments-count").textContent = `${
+                  post.comment_count || 0
+                } ความคิดเห็น`;
+              }
+            } catch (error) {
+              console.error("Error submitting comment:", error);
+              alert("เกิดข้อผิดพลาดในการส่งความคิดเห็น โปรดลองอีกครั้ง");
+            } finally {
+              // เปิดปุ่มส่งความคิดเห็นอีกครั้ง
+              submitBtn.disabled = false;
+              submitBtn.textContent = "ส่งความคิดเห็น";
+            }
+          });
+
+        // ลบกระทู้ (Modal)
+        const deleteModal = document.getElementById("delete-modal");
+        const deletePostBtn = document.getElementById("delete-post-btn");
+        const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
+        const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
+
+        // เปิด Modal ยืนยันการลบ
+        if (deletePostBtn) {
+          deletePostBtn.addEventListener("click", () => {
+            deleteModal.classList.remove("hidden");
+          });
         }
-      } catch (error) {
-        console.error('Error loading post:', error);
-        alert('เกิดข้อผิดพลาดในการโหลดกระทู้ โปรดลองอีกครั้ง');
+
+        // ปิด Modal โดยไม่ลบ
+        cancelDeleteBtn.addEventListener("click", () => {
+          deleteModal.classList.add("hidden");
+        });
+
+        // ยืนยันการลบกระทู้
+        confirmDeleteBtn.addEventListener("click", async () => {
+          try {
+            // ลบกระทู้
+            const { error } = await supabase
+              .from("posts")
+              .delete()
+              .eq("id", postId);
+
+            if (error) throw error;
+
+            alert("ลบกระทู้เรียบร้อยแล้ว");
+            window.location.href = "index.html";
+          } catch (error) {
+            console.error("Error deleting post:", error);
+            alert("เกิดข้อผิดพลาดในการลบกระทู้ โปรดลองอีกครั้ง");
+            deleteModal.classList.add("hidden");
+          }
+        });
+      });
+
+      // โหลดข้อมูลกระทู้
+      async function loadPost(postId, currentUser) {
+        try {
+          // ดึงข้อมูลกระทู้
+          const { data: post, error } = await supabase
+            .from("posts")
+            .select("*")
+            .eq("id", postId)
+            .single();
+
+          if (error) throw error;
+
+          if (!post) {
+            window.location.href = "index.html";
+            return;
+          }
+
+          // อัปเดตจำนวนการเข้าชม
+          await supabase
+            .from("posts")
+            .update({ view_count: (post.view_count || 0) + 1 })
+            .eq("id", postId);
+
+          // ซ่อน loading
+          document.getElementById("post-loading").classList.add("hidden");
+          document.getElementById("post-content").classList.remove("hidden");
+
+          // กำหนดเนื้อหากระทู้
+          document.title = `${post.title} - TU-PUP`;
+          document.getElementById("post-title").textContent = post.title;
+          document.getElementById("post-author").textContent = post.author_name;
+          document.getElementById("post-date").textContent = formatTimestamp(
+            post.created_at
+          );
+          document.getElementById("post-body").textContent = post.content;
+          document.getElementById("post-views").textContent = `${
+            (post.view_count || 0) + 1
+          } ครั้ง`;
+          document.getElementById("post-comments-count").textContent = `${
+            post.comment_count || 0
+          } ความคิดเห็น`;
+
+          // แสดงรูปภาพ (ถ้ามี)
+          const postImages = document.getElementById("post-images");
+
+          if (post.image_urls && post.image_urls.length > 0) {
+            post.image_urls.forEach((imageUrl) => {
+              const imageContainer = document.createElement("div");
+              imageContainer.className = "image-container";
+
+              const image = document.createElement("img");
+              image.src = imageUrl;
+              image.alt = "Post image";
+              image.className = "rounded-lg w-full";
+
+              imageContainer.appendChild(image);
+              postImages.appendChild(imageContainer);
+            });
+          } else {
+            postImages.classList.add("hidden");
+          }
+
+          // ตรวจสอบสิทธิ์การลบกระทู้ (ต้องเป็นเจ้าของกระทู้)
+          if (currentUser && post.author_id === currentUser.id) {
+            const deletePostBtn = document.getElementById("delete-post-btn");
+            deletePostBtn.classList.remove("hidden");
+          }
+        } catch (error) {
+          console.error("Error loading post:", error);
+          alert("เกิดข้อผิดพลาดในการโหลดกระทู้ โปรดลองอีกครั้ง");
+        }
       }
-    }
-    
-    // โหลดความคิดเห็น
-    async function loadComments(postId) {
-      try {
-        // ดึงความคิดเห็นของกระทู้
-        const { data: comments, error } = await supabase
-          .from('comments')
-          .select('*')
-          .eq('post_id', postId)
-          .order('created_at', { ascending: true });
-        
-        if (error) throw error;
-        
-        // ซ่อน loading
-        document.getElementById('comments-loading').classList.add('hidden');
-        
-        const commentsContent = document.getElementById('comments-content');
-        commentsContent.innerHTML = '';
-        
-        if (!comments || comments.length === 0) {
-          document.getElementById('no-comments').classList.remove('hidden');
-          return;
-        }
-        
-        document.getElementById('no-comments').classList.add('hidden');
-        
-        // แสดงความคิดเห็น
-        comments.forEach((comment, index) => {
-          const commentEl = document.createElement('div');
-          commentEl.className = 'mb-6 pb-6 border-b border-gray-200 last:border-0 last:mb-0 last:pb-0';
-          
-          let commentHtml = `
+
+      // โหลดความคิดเห็น
+      async function loadComments(postId) {
+        try {
+          // ดึงความคิดเห็นของกระทู้
+          const { data: comments, error } = await supabase
+            .from("comments")
+            .select("*")
+            .eq("post_id", postId)
+            .order("created_at", { ascending: true });
+
+          if (error) throw error;
+
+          // ซ่อน loading
+          document.getElementById("comments-loading").classList.add("hidden");
+
+          const commentsContent = document.getElementById("comments-content");
+          commentsContent.innerHTML = "";
+
+          if (!comments || comments.length === 0) {
+            document.getElementById("no-comments").classList.remove("hidden");
+            return;
+          }
+
+          document.getElementById("no-comments").classList.add("hidden");
+
+          // แสดงความคิดเห็น
+          comments.forEach((comment, index) => {
+            const commentEl = document.createElement("div");
+            commentEl.className =
+              "mb-6 pb-6 border-b border-gray-200 last:border-0 last:mb-0 last:pb-0";
+
+            let commentHtml = `
             <div class="flex items-center mb-3">
               <img src="img/default-avatar.png" alt="User" class="w-8 h-8 rounded-full mr-3">
               <div>
                 <div class="font-medium">${comment.author_name}</div>
-                <div class="text-gray-500 text-xs">${formatTimestamp(comment.created_at)}</div>
+                <div class="text-gray-500 text-xs">${formatTimestamp(
+                  comment.created_at
+                )}</div>
               </div>
             </div>
             <div class="ml-11">
               <div class="text-gray-700 mb-3">${comment.content}</div>
           `;
-          
-          // แสดงรูปภาพ (ถ้ามี)
-          if (comment.image_url) {
-            commentHtml += `
+
+            // แสดงรูปภาพ (ถ้ามี)
+            if (comment.image_url) {
+              commentHtml += `
               <div class="comment-image mt-2">
                 <img src="${comment.image_url}" alt="Comment image" class="rounded-lg">
               </div>
             `;
-          }
-          
-          commentHtml += `
+            }
+
+            commentHtml += `
             </div>
           `;
-          
-          commentEl.innerHTML = commentHtml;
-          commentsContent.appendChild(commentEl);
-        });
-      } catch (error) {
-        console.error('Error loading comments:', error);
-      }
-    }
-    
-    // สร้างความคิดเห็นใหม่
-    async function createComment(postId, content, imageUrl = null) {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) {
-          throw new Error('ไม่พบผู้ใช้งาน กรุณาเข้าสู่ระบบ');
+
+            commentEl.innerHTML = commentHtml;
+            commentsContent.appendChild(commentEl);
+          });
+        } catch (error) {
+          console.error("Error loading comments:", error);
         }
-        
-        // สร้างความคิดเห็นใหม่
-        const { data, error } = await supabase
-          .from('comments')
-          .insert({
+      }
+
+      // สร้างความคิดเห็นใหม่
+      async function createComment(postId, content, imageUrl = null) {
+        try {
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+
+          if (!user) {
+            throw new Error("ไม่พบผู้ใช้งาน กรุณาเข้าสู่ระบบ");
+          }
+
+          // สร้างความคิดเห็นใหม่
+          const { data, error } = await supabase.from("comments").insert({
             post_id: postId,
             content: content,
             author_id: user.id,
             author_name: user.user_metadata?.display_name || user.email,
-            image_url: imageUrl
+            image_url: imageUrl,
           });
-        
-        if (error) throw error;
-        
-        // อัปเดตจำนวนความคิดเห็นในกระทู้โดยตรง
-        // ดึงข้อมูลกระทู้ก่อน
-        const { data: postData, error: postError } = await supabase
-          .from('posts')
-          .select('comment_count')
-          .eq('id', postId)
-          .single();
-          
-        if (postError) throw postError;
-        
-        // คำนวณจำนวนความคิดเห็นใหม่
-        const newCommentCount = (postData.comment_count || 0) + 1;
-        
-        // อัปเดตจำนวนความคิดเห็น
-        const { error: updateError } = await supabase
-          .from('posts')
-          .update({ comment_count: newCommentCount })
-          .eq('id', postId);
-          
-        if (updateError) throw updateError;
-        
-        return data;
-      } catch (error) {
-        console.error('Error creating comment:', error);
-        throw error;
+
+          if (error) throw error;
+
+          // อัปเดตจำนวนความคิดเห็นในกระทู้โดยตรง
+          // ดึงข้อมูลกระทู้ก่อน
+          const { data: postData, error: postError } = await supabase
+            .from("posts")
+            .select("comment_count")
+            .eq("id", postId)
+            .single();
+
+          if (postError) throw postError;
+
+          // คำนวณจำนวนความคิดเห็นใหม่
+          const newCommentCount = (postData.comment_count || 0) + 1;
+
+          // อัปเดตจำนวนความคิดเห็น
+          const { error: updateError } = await supabase
+            .from("posts")
+            .update({ comment_count: newCommentCount })
+            .eq("id", postId);
+
+          if (updateError) throw updateError;
+
+          return data;
+        } catch (error) {
+          console.error("Error creating comment:", error);
+          throw error;
+        }
       }
-    }
-  </script>
-</body>
-</html> 
+      // เพิ่มฟังก์ชันนี้เพื่อบันทึกข้อมูลการเข้าชมในตาราง posts_view
+      async function recordPostView(postId, currentUser) {
+        try {
+          // ตรวจสอบว่าควรบันทึกการเข้าชมหรือไม่ (ป้องกันการนับซ้ำจากการรีเฟรชหน้า)
+          const viewedPosts = JSON.parse(
+            localStorage.getItem("viewedPosts") || "{}"
+          );
+          const lastViewTime = viewedPosts[postId] || 0;
+          const currentTime = new Date().getTime();
+          const fiveMinutesInMs = 5 * 60 * 1000; // 5 นาทีในหน่วย milliseconds
+
+          // บันทึกการเข้าชมเมื่อยังไม่เคยดูกระทู้นี้ หรือดูครั้งล่าสุดนานกว่า 5 นาที
+          if (!lastViewTime || currentTime - lastViewTime > fiveMinutesInMs) {
+            // บันทึกเวลาที่ดูกระทู้นี้ใน localStorage
+            viewedPosts[postId] = currentTime;
+            localStorage.setItem("viewedPosts", JSON.stringify(viewedPosts));
+
+            // เตรียมข้อมูลสำหรับบันทึก
+            const viewData = {
+              post_id: postId,
+              viewer_type: currentUser ? "authenticated" : "anonymous",
+              viewer_id: currentUser?.id || null,
+            };
+
+            // บันทึกข้อมูลการเข้าชมลงในตาราง posts_view
+            const { error } = await supabase
+              .from("posts_view")
+              .insert(viewData);
+
+            if (error) {
+              console.error("Error recording post view:", error);
+              return false;
+            }
+
+            return true;
+          }
+
+          return false;
+        } catch (error) {
+          console.error("Error in recordPostView:", error);
+          return false;
+        }
+      }
+
+      // เพิ่มฟังก์ชันนี้เพื่อดึงจำนวนการเข้าชมจากตาราง posts_view
+      async function getPostViewCount(postId) {
+        try {
+          // นับจำนวนการเข้าชมทั้งหมดของกระทู้
+          const { count, error } = await supabase
+            .from("posts_view")
+            .select("*", { count: "exact", head: true })
+            .eq("post_id", postId);
+
+          if (error) {
+            console.error("Error getting post view count:", error);
+            return 0;
+          }
+
+          return count || 0;
+        } catch (error) {
+          console.error("Error in getPostViewCount:", error);
+          return 0;
+        }
+      }
+
+      // แก้ไขฟังก์ชัน loadPost ในไฟล์ post.html
+      async function loadPost(postId, currentUser) {
+        try {
+          // ดึงข้อมูลกระทู้
+          const { data: post, error } = await supabase
+            .from("posts")
+            .select("*")
+            .eq("id", postId)
+            .single();
+
+          if (error) throw error;
+
+          if (!post) {
+            window.location.href = "index.html";
+            return;
+          }
+
+          // บันทึกการเข้าชมกระทู้ในตาราง posts_view
+          await recordPostView(postId, currentUser);
+
+          // ดึงจำนวนการเข้าชมทั้งหมดจากตาราง posts_view
+          const viewCount = await getPostViewCount(postId);
+
+          // ซ่อน loading
+          document.getElementById("post-loading").classList.add("hidden");
+          document.getElementById("post-content").classList.remove("hidden");
+
+          // กำหนดเนื้อหากระทู้
+          document.title = `${post.title} - TU-PUP`;
+          document.getElementById("post-title").textContent = post.title;
+          document.getElementById("post-author").textContent = post.author_name;
+          document.getElementById("post-date").textContent = formatTimestamp(
+            post.created_at
+          );
+          document.getElementById("post-body").textContent = post.content;
+          document.getElementById(
+            "post-views"
+          ).textContent = `${viewCount} ครั้ง`;
+          document.getElementById("post-comments-count").textContent = `${
+            post.comment_count || 0
+          } ความคิดเห็น`;
+
+          // แสดงรูปภาพ (ถ้ามี)
+          const postImages = document.getElementById("post-images");
+          postImages.innerHTML = "";
+
+          if (post.image_urls && post.image_urls.length > 0) {
+            post.image_urls.forEach((imageUrl) => {
+              const imageContainer = document.createElement("div");
+              imageContainer.className = "image-container";
+
+              const image = document.createElement("img");
+              image.src = imageUrl;
+              image.alt = "Post image";
+              image.className = "rounded-lg w-full";
+
+              imageContainer.appendChild(image);
+              postImages.appendChild(imageContainer);
+            });
+          } else {
+            postImages.classList.add("hidden");
+          }
+
+          // ตรวจสอบสิทธิ์การลบกระทู้ (ต้องเป็นเจ้าของกระทู้)
+          if (currentUser && post.author_id === currentUser.id) {
+            const deletePostBtn = document.getElementById("delete-post-btn");
+            deletePostBtn.classList.remove("hidden");
+          }
+        } catch (error) {
+          console.error("Error loading post:", error);
+          alert("เกิดข้อผิดพลาดในการโหลดกระทู้ โปรดลองอีกครั้ง");
+        }
+      }
+    </script>
+  </body>
+</html>
