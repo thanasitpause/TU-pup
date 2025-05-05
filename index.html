@@ -41,8 +41,10 @@
           </button>
           
           <div id="user-menu" class="hidden flex items-center space-x-2">
+
             <img id="user-avatar" src="img/default-avatar.png" alt="User" class="w-8 h-8 rounded-full">
             <span id="user-name" class="hidden md:inline text-sm font-medium"></span>
+
             <button id="logout-btn" class="text-sm text-gray-600 hover:text-gray-800">ออกจากระบบ</button>
           </div>
           
@@ -171,6 +173,10 @@
         window.location.href = 'new-post.html';
       });
       
+      document.getElementById('user-avatar').addEventListener('click', () => {
+        window.location.href = 'edit-accout.html';
+      });
+
       document.getElementById('mobile-new-post-btn').addEventListener('click', () => {
         if (user) {
           window.location.href = 'new-post.html';

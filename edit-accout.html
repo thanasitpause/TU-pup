@@ -13,8 +13,8 @@
     <div class="absolute -top-14 left-1/2 transform -translate-x-1/2">
       <label for="avatar" class="cursor-pointer">
         <div id="preview"
-             class="w-28 h-28 bg-purple-400 rounded-full border-4 border-white overflow-hidden flex items-center justify-center">
-          <span class="text-white text-sm text-center">คลิกเพื่อเลือกรูป</span>
+             class="w-28 h-28 bg-white rounded-full border-4 border-white overflow-hidden flex items-center justify-center">
+          <span class="text-black text-sm text-center">คลิกเพื่อเลือกรูป</span>
         </div>
       </label>
       <input type="file" id="avatar" name="avatar" accept="image/*" class="hidden" />
@@ -38,7 +38,7 @@
       </div>
 
       <!-- ปุ่มบันทึก -->
-      <button type="submit"
+      <button id="submit" type="submit"
         class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition">บันทึกข้อมูล</button>
     </form>
   </div>
@@ -66,6 +66,10 @@
 
       console.log({ name, password, avatarFile });
     });
+
+    document.getElementById('submit').addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
   </script>
 </body>
 </html>
