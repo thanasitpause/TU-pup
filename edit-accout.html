@@ -27,7 +27,7 @@
         .edit-form input[type="text"],
         .edit-form input[type="email"],
         .edit-form input[type="password"] {
-            width: 100%;
+            width: 478px;
             padding: 10px;
             margin-top: 5px;
             border: 1px solid #ccc;
@@ -71,9 +71,13 @@
         <label for="confirm-password">ยืนยันรหัสผ่าน</label>
         <input type="password" id="confirm-password" name="confirm-password">
 
-        <button type="submit">บันทึกการเปลี่ยนแปลง</button>
+        <button id="edit" type="submit">บันทึกการเปลี่ยนแปลง</button>
     </form>
 </div>
-
+<script>
+    document.getElementById('edit').addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
+</script>
 </body>
 </html>
