@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>กำลังเข้าสู่ระบบ - TU-PUP</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase Config -->
+  <script src="js/supabase-config.js"></script>
+  <!-- Auth Callback Handler -->
+  <script src="js/auth-callback.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+  <div class="container mx-auto px-4 py-8 max-w-md">
+    <div class="text-center mb-8">
+      <a href="index.html" class="inline-block">
+        <h1 class="text-3xl font-bold text-blue-600">TU-PUP</h1>
+      </a>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+      <div class="flex justify-center mb-6">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      </div>
+      
+      <p id="message-container" class="text-gray-700 text-lg">กำลังประมวลผลการเข้าสู่ระบบ...</p>
+    </div>
+  </div>
+</body>
+</html>
