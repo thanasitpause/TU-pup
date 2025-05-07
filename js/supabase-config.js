@@ -7,7 +7,7 @@ const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 const checkAuth = async () => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (user) {
       return user;
     } else {
@@ -27,7 +27,7 @@ const checkAuth = async () => {
 // เปลี่ยน Timestamp เป็นรูปแบบที่อ่านง่าย
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return '';
-  
+
   const date = new Date(timestamp);
   const now = new Date();
   const diffMs = now - date;
@@ -51,23 +51,23 @@ const formatTimestamp = (timestamp) => {
 const uploadImage = async (file, folder) => {
   try {
     if (!file) return null;
-    
+
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}.${fileExt}`;
     const filePath = `${folder}/${fileName}`;
-    
+
     const { error: uploadError } = await supabase.storage
       .from('images')
       .upload(filePath, file);
-    
+
     if (uploadError) {
       throw uploadError;
     }
-    
+
     const { data } = supabase.storage
       .from('images')
       .getPublicUrl(filePath);
-    
+
     return data.publicUrl;
   } catch (error) {
     console.error('Error uploading image:', error);
@@ -76,18 +76,29 @@ const uploadImage = async (file, folder) => {
 };
 
 // สร้าง Function เพิ่มจำนวนความคิดเห็น (ต้องสร้างใน Supabase ด้วย)
-// ตั้งชื่อว่า increment_comment_count
 const createIncrementFunction = async () => {
+  // ฟังก์ชันว่าง เนื่องจากเราสร้าง function และ trigger ใน Database แล้ว
+};
+
+const incrementCommentCount = async (postId) => {
   try {
-    const { error } = await supabase.rpc('create_increment_function');
-    if (error) console.error('Error creating function:', error);
+    const { error } = await supabase.rpc('update_comment_count', { post_id_param: postId });
+
+    if (error) {
+      console.error('Error updating comment count:', error);
+      throw error;
+    }
+
+    return true;
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in incrementCommentCount:', error);
+    return false;
   }
 };
 
-// ส่งออกตัวแปรเพื่อให้ไฟล์อื่นใช้งานได้
+// ส่งออกฟังก์ชัน
 window.supabase = supabase;
 window.checkAuth = checkAuth;
-window.formatTimestamp = formatTimestamp; // เพิ่มบรรทัดนี้
+window.formatTimestamp = formatTimestamp;
 window.uploadImage = uploadImage;
+window.incrementCommentCount = incrementCommentCount; // เพิ่มบรรทัดนี้
