@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .menu {
+            display:none;
+        }
+    </style>
+</head>
+<body>
+    <li class="popup">
+        <img id="user-avatar" src="img/default-avatar.png" onclick="showPopup()"></a>
+        <ul class="menu" id="popupMenu">
+            <li><a href="#">main1</a></li>
+            <li><a href="#">main2</a></li>
+            <li><a href="#">main3</a></li>
+        </ul>
+    </li>
+    <script>
+        function showPopup(){
+            let popupMenu = document.getElementById("popupMenu")
+
+            if (popupMenu.style.display === "none"){
+                popupMenu.style.display = "block";
+            } else{
+                popupMenu.style.display = "none"
+            }
+        }
+    </script>
+</body>
+</html>
