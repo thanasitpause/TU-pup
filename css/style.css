@@ -35,3 +35,13 @@
     word-break: break-word;
     hyphens: auto;
   }
+
+  .image-container img {
+      max-height: 500px;
+      object-fit: contain;
+  }
+
+  .comment-image img {
+      max-height: 300px;
+      object-fit: contain;
+  }
