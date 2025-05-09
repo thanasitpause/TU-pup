@@ -32,7 +32,7 @@
         <div>
           <label for="email" class="block text-gray-700 font-medium mb-2">อีเมล</label>
           <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="your@email.com" required>
-          <p id="email-error" class="text-red-500 text-sm mt-1 hidden">กรุณาใส่อีเมลที่ถูกต้อง (ต้องมี @ และ .com เท่านั้น)</p>
+          <p id="email-error" class="text-red-500 text-sm mt-1 hidden">กรุณาใส่อีเมลที่ถูกต้อง</p>
           <p id="email-exists-error" class="text-red-500 text-sm mt-1 hidden">อีเมลนี้ถูกใช้งานในระบบแล้ว กรุณาใช้อีเมลอื่น</p>
         </div>
         
@@ -106,6 +106,13 @@
       const errorMessage = document.getElementById('error-message');
       const successMessage = document.getElementById('success-message');
       
+      // ฟังก์ชันตรวจสอบอีเมล - ครอบคลุมหลายรูปแบบ
+      function validateEmail(email) {
+        // pattern นี้จะครอบคลุมอีเมลส่วนใหญ่ รวมถึง .com, .th, .co.th, .ac.th และอื่นๆ
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@.]{2,}$/;
+        return emailPattern.test(email);
+      }
+      
       // ฟังก์ชันตรวจสอบข้อมูลเมื่อส่งฟอร์ม
       function validateForm() {
         let isValid = true;
@@ -118,9 +125,8 @@
           displayNameError.classList.add('hidden');
         }
         
-        // ตรวจสอบอีเมล
-        const emailPattern = /^[^\s@]+@[^\s@]+\.com$/;
-        if (!emailPattern.test(emailInput.value.trim())) {
+        // ตรวจสอบอีเมลด้วย pattern ที่ครอบคลุมมากขึ้น
+        if (!validateEmail(emailInput.value.trim())) {
           emailError.classList.remove('hidden');
           isValid = false;
         } else {
@@ -149,29 +155,47 @@
       // ฟังก์ชันตรวจสอบว่าอีเมลมีอยู่ในระบบแล้วหรือไม่
       async function checkEmailExists(email) {
         try {
-          // ใช้ supabase admin function หรือ RPC function ในการตรวจสอบ
-          // ทดลองเรียกใช้ signIn เพื่อตรวจสอบว่าอีเมลนี้มีในระบบหรือไม่
-          const { error } = await supabase.auth.signInWithOtp({
-            email: email,
-            options: {
-              // บังคับให้เป็นการตรวจสอบเท่านั้น ไม่ส่ง OTP จริง
-              shouldCreateUser: false
-            }
+          // เรียกใช้ PostgreSQL function ที่เราสร้างไว้
+          const { data, error } = await supabase.rpc('check_email_exists', {
+            email_to_check: email
           });
           
-          // ถ้ามี error "User not found" แสดงว่าอีเมลยังไม่มีในระบบ
-          if (error && error.message.includes("User not found")) {
-            return false; // อีเมลไม่มีในระบบ สามารถใช้ได้
+          if (error) {
+            console.error('Error checking email:', error);
+            return false; // ถ้ามี error ให้สมมติว่าอีเมลยังไม่มีในระบบ
           }
           
-          // กรณีอื่นๆ (เช่น ไม่มี error หรือ error อื่นที่ไม่ใช่ User not found)
-          // สมมติว่าอีเมลมีในระบบแล้ว
-          return true;
+          return data; // data เป็น boolean (true ถ้ามีอีเมลในระบบแล้ว, false ถ้ายังไม่มี)
         } catch (error) {
-          console.error("Error checking email:", error);
-          return false; // กรณีมี error ให้สมมติว่าอีเมลไม่มีในระบบ (อนุญาตให้ลงทะเบียน)
+          console.error('Error checking email:', error);
+          return false;
         }
       }
+      
+      // เพิ่ม Event Listener สำหรับการตรวจสอบอีเมลแบบ Real-time
+      emailInput.addEventListener('blur', async function() {
+        const email = emailInput.value.trim();
+        
+        // ตรวจสอบรูปแบบอีเมลก่อน
+        if (!validateEmail(email)) {
+          emailError.classList.remove('hidden');
+          emailExistsError.classList.add('hidden');
+          return; // ถ้าอีเมลไม่ถูกต้อง ไม่ต้องตรวจสอบการมีอยู่
+        } else {
+          emailError.classList.add('hidden');
+        }
+        
+        // ซ่อนข้อความเตือนอีเมลซ้ำก่อน
+        emailExistsError.classList.add('hidden');
+        
+        // ตรวจสอบว่าอีเมลมีอยู่ในระบบแล้วหรือไม่
+        const emailExists = await checkEmailExists(email);
+        
+        if (emailExists) {
+          // ถ้าอีเมลมีอยู่แล้ว แสดงข้อความเตือน
+          emailExistsError.classList.remove('hidden');
+        }
+      });
       
       // ลงทะเบียนผู้ใช้ใหม่
       const registerForm = document.getElementById('register-form');
@@ -202,7 +226,7 @@
         registerBtn.textContent = 'กำลังตรวจสอบ...';
         
         try {
-          // ตรวจสอบว่าอีเมลมีอยู่ในระบบแล้วหรือไม่
+          // ตรวจสอบว่าอีเมลมีอยู่ในระบบแล้วหรือไม่ก่อนลงทะเบียน
           const emailExists = await checkEmailExists(email);
           
           if (emailExists) {
@@ -227,19 +251,27 @@
             }
           });
           
-          if (error) throw error;
-          
-          // ตรวจสอบว่าต้องยืนยันอีเมลหรือไม่
-          if (data?.user && !data?.session) {
-            // ต้องยืนยันอีเมล
-            successMessage.textContent = 'ลงทะเบียนสำเร็จ! กรุณาตรวจสอบอีเมลของคุณเพื่อยืนยันบัญชี';
-            successMessage.classList.remove('hidden');
-            
-            // เคลียร์ฟอร์ม
-            registerForm.reset();
-          } else if (data?.user && data?.session) {
-            // ลงทะเบียนสำเร็จและล็อกอินอัตโนมัติ
-            window.location.href = 'index.html';
+          // จัดการกับข้อผิดพลาด
+          if (error) {
+            // ตรวจสอบว่าเป็นข้อผิดพลาดอีเมลมีอยู่แล้วหรือไม่
+            if (error.message && error.message.includes('already registered')) {
+              emailExistsError.classList.remove('hidden');
+            } else {
+              throw error;
+            }
+          } else if (data?.user) {
+            // ตรวจสอบว่าต้องยืนยันอีเมลหรือไม่
+            if (!data?.session) {
+              // ต้องยืนยันอีเมล
+              successMessage.textContent = 'ลงทะเบียนสำเร็จ! กรุณาตรวจสอบอีเมลของคุณเพื่อยืนยันบัญชี';
+              successMessage.classList.remove('hidden');
+              
+              // เคลียร์ฟอร์ม
+              registerForm.reset();
+            } else {
+              // ลงทะเบียนสำเร็จและล็อกอินอัตโนมัติ
+              window.location.href = 'index.html';
+            }
           } else {
             throw new Error('เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ');
           }
