@@ -1,1026 +1,594 @@
 <!DOCTYPE html>
 <html lang="th">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>รายละเอียดกระทู้ - TU-PUP</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Supabase Config -->
-    <script src="js/supabase-config.js"></script>
-    <!-- Sidebar CSS -->
-    <link rel="stylesheet" href="css/sidebar.css" />
-    <!-- Sidebar JS -->
-    <script src="js/sidebar.js"></script>
-    <!-- Custom Style CSS -->
-    <link rel="stylesheet" href="css/style.css" />
-  </head>
 
-  <body class="bg-gray-50 min-h-screen">
-    <!-- Navbar -->
-    <nav class="bg-white shadow-md sticky top-0 z-10">
-      <div class="container mx-auto px-4 py-3">
-        <div class="flex justify-between items-center">
-          <!-- Logo -->
-          <a href="index.html" class="font-bold text-2xl text-blue-600"
-            >TU-PUP</a
-          >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>รายละเอียดกระทู้ - TU-PUP</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase Config -->
+  <script src="js/supabase-config.js"></script>
+  <!-- Sidebar CSS -->
+  <link rel="stylesheet" href="css/sidebar.css" />
+  <!-- Sidebar JS -->
+  <script src="js/sidebar.js"></script>
+  <!-- Custom Style CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
 
-          <!-- User Menu -->
-          <div class="flex items-center space-x-4">
-            <button
-              id="new-post-btn"
-              class="hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition duration-300"
-            >
-              สร้างกระทู้ใหม่
-            </button>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md sticky top-0 z-10">
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex justify-between items-center">
+        <!-- Logo -->
+        <a href="index.html" class="font-bold text-2xl text-blue-600">TU-PUP</a>
 
-            <div id="user-menu" class="hidden flex items-center space-x-2">
-              <img
-                id="user-avatar"
-                src="img/default-avatar.png"
-                alt="User"
-                class="w-8 h-8 rounded-full"
-              />
-              <span
-                id="user-name"
-                class="hidden md:inline text-sm font-medium"
-              ></span>
-              <button
-                id="logout-btn"
-                class="text-sm text-gray-600 hover:text-gray-800"
-              >
-                ออกจากระบบ
-              </button>
-            </div>
+        <!-- User Menu -->
+        <div class="flex items-center space-x-4">
+          <button id="new-post-btn"
+            class="hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition duration-300">
+            สร้างกระทู้ใหม่
+          </button>
 
-            <div id="login-menu">
-              <a
-                href="login.html"
-                class="text-blue-600 hover:text-blue-800 font-medium"
-                >เข้าสู่ระบบ</a
-              >
-              <span class="text-gray-400 mx-2">|</span>
-              <a
-                href="register.html"
-                class="text-blue-600 hover:text-blue-800 font-medium"
-                >สมัครสมาชิก</a
-              >
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
-      <!-- Back Button -->
-      <div class="mb-4">
-        <a
-          href="index.html"
-          class="flex items-center text-blue-600 hover:text-blue-800"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 mr-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          กลับไปหน้าหลัก
-        </a>
-      </div>
-
-      <!-- Post Container -->
-      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <!-- Post Loading Placeholder -->
-        <div id="post-loading" class="animate-pulse">
-          <div class="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-          <div class="flex items-center mb-4">
-            <div class="rounded-full bg-gray-200 h-10 w-10 mr-3"></div>
-            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-          </div>
-          <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
-          <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
-          <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
-          <div class="h-64 bg-gray-200 rounded w-full mb-4"></div>
-        </div>
-
-        <!-- Post Content -->
-        <div id="post-content" class="hidden">
-          <div class="flex justify-between items-start mb-4">
-            <h1 id="post-title" class="text-2xl font-bold text-gray-800"></h1>
-
-            <!-- Post Action Buttons (จะแสดงเฉพาะเจ้าของกระทู้) -->
-            <div id="post-actions" class="hidden">
-              <button
-                id="edit-post-btn"
-                class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-3 rounded-lg text-sm transition duration-300 mr-2"
-              >
-                แก้ไขกระทู้
-              </button>
-              <button
-                id="delete-post-btn"
-                class="bg-red-500 hover:bg-red-600 text-white font-medium py-1 px-3 rounded-lg text-sm transition duration-300"
-              >
-                ลบกระทู้
-              </button>
-            </div>
-          </div>
-
-          <div class="flex items-center mb-4">
-            <img
-              id="post-author-avatar"
-              src="img/default-avatar.png"
-              alt="Author"
-              class="w-10 h-10 rounded-full mr-3"
-            />
-            <div>
-              <div id="post-author" class="font-medium"></div>
-              <div id="post-date" class="text-gray-500 text-sm"></div>
-            </div>
-          </div>
-
-          <div
-            id="post-body"
-            class="post-body text-gray-700 mb-6 whitespace-pre-line break-words"
-          ></div>
-
-          <!-- Post Images -->
-          <div
-            id="post-images"
-            class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"
-          ></div>
-
-          <div class="flex items-center text-gray-500 text-sm">
-            <div class="flex items-center mr-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                />
-              </svg>
-              <span id="post-views">0 ครั้ง</span>
-            </div>
-
-            <div class="flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-                />
-              </svg>
-              <span id="post-comments-count">0 ความคิดเห็น</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Edit Post Form Modal -->
-      <div
-        id="edit-modal"
-        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
-      >
-        <div
-          class="bg-white rounded-lg p-6 max-w-3xl w-full mx-4 max-h-screen overflow-y-auto"
-        >
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold">แก้ไขกระทู้</h3>
-            <button
-              id="close-edit-btn"
-              class="text-gray-500 hover:text-gray-700"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+          <div id="user-menu" class="hidden flex items-center space-x-2">
+            <img id="user-avatar" src="img/default-avatar.png" alt="User" class="w-8 h-8 rounded-full" />
+            <span id="user-name" class="hidden md:inline text-sm font-medium"></span>
+            <button id="logout-btn" class="text-sm text-gray-600 hover:text-gray-800">
+              ออกจากระบบ
             </button>
           </div>
 
-          <form id="edit-post-form" class="space-y-4">
-            <div>
-              <label
-                for="edit-title"
-                class="block text-gray-700 font-medium mb-2"
-                >หัวข้อกระทู้</label
-              >
-              <input
-                type="text"
-                id="edit-title"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="ใส่หัวข้อกระทู้ของคุณที่นี่"
-                required
-              />
-            </div>
-
-            <div>
-              <label
-                for="edit-content"
-                class="block text-gray-700 font-medium mb-2"
-                >เนื้อหากระทู้</label
-              >
-              <textarea
-                id="edit-content"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                rows="10"
-                placeholder="เล่าเรื่องของคุณที่นี่..."
-                required
-              ></textarea>
-            </div>
-
-            <!-- Image Management -->
-            <div>
-              <label class="block text-gray-700 font-medium mb-2"
-                >รูปภาพประกอบ</label
-              >
-
-              <!-- Current Images (if any) -->
-              <div id="current-images" class="mb-4">
-                <p class="text-gray-600 mb-2">รูปภาพปัจจุบัน:</p>
-                <div
-                  id="edit-post-images"
-                  class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2"
-                ></div>
-              </div>
-
-              <!-- Add New Images -->
-              <div>
-                <p class="text-gray-600 mb-2">เพิ่มรูปภาพใหม่:</p>
-                <div class="flex flex-wrap items-center mb-3">
-                  <label
-                    class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5 inline-block mr-1"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    เลือกรูปภาพ
-                    <input
-                      type="file"
-                      id="edit-image-upload"
-                      accept="image/*"
-                      class="hidden"
-                      multiple
-                    />
-                  </label>
-                  <span class="ml-3 text-sm text-gray-600"
-                    >สามารถเลือกได้หลายรูป</span
-                  >
-                </div>
-              </div>
-
-              <!-- Image Previews for New Images -->
-              <div
-                id="edit-image-previews"
-                class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3"
-              ></div>
-            </div>
-
-            <div
-              id="edit-error-message"
-              class="hidden p-3 bg-red-100 text-red-700 rounded-lg"
-            ></div>
-            <div
-              id="edit-success-message"
-              class="hidden p-3 bg-green-100 text-green-700 rounded-lg"
-            ></div>
-
-            <div class="flex justify-end space-x-3">
-              <button
-                type="button"
-                id="cancel-edit-btn"
-                class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-6 rounded-lg transition duration-300"
-              >
-                ยกเลิก
-              </button>
-              <button
-                type="submit"
-                id="save-edit-btn"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-300"
-              >
-                บันทึกการแก้ไข
-              </button>
-            </div>
-          </form>
+          <div id="login-menu">
+            <a href="login.html" class="text-blue-600 hover:text-blue-800 font-medium">เข้าสู่ระบบ</a>
+            <span class="text-gray-400 mx-2">|</span>
+            <a href="register.html" class="text-blue-600 hover:text-blue-800 font-medium">สมัครสมาชิก</a>
+          </div>
         </div>
       </div>
+    </div>
+  </nav>
 
-      <!-- Comments Section -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">ความคิดเห็น</h2>
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8">
+    <!-- Back Button -->
+    <div class="mb-4">
+      <a href="index.html" class="flex items-center text-blue-600 hover:text-blue-800">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        กลับไปหน้าหลัก
+      </a>
+    </div>
 
-        <!-- Comments List -->
-        <div id="comments-container" class="mb-6">
-          <!-- Comments Loading Placeholder -->
-          <div id="comments-loading" class="animate-pulse">
-            <div class="flex items-center mb-3">
-              <div class="rounded-full bg-gray-200 h-8 w-8 mr-3"></div>
-              <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-            </div>
-            <div class="ml-11 mb-6">
-              <div class="h-3 bg-gray-200 rounded w-full mb-2"></div>
-              <div class="h-3 bg-gray-200 rounded w-5/6 mb-2"></div>
-              <div class="h-3 bg-gray-200 rounded w-3/4"></div>
-            </div>
+    <!-- Post Container -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <!-- Post Loading Placeholder -->
+      <div id="post-loading" class="animate-pulse">
+        <div class="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
+        <div class="flex items-center mb-4">
+          <div class="rounded-full bg-gray-200 h-10 w-10 mr-3"></div>
+          <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+        </div>
+        <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+        <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+        <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+        <div class="h-64 bg-gray-200 rounded w-full mb-4"></div>
+      </div>
 
-            <div class="flex items-center mb-3">
-              <div class="rounded-full bg-gray-200 h-8 w-8 mr-3"></div>
-              <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-            </div>
-            <div class="ml-11 mb-6">
-              <div class="h-3 bg-gray-200 rounded w-full mb-2"></div>
-              <div class="h-3 bg-gray-200 rounded w-4/6"></div>
+      <!-- Post Content -->
+      <div id="post-content" class="hidden">
+        <div class="flex justify-between items-start mb-4">
+          <h1 id="post-title" class="text-2xl font-bold text-gray-800"></h1>
+
+          <!-- Post Action Buttons (จะแสดงเฉพาะเจ้าของกระทู้) -->
+          <div id="post-actions" class="hidden relative">
+            <button id="post-menu-btn" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+              </svg>
+            </button>
+            <div id="post-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 hidden">
+              <div class="py-1">
+                <button id="edit-post-btn"
+                  class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  แก้ไขกระทู้
+                </button>
+                <button id="delete-post-btn"
+                  class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                  ลบกระทู้
+                </button>
+              </div>
             </div>
           </div>
-
-          <!-- No Comments Message -->
-          <div id="no-comments" class="hidden text-center py-4 text-gray-500">
-            ยังไม่มีความคิดเห็น เป็นคนแรกที่แสดงความคิดเห็น!
-          </div>
-
-          <!-- Comments Content -->
-          <div id="comments-content"></div>
         </div>
 
-        <!-- Comment Form -->
-        <div id="comment-form-container" class="border-t pt-6">
-          <div id="login-to-comment" class="hidden text-center py-4">
-            <p class="mb-4 text-gray-600">
-              โปรด
-              <a href="login.html" class="text-blue-600 hover:text-blue-800"
-                >เข้าสู่ระบบ</a
-              >
-              เพื่อแสดงความคิดเห็น
-            </p>
+        <div class="flex items-center mb-4">
+          <img id="post-author-avatar" src="img/default-avatar.png" alt="Author" class="w-10 h-10 rounded-full mr-3" />
+          <div>
+            <div id="post-author" class="font-medium"></div>
+            <div id="post-date" class="text-gray-500 text-sm"></div>
+          </div>
+        </div>
+
+        <div id="post-body" class="post-body text-gray-700 mb-6 whitespace-pre-line break-words"></div>
+
+        <!-- Post Images -->
+        <div id="post-images" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
+
+        <div class="flex items-center text-gray-500 text-sm">
+          <div class="flex items-center mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span id="post-views">0 ครั้ง</span>
           </div>
 
-          <div id="comment-form" class="hidden">
-            <h3 class="text-lg font-semibold mb-4">แสดงความคิดเห็น</h3>
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+            </svg>
+            <span id="post-comments-count">0 ความคิดเห็น</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-            <div class="mb-4">
-              <textarea
-                id="comment-text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                rows="4"
-                placeholder="พิมพ์ความคิดเห็นของคุณที่นี่..."
-              ></textarea>
+    <!-- Edit Post Form Modal -->
+    <div id="edit-modal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
+      <div class="bg-white rounded-lg p-6 max-w-3xl w-full mx-4 max-h-screen overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold">แก้ไขกระทู้</h3>
+          <button id="close-edit-btn" class="text-gray-500 hover:text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form id="edit-post-form" class="space-y-4">
+          <div>
+            <label for="edit-title" class="block text-gray-700 font-medium mb-2">หัวข้อกระทู้</label>
+            <input type="text" id="edit-title"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="ใส่หัวข้อกระทู้ของคุณที่นี่" required />
+          </div>
+
+          <div>
+            <label for="edit-content" class="block text-gray-700 font-medium mb-2">เนื้อหากระทู้</label>
+            <textarea id="edit-content"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              rows="10" placeholder="เล่าเรื่องของคุณที่นี่..." required></textarea>
+          </div>
+
+          <!-- Image Management -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-2">รูปภาพประกอบ</label>
+
+            <!-- Current Images (if any) -->
+            <div id="current-images" class="mb-4">
+              <p class="text-gray-600 mb-2">รูปภาพปัจจุบัน:</p>
+              <div id="edit-post-images" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2"></div>
             </div>
 
-            <!-- Image Upload -->
-            <div class="mb-4">
-              <label class="block text-gray-700 mb-2"
-                >แนบรูปภาพ (ไม่บังคับ)</label
-              >
-              <div class="flex items-center">
+            <!-- Add New Images -->
+            <div>
+              <p class="text-gray-600 mb-2">เพิ่มรูปภาพใหม่:</p>
+              <div class="flex flex-wrap items-center mb-3">
                 <label
-                  class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5 inline-block mr-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
+                  class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   เลือกรูปภาพ
-                  <input
-                    type="file"
-                    id="comment-image"
-                    accept="image/*"
-                    class="hidden"
-                  />
+                  <input type="file" id="edit-image-upload" accept="image/*" class="hidden" multiple />
                 </label>
-                <span
-                  id="selected-image-name"
-                  class="ml-3 text-gray-600"
-                ></span>
-              </div>
-
-              <!-- Selected Image Preview -->
-              <div id="comment-image-preview-container" class="hidden mt-3">
-                <img
-                  id="comment-image-preview"
-                  src="#"
-                  alt="Preview"
-                  class="max-h-40 rounded"
-                />
-                <button
-                  id="remove-image-btn"
-                  class="text-sm text-red-600 hover:text-red-800 mt-1"
-                >
-                  ลบรูปภาพ
-                </button>
+                <span class="ml-3 text-sm text-gray-600">สามารถเลือกได้หลายรูป</span>
               </div>
             </div>
 
-            <div class="text-right">
-              <button
-                id="submit-comment-btn"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition duration-300"
-              >
-                ส่งความคิดเห็น
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Edit Comment Modal -->
-      <div
-        id="edit-comment-modal"
-        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
-      >
-        <div
-          class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-screen overflow-y-auto"
-        >
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold">แก้ไขความคิดเห็น</h3>
-            <button
-              id="close-edit-comment-btn"
-              class="text-gray-500 hover:text-gray-700"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+            <!-- Image Previews for New Images -->
+            <div id="edit-image-previews" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3"></div>
           </div>
 
-          <form id="edit-comment-form" class="space-y-4">
-            <input type="hidden" id="edit-comment-id" />
+          <div id="edit-error-message" class="hidden p-3 bg-red-100 text-red-700 rounded-lg"></div>
+          <div id="edit-success-message" class="hidden p-3 bg-green-100 text-green-700 rounded-lg"></div>
 
-            <div>
-              <label
-                for="edit-comment-content"
-                class="block text-gray-700 font-medium mb-2"
-                >เนื้อหาความคิดเห็น</label
-              >
-              <textarea
-                id="edit-comment-content"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                rows="6"
-                placeholder="พิมพ์ความคิดเห็นของคุณที่นี่..."
-                required
-              ></textarea>
-            </div>
-
-            <!-- Image Management -->
-            <div>
-              <!-- Current Image (if any) -->
-              <div id="current-comment-image" class="mb-4 hidden">
-                <p class="text-gray-600 mb-2">รูปภาพปัจจุบัน:</p>
-                <div class="relative inline-block">
-                  <img
-                    id="edit-comment-current-image"
-                    src="#"
-                    alt="Current comment image"
-                    class="max-h-48 rounded-lg"
-                  />
-                  <button
-                    id="remove-comment-image-btn"
-                    type="button"
-                    class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition duration-300"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-
-              <!-- Add New Image -->
-              <div id="add-comment-image-section">
-                <p class="text-gray-600 mb-2">เพิ่มรูปภาพใหม่:</p>
-                <div class="flex flex-wrap items-center mb-3">
-                  <label
-                    class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5 inline-block mr-1"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    เลือกรูปภาพ
-                    <input
-                      type="file"
-                      id="edit-comment-image-upload"
-                      accept="image/*"
-                      class="hidden"
-                    />
-                  </label>
-                  <span
-                    id="selected-comment-image-name"
-                    class="ml-3 text-gray-600"
-                  ></span>
-                </div>
-              </div>
-
-              <!-- Image Preview for New Image -->
-              <div
-                id="edit-comment-image-preview-container"
-                class="hidden mt-3"
-              >
-                <img
-                  id="edit-comment-image-preview"
-                  src="#"
-                  alt="Preview"
-                  class="max-h-40 rounded"
-                />
-                <button
-                  id="remove-edit-comment-image-btn"
-                  type="button"
-                  class="text-sm text-red-600 hover:text-red-800 mt-1"
-                >
-                  ลบรูปภาพที่เลือก
-                </button>
-              </div>
-            </div>
-
-            <div
-              id="edit-comment-error-message"
-              class="hidden p-3 bg-red-100 text-red-700 rounded-lg"
-            ></div>
-            <div
-              id="edit-comment-success-message"
-              class="hidden p-3 bg-green-100 text-green-700 rounded-lg"
-            ></div>
-
-            <div class="flex justify-end space-x-3">
-              <button
-                type="button"
-                id="cancel-edit-comment-btn"
-                class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-6 rounded-lg transition duration-300"
-              >
-                ยกเลิก
-              </button>
-              <button
-                type="submit"
-                id="save-edit-comment-btn"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-300"
-              >
-                บันทึกการแก้ไข
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Delete Comment Confirmation Modal -->
-      <div
-        id="delete-comment-modal"
-        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-      >
-        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-          <h3 class="text-xl font-bold mb-4">ยืนยันการลบความคิดเห็น</h3>
-          <p class="mb-6 text-gray-600">
-            คุณแน่ใจหรือไม่ว่าต้องการลบความคิดเห็นนี้?
-            การกระทำนี้ไม่สามารถย้อนกลับได้
-          </p>
-          <input type="hidden" id="delete-comment-id" />
           <div class="flex justify-end space-x-3">
-            <button
-              id="cancel-delete-comment-btn"
-              class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300"
-            >
+            <button type="button" id="cancel-edit-btn"
+              class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-6 rounded-lg transition duration-300">
               ยกเลิก
             </button>
-            <button
-              id="confirm-delete-comment-btn"
-              class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300"
-            >
-              ลบความคิดเห็น
+            <button type="submit" id="save-edit-btn"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+              บันทึกการแก้ไข
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">ความคิดเห็น</h2>
+
+      <!-- Comments List -->
+      <div id="comments-container" class="mb-6">
+        <!-- Comments Loading Placeholder -->
+        <div id="comments-loading" class="animate-pulse">
+          <div class="flex items-center mb-3">
+            <div class="rounded-full bg-gray-200 h-8 w-8 mr-3"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+          </div>
+          <div class="ml-11 mb-6">
+            <div class="h-3 bg-gray-200 rounded w-full mb-2"></div>
+            <div class="h-3 bg-gray-200 rounded w-5/6 mb-2"></div>
+            <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+          </div>
+
+          <div class="flex items-center mb-3">
+            <div class="rounded-full bg-gray-200 h-8 w-8 mr-3"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+          </div>
+          <div class="ml-11 mb-6">
+            <div class="h-3 bg-gray-200 rounded w-full mb-2"></div>
+            <div class="h-3 bg-gray-200 rounded w-4/6"></div>
+          </div>
+        </div>
+
+        <!-- No Comments Message -->
+        <div id="no-comments" class="hidden text-center py-4 text-gray-500">
+          ยังไม่มีความคิดเห็น เป็นคนแรกที่แสดงความคิดเห็น!
+        </div>
+
+        <!-- Comments Content -->
+        <div id="comments-content"></div>
+      </div>
+
+      <!-- Comment Form -->
+      <div id="comment-form-container" class="border-t pt-6">
+        <div id="login-to-comment" class="hidden text-center py-4">
+          <p class="mb-4 text-gray-600">
+            โปรด
+            <a href="login.html" class="text-blue-600 hover:text-blue-800">เข้าสู่ระบบ</a>
+            เพื่อแสดงความคิดเห็น
+          </p>
+        </div>
+
+        <div id="comment-form" class="hidden">
+          <h3 class="text-lg font-semibold mb-4">แสดงความคิดเห็น</h3>
+
+          <div class="mb-4">
+            <textarea id="comment-text"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              rows="4" placeholder="พิมพ์ความคิดเห็นของคุณที่นี่..."></textarea>
+          </div>
+
+          <!-- Image Upload -->
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-2">แนบรูปภาพ (ไม่บังคับ)</label>
+            <div class="flex items-center">
+              <label
+                class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none"
+                  viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                เลือกรูปภาพ
+                <input type="file" id="comment-image" accept="image/*" class="hidden" />
+              </label>
+              <span id="selected-image-name" class="ml-3 text-gray-600"></span>
+            </div>
+
+            <!-- Selected Image Preview -->
+            <div id="comment-image-preview-container" class="hidden mt-3">
+              <img id="comment-image-preview" src="#" alt="Preview" class="max-h-40 rounded" />
+              <button id="remove-image-btn" class="text-sm text-red-600 hover:text-red-800 mt-1">
+                ลบรูปภาพ
+              </button>
+            </div>
+          </div>
+
+          <div class="text-right">
+            <button id="submit-comment-btn"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition duration-300">
+              ส่งความคิดเห็น
             </button>
           </div>
         </div>
       </div>
-    </main>
+    </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div
-      id="delete-modal"
-      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
+    <!-- Edit Comment Modal -->
+    <div id="edit-comment-modal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
+      <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold">แก้ไขความคิดเห็น</h3>
+          <button id="close-edit-comment-btn" class="text-gray-500 hover:text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form id="edit-comment-form" class="space-y-4">
+          <input type="hidden" id="edit-comment-id" />
+
+          <div>
+            <label for="edit-comment-content" class="block text-gray-700 font-medium mb-2">เนื้อหาความคิดเห็น</label>
+            <textarea id="edit-comment-content"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              rows="6" placeholder="พิมพ์ความคิดเห็นของคุณที่นี่..." required></textarea>
+          </div>
+
+          <!-- Image Management -->
+          <div>
+            <!-- Current Image (if any) -->
+            <div id="current-comment-image" class="mb-4 hidden">
+              <p class="text-gray-600 mb-2">รูปภาพปัจจุบัน:</p>
+              <div class="relative inline-block">
+                <img id="edit-comment-current-image" src="#" alt="Current comment image" class="max-h-48 rounded-lg" />
+                <button id="remove-comment-image-btn" type="button"
+                  class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition duration-300">
+                  ×
+                </button>
+              </div>
+            </div>
+
+            <!-- Add New Image -->
+            <div id="add-comment-image-section">
+              <p class="text-gray-600 mb-2">เพิ่มรูปภาพใหม่:</p>
+              <div class="flex flex-wrap items-center mb-3">
+                <label
+                  class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  เลือกรูปภาพ
+                  <input type="file" id="edit-comment-image-upload" accept="image/*" class="hidden" />
+                </label>
+                <span id="selected-comment-image-name" class="ml-3 text-gray-600"></span>
+              </div>
+            </div>
+
+            <!-- Image Preview for New Image -->
+            <div id="edit-comment-image-preview-container" class="hidden mt-3">
+              <img id="edit-comment-image-preview" src="#" alt="Preview" class="max-h-40 rounded" />
+              <button id="remove-edit-comment-image-btn" type="button"
+                class="text-sm text-red-600 hover:text-red-800 mt-1">
+                ลบรูปภาพที่เลือก
+              </button>
+            </div>
+          </div>
+
+          <div id="edit-comment-error-message" class="hidden p-3 bg-red-100 text-red-700 rounded-lg"></div>
+          <div id="edit-comment-success-message" class="hidden p-3 bg-green-100 text-green-700 rounded-lg"></div>
+
+          <div class="flex justify-end space-x-3">
+            <button type="button" id="cancel-edit-comment-btn"
+              class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-6 rounded-lg transition duration-300">
+              ยกเลิก
+            </button>
+            <button type="submit" id="save-edit-comment-btn"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+              บันทึกการแก้ไข
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Comment Confirmation Modal -->
+    <div id="delete-comment-modal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 class="text-xl font-bold mb-4">ยืนยันการลบกระทู้</h3>
+        <h3 class="text-xl font-bold mb-4">ยืนยันการลบความคิดเห็น</h3>
         <p class="mb-6 text-gray-600">
-          คุณแน่ใจหรือไม่ว่าต้องการลบกระทู้นี้? การกระทำนี้ไม่สามารถย้อนกลับได้
+          คุณแน่ใจหรือไม่ว่าต้องการลบความคิดเห็นนี้?
+          การกระทำนี้ไม่สามารถย้อนกลับได้
         </p>
+        <input type="hidden" id="delete-comment-id" />
         <div class="flex justify-end space-x-3">
-          <button
-            id="cancel-delete-btn"
-            class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300"
-          >
+          <button id="cancel-delete-comment-btn"
+            class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300">
             ยกเลิก
           </button>
-          <button
-            id="confirm-delete-btn"
-            class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300"
-          >
-            ลบกระทู้
+          <button id="confirm-delete-comment-btn"
+            class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+            ลบความคิดเห็น
           </button>
         </div>
       </div>
     </div>
-    <script>
-      // ประกาศตัวแปรสำหรับการแก้ไขกระทู้
-      let currentPost = null; // เก็บข้อมูลกระทู้ปัจจุบัน
-      let imagesToRemove = []; // รายการ URL ของรูปภาพที่จะลบ
-      let newImagesToUpload = []; // รายการไฟล์รูปภาพใหม่ที่จะอัปโหลด
+  </main>
 
-      // ประกาศตัวแปรสำหรับการแก้ไขความคิดเห็น
-      let currentComment = null; // เก็บข้อมูลความคิดเห็นที่กำลังแก้ไข
-      let removeCommentImage = false; // ใช้ตรวจสอบว่าต้องการลบรูปภาพความคิดเห็นหรือไม่
-      let newCommentImage = null; // ไฟล์รูปภาพใหม่ที่จะอัปโหลดสำหรับความคิดเห็น
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+      <h3 class="text-xl font-bold mb-4">ยืนยันการลบกระทู้</h3>
+      <p class="mb-6 text-gray-600">
+        คุณแน่ใจหรือไม่ว่าต้องการลบกระทู้นี้? การกระทำนี้ไม่สามารถย้อนกลับได้
+      </p>
+      <div class="flex justify-end space-x-3">
+        <button id="cancel-delete-btn"
+          class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300">
+          ยกเลิก
+        </button>
+        <button id="confirm-delete-btn"
+          class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+          ลบกระทู้
+        </button>
+      </div>
+    </div>
+  </div>
+  <script>
+    // ประกาศตัวแปรสำหรับการแก้ไขกระทู้
+    let currentPost = null; // เก็บข้อมูลกระทู้ปัจจุบัน
+    let imagesToRemove = []; // รายการ URL ของรูปภาพที่จะลบ
+    let newImagesToUpload = []; // รายการไฟล์รูปภาพใหม่ที่จะอัปโหลด
 
-      document.addEventListener("DOMContentLoaded", async function () {
-        // ดึง Post ID จาก URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const postId = urlParams.get("id");
+    // ประกาศตัวแปรสำหรับการแก้ไขความคิดเห็น
+    let currentComment = null; // เก็บข้อมูลความคิดเห็นที่กำลังแก้ไข
+    let removeCommentImage = false; // ใช้ตรวจสอบว่าต้องการลบรูปภาพความคิดเห็นหรือไม่
+    let newCommentImage = null; // ไฟล์รูปภาพใหม่ที่จะอัปโหลดสำหรับความคิดเห็น
 
-        if (!postId) {
-          window.location.href = "index.html";
-          return;
+    document.addEventListener("DOMContentLoaded", async function () {
+      // ดึง Post ID จาก URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const postId = urlParams.get("id");
+
+      if (!postId) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      // ตรวจสอบสถานะการล็อกอิน
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      // แสดงหรือซ่อนเมนูตามสถานะล็อกอิน
+      if (user) {
+        document.getElementById("login-menu").classList.add("hidden");
+        document.getElementById("user-menu").classList.remove("hidden");
+        document.getElementById("new-post-btn").classList.remove("hidden");
+        document.getElementById("login-to-comment").classList.add("hidden");
+        document.getElementById("comment-form").classList.remove("hidden");
+
+        const displayName = user.user_metadata?.display_name || user.email;
+        document.getElementById("user-name").textContent = displayName;
+
+        // ตรวจสอบรูปโปรไฟล์
+        if (user.user_metadata?.avatar_url) {
+          document.getElementById("user-avatar").src =
+            user.user_metadata.avatar_url;
         }
 
-        // ตรวจสอบสถานะการล็อกอิน
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        // แสดงหรือซ่อนเมนูตามสถานะล็อกอิน
-        if (user) {
-          document.getElementById("login-menu").classList.add("hidden");
-          document.getElementById("user-menu").classList.remove("hidden");
-          document.getElementById("new-post-btn").classList.remove("hidden");
-          document.getElementById("login-to-comment").classList.add("hidden");
-          document.getElementById("comment-form").classList.remove("hidden");
-
-          const displayName = user.user_metadata?.display_name || user.email;
-          document.getElementById("user-name").textContent = displayName;
-
-          // ตรวจสอบรูปโปรไฟล์
-          if (user.user_metadata?.avatar_url) {
-            document.getElementById("user-avatar").src =
-              user.user_metadata.avatar_url;
-          }
-
-          // Event listener สำหรับปุ่มล็อกเอาต์
-          document
-            .getElementById("logout-btn")
-            .addEventListener("click", async () => {
-              const { error } = await supabase.auth.signOut();
-              if (!error) {
-                window.location.reload();
-              }
-            });
-        } else {
-          document
-            .getElementById("login-to-comment")
-            .classList.remove("hidden");
-        }
-
-        // Event listeners สำหรับปุ่มสร้างกระทู้ใหม่
+        // Event listener สำหรับปุ่มล็อกเอาต์
         document
-          .getElementById("new-post-btn")
-          .addEventListener("click", () => {
-            window.location.href = "new-post.html";
-          });
-
-        // โหลดข้อมูลกระทู้
-        await loadPost(postId, user);
-
-        // โหลดความคิดเห็น
-        await loadComments(postId, user);
-
-        // จัดการรูปภาพที่แนบกับความคิดเห็น
-        document
-          .getElementById("comment-image")
-          .addEventListener("change", function (e) {
-            const file = e.target.files[0];
-            if (file) {
-              document.getElementById("selected-image-name").textContent =
-                file.name;
-              document
-                .getElementById("comment-image-preview-container")
-                .classList.remove("hidden");
-
-              // แสดงตัวอย่างรูปภาพ
-              const reader = new FileReader();
-              reader.onload = function (e) {
-                document.getElementById("comment-image-preview").src =
-                  e.target.result;
-              };
-              reader.readAsDataURL(file);
+          .getElementById("logout-btn")
+          .addEventListener("click", async () => {
+            const { error } = await supabase.auth.signOut();
+            if (!error) {
+              window.location.reload();
             }
           });
-
-        // ลบรูปภาพที่เลือก
+      } else {
         document
-          .getElementById("remove-image-btn")
-          .addEventListener("click", function () {
+          .getElementById("login-to-comment")
+          .classList.remove("hidden");
+      }
+
+      // Event listeners สำหรับปุ่มสร้างกระทู้ใหม่
+      document
+        .getElementById("new-post-btn")
+        .addEventListener("click", () => {
+          window.location.href = "new-post.html";
+        });
+
+      // โหลดข้อมูลกระทู้
+      await loadPost(postId, user);
+
+      // โหลดความคิดเห็น
+      await loadComments(postId, user);
+
+      // จัดการรูปภาพที่แนบกับความคิดเห็น
+      document
+        .getElementById("comment-image")
+        .addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          if (file) {
+            document.getElementById("selected-image-name").textContent =
+              file.name;
+            document
+              .getElementById("comment-image-preview-container")
+              .classList.remove("hidden");
+
+            // แสดงตัวอย่างรูปภาพ
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              document.getElementById("comment-image-preview").src =
+                e.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+      // ลบรูปภาพที่เลือก
+      document
+        .getElementById("remove-image-btn")
+        .addEventListener("click", function () {
+          document.getElementById("comment-image").value = "";
+          document.getElementById("selected-image-name").textContent = "";
+          document
+            .getElementById("comment-image-preview-container")
+            .classList.add("hidden");
+        });
+
+      // ส่งความคิดเห็น
+      document
+        .getElementById("submit-comment-btn")
+        .addEventListener("click", async function () {
+          if (!user) {
+            window.location.href = "login.html";
+            return;
+          }
+
+          const commentText = document
+            .getElementById("comment-text")
+            .value.trim();
+          const commentImageInput = document.getElementById("comment-image");
+
+          if (!commentText && !commentImageInput.files[0]) {
+            alert("โปรดใส่ข้อความหรือรูปภาพ");
+            return;
+          }
+
+          // ปิดปุ่มส่งความคิดเห็นระหว่างที่กำลังส่ง
+          const submitBtn = this;
+          submitBtn.disabled = true;
+          submitBtn.textContent = "กำลังส่ง...";
+
+          try {
+            let imageUrl = null;
+
+            // อัปโหลดรูปภาพ (ถ้ามี)
+            if (commentImageInput.files[0]) {
+              const file = commentImageInput.files[0];
+              imageUrl = await uploadImage(file, "comments");
+            }
+
+            // สร้างความคิดเห็นใหม่
+            await createComment(postId, commentText, imageUrl);
+
+            // รีเซ็ตฟอร์ม
+            document.getElementById("comment-text").value = "";
             document.getElementById("comment-image").value = "";
             document.getElementById("selected-image-name").textContent = "";
             document
               .getElementById("comment-image-preview-container")
               .classList.add("hidden");
-          });
-
-        // ส่งความคิดเห็น
-        document
-          .getElementById("submit-comment-btn")
-          .addEventListener("click", async function () {
-            if (!user) {
-              window.location.href = "login.html";
-              return;
-            }
-
-            const commentText = document
-              .getElementById("comment-text")
-              .value.trim();
-            const commentImageInput = document.getElementById("comment-image");
-
-            if (!commentText && !commentImageInput.files[0]) {
-              alert("โปรดใส่ข้อความหรือรูปภาพ");
-              return;
-            }
-
-            // ปิดปุ่มส่งความคิดเห็นระหว่างที่กำลังส่ง
-            const submitBtn = this;
-            submitBtn.disabled = true;
-            submitBtn.textContent = "กำลังส่ง...";
-
-            try {
-              let imageUrl = null;
-
-              // อัปโหลดรูปภาพ (ถ้ามี)
-              if (commentImageInput.files[0]) {
-                const file = commentImageInput.files[0];
-                imageUrl = await uploadImage(file, "comments");
-              }
-
-              // สร้างความคิดเห็นใหม่
-              await createComment(postId, commentText, imageUrl);
-
-              // รีเซ็ตฟอร์ม
-              document.getElementById("comment-text").value = "";
-              document.getElementById("comment-image").value = "";
-              document.getElementById("selected-image-name").textContent = "";
-              document
-                .getElementById("comment-image-preview-container")
-                .classList.add("hidden");
-
-              // โหลดความคิดเห็นใหม่
-              await loadComments(postId, user);
-
-              // ดึงข้อมูลกระทู้ใหม่เพื่ออัปเดตจำนวนความคิดเห็นที่แสดงในหน้าเว็บ
-              const { data: post } = await supabase
-                .from("posts")
-                .select("comment_count")
-                .eq("id", postId)
-                .single();
-
-              if (post) {
-                document.getElementById("post-comments-count").textContent = `${
-                  post.comment_count || 0
-                } ความคิดเห็น`;
-              }
-            } catch (error) {
-              console.error("Error submitting comment:", error);
-              alert("เกิดข้อผิดพลาดในการส่งความคิดเห็น โปรดลองอีกครั้ง");
-            } finally {
-              // เปิดปุ่มส่งความคิดเห็นอีกครั้ง
-              submitBtn.disabled = false;
-              submitBtn.textContent = "ส่งความคิดเห็น";
-            }
-          });
-
-        // ลบกระทู้ (Modal)
-        const deleteModal = document.getElementById("delete-modal");
-        const deletePostBtn = document.getElementById("delete-post-btn");
-        const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
-        const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
-
-        // เปิด Modal ยืนยันการลบ
-        if (deletePostBtn) {
-          deletePostBtn.addEventListener("click", () => {
-            deleteModal.classList.remove("hidden");
-          });
-        }
-
-        // ปิด Modal โดยไม่ลบ
-        cancelDeleteBtn.addEventListener("click", () => {
-          deleteModal.classList.add("hidden");
-        });
-
-        // ยืนยันการลบกระทู้
-        confirmDeleteBtn.addEventListener("click", async () => {
-          try {
-            // ลบกระทู้
-            const { error } = await supabase
-              .from("posts")
-              .delete()
-              .eq("id", postId);
-
-            if (error) throw error;
-
-            alert("ลบกระทู้เรียบร้อยแล้ว");
-            window.location.href = "index.html";
-          } catch (error) {
-            console.error("Error deleting post:", error);
-            alert("เกิดข้อผิดพลาดในการลบกระทู้ โปรดลองอีกครั้ง");
-            deleteModal.classList.add("hidden");
-          }
-        });
-
-        // เพิ่ม event listeners สำหรับการแก้ไขกระทู้
-        const editPostBtn = document.getElementById("edit-post-btn");
-        const editModal = document.getElementById("edit-modal");
-        const closeEditBtn = document.getElementById("close-edit-btn");
-        const cancelEditBtn = document.getElementById("cancel-edit-btn");
-        const editPostForm = document.getElementById("edit-post-form");
-
-        if (editPostBtn) {
-          // เปิด modal แก้ไขกระทู้
-          editPostBtn.addEventListener("click", () => {
-            initEditForm();
-            editModal.classList.remove("hidden");
-          });
-        }
-
-        // ปิด modal แก้ไขกระทู้
-        closeEditBtn.addEventListener("click", closeEditModal);
-        cancelEditBtn.addEventListener("click", closeEditModal);
-
-        // บันทึกการแก้ไขกระทู้
-        editPostForm.addEventListener("submit", handleEditFormSubmit);
-
-        // จัดการอัปโหลดรูปภาพใหม่
-        document
-          .getElementById("edit-image-upload")
-          .addEventListener("change", handleEditImageUpload);
-
-        // ตั้งค่า event listeners สำหรับการแก้ไขความคิดเห็น
-        const editCommentModal = document.getElementById("edit-comment-modal");
-        const closeEditCommentBtn = document.getElementById(
-          "close-edit-comment-btn"
-        );
-        const cancelEditCommentBtn = document.getElementById(
-          "cancel-edit-comment-btn"
-        );
-        const editCommentForm = document.getElementById("edit-comment-form");
-
-        // ปิด modal แก้ไขความคิดเห็น
-        closeEditCommentBtn.addEventListener("click", closeEditCommentModal);
-        cancelEditCommentBtn.addEventListener("click", closeEditCommentModal);
-
-        // บันทึกการแก้ไขความคิดเห็น
-        editCommentForm.addEventListener("submit", handleEditCommentFormSubmit);
-
-        // จัดการการแสดงตัวอย่างรูปภาพใหม่สำหรับความคิดเห็น
-        document
-          .getElementById("edit-comment-image-upload")
-          .addEventListener("change", handleEditCommentImageUpload);
-
-        // ลบรูปภาพความคิดเห็นปัจจุบัน
-        document
-          .getElementById("remove-comment-image-btn")
-          .addEventListener("click", function () {
-            removeCommentImage = true;
-            document
-              .getElementById("current-comment-image")
-              .classList.add("hidden");
-            document
-              .getElementById("add-comment-image-section")
-              .classList.remove("hidden");
-          });
-
-        // ลบรูปภาพความคิดเห็นใหม่ที่เลือก
-        document
-          .getElementById("remove-edit-comment-image-btn")
-          .addEventListener("click", function () {
-            newCommentImage = null;
-            document.getElementById("edit-comment-image-upload").value = "";
-            document.getElementById("selected-comment-image-name").textContent =
-              "";
-            document
-              .getElementById("edit-comment-image-preview-container")
-              .classList.add("hidden");
-          });
-
-        // ตั้งค่า event listeners สำหรับการลบความคิดเห็น
-        const deleteCommentModal = document.getElementById(
-          "delete-comment-modal"
-        );
-        const cancelDeleteCommentBtn = document.getElementById(
-          "cancel-delete-comment-btn"
-        );
-        const confirmDeleteCommentBtn = document.getElementById(
-          "confirm-delete-comment-btn"
-        );
-
-        // ปิด Modal การลบความคิดเห็นโดยไม่ลบ
-        cancelDeleteCommentBtn.addEventListener("click", () => {
-          deleteCommentModal.classList.add("hidden");
-        });
-
-        // ยืนยันการลบความคิดเห็น
-        confirmDeleteCommentBtn.addEventListener("click", async () => {
-          const commentId = document.getElementById("delete-comment-id").value;
-
-          if (!commentId) {
-            deleteCommentModal.classList.add("hidden");
-            return;
-          }
-
-          try {
-            // ลบความคิดเห็น
-            const { error } = await supabase
-              .from("comments")
-              .delete()
-              .eq("id", commentId);
-
-            if (error) throw error;
-
-            // ลดจำนวนความคิดเห็นของกระทู้
-            await decrementCommentCount(postId);
-
-            // ปิด modal
-            deleteCommentModal.classList.add("hidden");
 
             // โหลดความคิดเห็นใหม่
             await loadComments(postId, user);
@@ -1033,711 +601,934 @@
               .single();
 
             if (post) {
-              document.getElementById("post-comments-count").textContent = `${
-                post.comment_count || 0
-              } ความคิดเห็น`;
+              document.getElementById("post-comments-count").textContent = `${post.comment_count || 0
+                } ความคิดเห็น`;
             }
           } catch (error) {
-            console.error("Error deleting comment:", error);
-            alert("เกิดข้อผิดพลาดในการลบความคิดเห็น โปรดลองอีกครั้ง");
-            deleteCommentModal.classList.add("hidden");
+            console.error("Error submitting comment:", error);
+            alert("เกิดข้อผิดพลาดในการส่งความคิดเห็น โปรดลองอีกครั้ง");
+          } finally {
+            // เปิดปุ่มส่งความคิดเห็นอีกครั้ง
+            submitBtn.disabled = false;
+            submitBtn.textContent = "ส่งความคิดเห็น";
           }
         });
+
+      // ลบกระทู้ (Modal)
+      const deleteModal = document.getElementById("delete-modal");
+      const deletePostBtn = document.getElementById("delete-post-btn");
+      const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
+      const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
+
+      // เปิด Modal ยืนยันการลบ
+      if (deletePostBtn) {
+        deletePostBtn.addEventListener("click", () => {
+          deleteModal.classList.remove("hidden");
+        });
+      }
+
+      // ปิด Modal โดยไม่ลบ
+      cancelDeleteBtn.addEventListener("click", () => {
+        deleteModal.classList.add("hidden");
       });
 
-      // โหลดข้อมูลกระทู้
-      async function loadPost(postId, currentUser) {
+      // ยืนยันการลบกระทู้
+      confirmDeleteBtn.addEventListener("click", async () => {
         try {
-          // ดึงข้อมูลกระทู้
-          const { data: post, error } = await supabase
+          // ลบกระทู้
+          const { error } = await supabase
             .from("posts")
-            .select("*")
+            .delete()
+            .eq("id", postId);
+
+          if (error) throw error;
+
+          alert("ลบกระทู้เรียบร้อยแล้ว");
+          window.location.href = "index.html";
+        } catch (error) {
+          console.error("Error deleting post:", error);
+          alert("เกิดข้อผิดพลาดในการลบกระทู้ โปรดลองอีกครั้ง");
+          deleteModal.classList.add("hidden");
+        }
+      });
+
+      // เพิ่ม event listeners สำหรับการแก้ไขกระทู้
+      const editPostBtn = document.getElementById("edit-post-btn");
+      const editModal = document.getElementById("edit-modal");
+      const closeEditBtn = document.getElementById("close-edit-btn");
+      const cancelEditBtn = document.getElementById("cancel-edit-btn");
+      const editPostForm = document.getElementById("edit-post-form");
+
+      if (editPostBtn) {
+        // เปิด modal แก้ไขกระทู้
+        editPostBtn.addEventListener("click", () => {
+          initEditForm();
+          editModal.classList.remove("hidden");
+        });
+      }
+
+      // ปิด modal แก้ไขกระทู้
+      closeEditBtn.addEventListener("click", closeEditModal);
+      cancelEditBtn.addEventListener("click", closeEditModal);
+
+      // บันทึกการแก้ไขกระทู้
+      editPostForm.addEventListener("submit", handleEditFormSubmit);
+
+      // จัดการอัปโหลดรูปภาพใหม่
+      document
+        .getElementById("edit-image-upload")
+        .addEventListener("change", handleEditImageUpload);
+
+      // ตั้งค่า event listeners สำหรับการแก้ไขความคิดเห็น
+      const editCommentModal = document.getElementById("edit-comment-modal");
+      const closeEditCommentBtn = document.getElementById(
+        "close-edit-comment-btn"
+      );
+      const cancelEditCommentBtn = document.getElementById(
+        "cancel-edit-comment-btn"
+      );
+      const editCommentForm = document.getElementById("edit-comment-form");
+
+      // ปิด modal แก้ไขความคิดเห็น
+      closeEditCommentBtn.addEventListener("click", closeEditCommentModal);
+      cancelEditCommentBtn.addEventListener("click", closeEditCommentModal);
+
+      // บันทึกการแก้ไขความคิดเห็น
+      editCommentForm.addEventListener("submit", handleEditCommentFormSubmit);
+
+      // จัดการการแสดงตัวอย่างรูปภาพใหม่สำหรับความคิดเห็น
+      document
+        .getElementById("edit-comment-image-upload")
+        .addEventListener("change", handleEditCommentImageUpload);
+
+      // ลบรูปภาพความคิดเห็นปัจจุบัน
+      document
+        .getElementById("remove-comment-image-btn")
+        .addEventListener("click", function () {
+          removeCommentImage = true;
+          document
+            .getElementById("current-comment-image")
+            .classList.add("hidden");
+          document
+            .getElementById("add-comment-image-section")
+            .classList.remove("hidden");
+        });
+
+      // ลบรูปภาพความคิดเห็นใหม่ที่เลือก
+      document
+        .getElementById("remove-edit-comment-image-btn")
+        .addEventListener("click", function () {
+          newCommentImage = null;
+          document.getElementById("edit-comment-image-upload").value = "";
+          document.getElementById("selected-comment-image-name").textContent =
+            "";
+          document
+            .getElementById("edit-comment-image-preview-container")
+            .classList.add("hidden");
+        });
+
+      // ตั้งค่า event listeners สำหรับการลบความคิดเห็น
+      const deleteCommentModal = document.getElementById(
+        "delete-comment-modal"
+      );
+      const cancelDeleteCommentBtn = document.getElementById(
+        "cancel-delete-comment-btn"
+      );
+      const confirmDeleteCommentBtn = document.getElementById(
+        "confirm-delete-comment-btn"
+      );
+
+      // ปิด Modal การลบความคิดเห็นโดยไม่ลบ
+      cancelDeleteCommentBtn.addEventListener("click", () => {
+        deleteCommentModal.classList.add("hidden");
+      });
+
+      // ยืนยันการลบความคิดเห็น
+      confirmDeleteCommentBtn.addEventListener("click", async () => {
+        const commentId = document.getElementById("delete-comment-id").value;
+
+        if (!commentId) {
+          deleteCommentModal.classList.add("hidden");
+          return;
+        }
+
+        try {
+          // ลบความคิดเห็น
+          const { error } = await supabase
+            .from("comments")
+            .delete()
+            .eq("id", commentId);
+
+          if (error) throw error;
+
+          // ลดจำนวนความคิดเห็นของกระทู้
+          await decrementCommentCount(postId);
+
+          // ปิด modal
+          deleteCommentModal.classList.add("hidden");
+
+          // โหลดความคิดเห็นใหม่
+          await loadComments(postId, user);
+
+          // ดึงข้อมูลกระทู้ใหม่เพื่ออัปเดตจำนวนความคิดเห็นที่แสดงในหน้าเว็บ
+          const { data: post } = await supabase
+            .from("posts")
+            .select("comment_count")
             .eq("id", postId)
             .single();
 
-          if (error) throw error;
-
-          if (!post) {
-            window.location.href = "index.html";
-            return;
-          }
-
-          // อัปเดตตัวแปร currentPost เพื่อใช้ในการแก้ไขกระทู้
-          currentPost = post;
-
-          // บันทึกการเข้าชมกระทู้ในตาราง posts_view
-          await recordPostView(postId, currentUser);
-
-          // ดึงจำนวนการเข้าชมทั้งหมดจากตาราง posts_view
-          const viewCount = await getPostViewCount(postId);
-
-          // ซ่อน loading
-          document.getElementById("post-loading").classList.add("hidden");
-          document.getElementById("post-content").classList.remove("hidden");
-
-          // กำหนดเนื้อหากระทู้
-          document.title = `${post.title} - TU-PUP`;
-          document.getElementById("post-title").textContent = post.title;
-          document.getElementById("post-author").textContent = post.author_name;
-          document.getElementById("post-date").textContent = formatTimestamp(
-            post.created_at
-          );
-          document.getElementById("post-body").textContent = post.content;
-          document.getElementById(
-            "post-views"
-          ).textContent = `${viewCount} ครั้ง`;
-          document.getElementById("post-comments-count").textContent = `${
-            post.comment_count || 0
-          } ความคิดเห็น`;
-
-          // แสดงรูปภาพ (ถ้ามี)
-          const postImages = document.getElementById("post-images");
-          postImages.innerHTML = "";
-
-          if (post.image_urls && post.image_urls.length > 0) {
-            post.image_urls.forEach((imageUrl) => {
-              const imageContainer = document.createElement("div");
-              imageContainer.className = "image-container";
-
-              const image = document.createElement("img");
-              image.src = imageUrl;
-              image.alt = "Post image";
-              image.className = "rounded-lg w-full";
-
-              imageContainer.appendChild(image);
-              postImages.appendChild(imageContainer);
-            });
-            postImages.classList.remove("hidden");
-          } else {
-            postImages.classList.add("hidden");
-          }
-
-          // ตรวจสอบสิทธิ์การจัดการกระทู้ (ต้องเป็นเจ้าของกระทู้)
-          if (currentUser && post.author_id === currentUser.id) {
-            // แสดงกลุ่มปุ่มจัดการกระทู้
-            document.getElementById("post-actions").classList.remove("hidden");
-          } else {
-            // ซ่อนกลุ่มปุ่มจัดการกระทู้
-            document.getElementById("post-actions").classList.add("hidden");
+          if (post) {
+            document.getElementById("post-comments-count").textContent = `${post.comment_count || 0
+              } ความคิดเห็น`;
           }
         } catch (error) {
-          console.error("Error loading post:", error);
-          alert("เกิดข้อผิดพลาดในการโหลดกระทู้ โปรดลองอีกครั้ง");
+          console.error("Error deleting comment:", error);
+          alert("เกิดข้อผิดพลาดในการลบความคิดเห็น โปรดลองอีกครั้ง");
+          deleteCommentModal.classList.add("hidden");
         }
+      });
+
+      // สำหรับเมนูของกระทู้
+      const postMenuBtn = document.getElementById("post-menu-btn");
+      const postDropdown = document.getElementById("post-dropdown");
+
+      if (postMenuBtn) {
+        postMenuBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          postDropdown.classList.toggle("hidden");
+        });
       }
 
-      // โหลดความคิดเห็น
-      async function loadComments(postId, currentUser) {
-        try {
-          // ดึงความคิดเห็นของกระทู้
-          const { data: comments, error } = await supabase
-            .from("comments")
-            .select("*")
-            .eq("post_id", postId)
-            .order("created_at", { ascending: true });
+      // ปิดเมนูเมื่อคลิกที่อื่น
+      document.addEventListener("click", function () {
+        if (postDropdown) {
+          postDropdown.classList.add("hidden");
+        }
 
-          if (error) throw error;
+        // ปิดเมนูความคิดเห็นทั้งหมด
+        document.querySelectorAll(".comment-dropdown").forEach((dropdown) => {
+          dropdown.classList.add("hidden");
+        });
+      });
+    }); // ปิดท้าย DOMContentLoaded
 
-          // ซ่อน loading
-          document.getElementById("comments-loading").classList.add("hidden");
+    // โหลดข้อมูลกระทู้
+    async function loadPost(postId, currentUser) {
+      try {
+        // ดึงข้อมูลกระทู้
+        const { data: post, error } = await supabase
+          .from("posts")
+          .select("*")
+          .eq("id", postId)
+          .single();
 
-          const commentsContent = document.getElementById("comments-content");
-          commentsContent.innerHTML = "";
+        if (error) throw error;
 
-          if (!comments || comments.length === 0) {
-            document.getElementById("no-comments").classList.remove("hidden");
-            return;
-          }
+        if (!post) {
+          window.location.href = "index.html";
+          return;
+        }
 
-          document.getElementById("no-comments").classList.add("hidden");
+        // อัปเดตตัวแปร currentPost เพื่อใช้ในการแก้ไขกระทู้
+        currentPost = post;
 
-          // แสดงความคิดเห็น
-          comments.forEach((comment, index) => {
-            const commentEl = document.createElement("div");
-            commentEl.className =
-              "mb-6 pb-6 border-b border-gray-200 last:border-0 last:mb-0 last:pb-0";
-            commentEl.id = `comment-${comment.id}`;
+        // บันทึกการเข้าชมกระทู้ในตาราง posts_view
+        await recordPostView(postId, currentUser);
 
-            let commentHtml = `
+        // ดึงจำนวนการเข้าชมทั้งหมดจากตาราง posts_view
+        const viewCount = await getPostViewCount(postId);
+
+        // ซ่อน loading
+        document.getElementById("post-loading").classList.add("hidden");
+        document.getElementById("post-content").classList.remove("hidden");
+
+        // กำหนดเนื้อหากระทู้
+        document.title = `${post.title} - TU-PUP`;
+        document.getElementById("post-title").textContent = post.title;
+        document.getElementById("post-author").textContent = post.author_name;
+        document.getElementById("post-date").textContent = formatTimestamp(
+          post.created_at
+        );
+        document.getElementById("post-body").textContent = post.content;
+        document.getElementById(
+          "post-views"
+        ).textContent = `${viewCount} ครั้ง`;
+        document.getElementById("post-comments-count").textContent = `${post.comment_count || 0
+          } ความคิดเห็น`;
+
+        // แสดงรูปภาพ (ถ้ามี)
+        const postImages = document.getElementById("post-images");
+        postImages.innerHTML = "";
+
+        if (post.image_urls && post.image_urls.length > 0) {
+          post.image_urls.forEach((imageUrl) => {
+            const imageContainer = document.createElement("div");
+            imageContainer.className = "image-container";
+
+            const image = document.createElement("img");
+            image.src = imageUrl;
+            image.alt = "Post image";
+            image.className = "rounded-lg w-full";
+
+            imageContainer.appendChild(image);
+            postImages.appendChild(imageContainer);
+          });
+          postImages.classList.remove("hidden");
+        } else {
+          postImages.classList.add("hidden");
+        }
+
+        // ตรวจสอบสิทธิ์การจัดการกระทู้ (ต้องเป็นเจ้าของกระทู้)
+        if (currentUser && post.author_id === currentUser.id) {
+          // แสดงกลุ่มปุ่มจัดการกระทู้
+          document.getElementById("post-actions").classList.remove("hidden");
+        } else {
+          // ซ่อนกลุ่มปุ่มจัดการกระทู้
+          document.getElementById("post-actions").classList.add("hidden");
+        }
+      } catch (error) {
+        console.error("Error loading post:", error);
+        alert("เกิดข้อผิดพลาดในการโหลดกระทู้ โปรดลองอีกครั้ง");
+      }
+    }
+
+    // โหลดความคิดเห็น
+    async function loadComments(postId, currentUser) {
+      try {
+        // ดึงความคิดเห็นของกระทู้
+        const { data: comments, error } = await supabase
+          .from("comments")
+          .select("*")
+          .eq("post_id", postId)
+          .order("created_at", { ascending: true });
+
+        if (error) throw error;
+
+        // ซ่อน loading
+        document.getElementById("comments-loading").classList.add("hidden");
+
+        const commentsContent = document.getElementById("comments-content");
+        commentsContent.innerHTML = "";
+
+        if (!comments || comments.length === 0) {
+          document.getElementById("no-comments").classList.remove("hidden");
+          return;
+        }
+
+        document.getElementById("no-comments").classList.add("hidden");
+
+        // แสดงความคิดเห็น
+        comments.forEach((comment, index) => {
+          const commentEl = document.createElement("div");
+          commentEl.className =
+            "mb-6 pb-6 border-b border-gray-200 last:border-0 last:mb-0 last:pb-0";
+          commentEl.id = `comment-${comment.id}`;
+
+          let commentHtml = `
             <div class="flex justify-between items-start">
               <div class="flex items-center mb-3">
                 <img src="img/default-avatar.png" alt="User" class="w-8 h-8 rounded-full mr-3">
                 <div>
                   <div class="font-medium">${comment.author_name}</div>
                   <div class="text-gray-500 text-xs">${formatTimestamp(
-                    comment.created_at
-                  )}</div>
+            comment.created_at
+          )}</div>
                 </div>
               </div>
             `;
 
-            // แสดงปุ่มแก้ไข/ลบสำหรับเจ้าของความคิดเห็น
-            if (currentUser && comment.author_id === currentUser.id) {
-              commentHtml += `
-                <div class="comment-actions">
-                  <button
-                    class="edit-comment-btn text-blue-500 hover:text-blue-700 text-sm mr-2"
-                    data-id="${comment.id}"
-                  >
-                    แก้ไข
-                  </button>
-                  <button
-                    class="delete-comment-btn text-red-500 hover:text-red-700 text-sm"
-                    data-id="${comment.id}"
-                  >
-                    ลบ
-                  </button>
-                </div>
-              `;
-            }
-
+          // แสดงปุ่มแก้ไข/ลบสำหรับเจ้าของความคิดเห็น
+          if (currentUser && comment.author_id === currentUser.id) {
             commentHtml += `
+    <div class="comment-actions relative">
+      <button
+        class="comment-menu-btn text-gray-500 hover:text-gray-700 focus:outline-none"
+        data-id="${comment.id}"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+        </svg>
+      </button>
+      <div class="comment-dropdown absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10 hidden">
+        <div class="py-1">
+          <button class="edit-comment-btn w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-id="${comment.id}">
+            แก้ไข
+          </button>
+          <button class="delete-comment-btn w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-gray-100" data-id="${comment.id}">
+            ลบ
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+          }
+
+          commentHtml += `
             </div>
             <div class="ml-11">
               <div class="comment-content text-gray-700 mb-3 break-words">${comment.content}</div>
             `;
 
-            // แสดงรูปภาพ (ถ้ามี)
-            if (comment.image_url) {
-              commentHtml += `
+          // แสดงรูปภาพ (ถ้ามี)
+          if (comment.image_url) {
+            commentHtml += `
               <div class="comment-image mt-2">
                 <img src="${comment.image_url}" alt="Comment image" class="rounded-lg">
               </div>
             `;
-            }
+          }
 
-            commentHtml += `
+          commentHtml += `
             </div>
           `;
 
-            commentEl.innerHTML = commentHtml;
-            commentsContent.appendChild(commentEl);
+          commentEl.innerHTML = commentHtml;
+          commentsContent.appendChild(commentEl);
 
-            // เพิ่ม event listener สำหรับปุ่มแก้ไขความคิดเห็น
-            const editButtons = commentEl.querySelectorAll(".edit-comment-btn");
-            editButtons.forEach((button) => {
-              button.addEventListener("click", () => {
-                initEditCommentForm(comment);
-                document
-                  .getElementById("edit-comment-modal")
-                  .classList.remove("hidden");
-              });
-            });
-
-            // เพิ่ม event listener สำหรับปุ่มลบความคิดเห็น
-            const deleteButtons = commentEl.querySelectorAll(
-              ".delete-comment-btn"
-            );
-            deleteButtons.forEach((button) => {
-              button.addEventListener("click", () => {
-                document.getElementById("delete-comment-id").value = comment.id;
-                document
-                  .getElementById("delete-comment-modal")
-                  .classList.remove("hidden");
-              });
+          // เพิ่ม event listener สำหรับปุ่มแก้ไขความคิดเห็น
+          const editButtons = commentEl.querySelectorAll(".edit-comment-btn");
+          editButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+              initEditCommentForm(comment);
+              document
+                .getElementById("edit-comment-modal")
+                .classList.remove("hidden");
             });
           });
-        } catch (error) {
-          console.error("Error loading comments:", error);
-        }
+
+          // เพิ่ม event listener สำหรับปุ่มลบความคิดเห็น
+          const deleteButtons = commentEl.querySelectorAll(
+            ".delete-comment-btn"
+          );
+          deleteButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+              document.getElementById("delete-comment-id").value = comment.id;
+              document
+                .getElementById("delete-comment-modal")
+                .classList.remove("hidden");
+            });
+          });
+
+          // เพิ่ม event listener สำหรับปุ่มเมนูความคิดเห็น
+          const menuButtons = commentEl.querySelectorAll(".comment-menu-btn");
+          menuButtons.forEach((button) => {
+            button.addEventListener("click", function (e) {
+              e.stopPropagation();
+              // ปิดเมนูดรอปดาวน์อื่นๆ ทั้งหมดก่อน
+              document
+                .querySelectorAll(".comment-dropdown")
+                .forEach((dropdown) => {
+                  dropdown.classList.add("hidden");
+                });
+
+              // เปิด/ปิดเมนูปัจจุบัน
+              const dropdown = this.nextElementSibling;
+              dropdown.classList.toggle("hidden");
+            });
+          });
+        });
+      } catch (error) {
+        console.error("Error loading comments:", error);
       }
+    }
 
-      // สร้างความคิดเห็นใหม่
-      async function createComment(postId, content, imageUrl = null) {
-        try {
-          const {
-            data: { user },
-          } = await supabase.auth.getUser();
+    // สร้างความคิดเห็นใหม่
+    async function createComment(postId, content, imageUrl = null) {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-          if (!user) {
-            throw new Error("ไม่พบผู้ใช้งาน กรุณาเข้าสู่ระบบ");
-          }
+        if (!user) {
+          throw new Error("ไม่พบผู้ใช้งาน กรุณาเข้าสู่ระบบ");
+        }
 
-          console.log("กำลังสร้างความคิดเห็นสำหรับโพสต์ ID:", postId);
+        console.log("กำลังสร้างความคิดเห็นสำหรับโพสต์ ID:", postId);
 
-          // สร้างความคิดเห็นใหม่
-          const { data, error } = await supabase.from("comments").insert({
-            post_id: postId,
-            content: content,
-            author_id: user.id,
-            author_name: user.user_metadata?.display_name || user.email,
-            image_url: imageUrl,
-          });
+        // สร้างความคิดเห็นใหม่
+        const { data, error } = await supabase.from("comments").insert({
+          post_id: postId,
+          content: content,
+          author_id: user.id,
+          author_name: user.user_metadata?.display_name || user.email,
+          image_url: imageUrl,
+        });
 
-          if (error) {
-            console.error("เกิดข้อผิดพลาดในการสร้างความคิดเห็น:", error);
-            throw error;
-          }
-
-          console.log("สร้างความคิดเห็นสำเร็จ");
-
-          // เพิ่มจำนวนความคิดเห็นด้วยตัวเอง เนื่องจาก trigger ไม่ทำงานตามที่คาดหวัง
-          await incrementCommentCount(postId);
-
-          return data;
-        } catch (error) {
+        if (error) {
           console.error("เกิดข้อผิดพลาดในการสร้างความคิดเห็น:", error);
           throw error;
         }
+
+        console.log("สร้างความคิดเห็นสำเร็จ");
+
+        // เพิ่มจำนวนความคิดเห็นด้วยตัวเอง เนื่องจาก trigger ไม่ทำงานตามที่คาดหวัง
+        await incrementCommentCount(postId);
+
+        return data;
+      } catch (error) {
+        console.error("เกิดข้อผิดพลาดในการสร้างความคิดเห็น:", error);
+        throw error;
       }
+    }
 
-      // ลดจำนวนความคิดเห็น
-      async function decrementCommentCount(postId) {
-        try {
-          // ดึงข้อมูลจำนวนความคิดเห็นปัจจุบัน
-          const { data: post, error } = await supabase
-            .from("posts")
-            .select("comment_count")
-            .eq("id", postId)
-            .single();
+    // ลดจำนวนความคิดเห็น
+    async function decrementCommentCount(postId) {
+      try {
+        // ดึงข้อมูลจำนวนความคิดเห็นปัจจุบัน
+        const { data: post, error } = await supabase
+          .from("posts")
+          .select("comment_count")
+          .eq("id", postId)
+          .single();
 
-          if (error) throw error;
+        if (error) throw error;
 
-          // ตรวจสอบและอัปเดตจำนวนความคิดเห็น
-          const currentCount = post.comment_count || 0;
-          const newCount = Math.max(0, currentCount - 1); // ไม่ให้ต่ำกว่า 0
+        // ตรวจสอบและอัปเดตจำนวนความคิดเห็น
+        const currentCount = post.comment_count || 0;
+        const newCount = Math.max(0, currentCount - 1); // ไม่ให้ต่ำกว่า 0
 
-          // อัปเดตจำนวนความคิดเห็น
-          const { error: updateError } = await supabase
-            .from("posts")
-            .update({ comment_count: newCount })
-            .eq("id", postId);
+        // อัปเดตจำนวนความคิดเห็น
+        const { error: updateError } = await supabase
+          .from("posts")
+          .update({ comment_count: newCount })
+          .eq("id", postId);
 
-          if (updateError) throw updateError;
+        if (updateError) throw updateError;
 
-          return true;
-        } catch (error) {
-          console.error("Error in decrementCommentCount:", error);
-          return false;
-        }
+        return true;
+      } catch (error) {
+        console.error("Error in decrementCommentCount:", error);
+        return false;
       }
+    }
 
-      // บันทึกข้อมูลการเข้าชมในตาราง posts_view
-      async function recordPostView(postId, currentUser) {
-        try {
-          // ตรวจสอบว่าควรบันทึกการเข้าชมหรือไม่ (ป้องกันการนับซ้ำจากการรีเฟรชหน้า)
-          const viewedPosts = JSON.parse(
-            localStorage.getItem("viewedPosts") || "{}"
-          );
-          const lastViewTime = viewedPosts[postId] || 0;
-          const currentTime = new Date().getTime();
-          const fiveMinutesInMs = 5 * 60 * 1000; // 5 นาทีในหน่วย milliseconds
+    // บันทึกข้อมูลการเข้าชมในตาราง posts_view
+    async function recordPostView(postId, currentUser) {
+      try {
+        // ตรวจสอบว่าควรบันทึกการเข้าชมหรือไม่ (ป้องกันการนับซ้ำจากการรีเฟรชหน้า)
+        const viewedPosts = JSON.parse(
+          localStorage.getItem("viewedPosts") || "{}"
+        );
+        const lastViewTime = viewedPosts[postId] || 0;
+        const currentTime = new Date().getTime();
+        const fiveMinutesInMs = 5 * 60 * 1000; // 5 นาทีในหน่วย milliseconds
 
-          // บันทึกการเข้าชมเมื่อยังไม่เคยดูกระทู้นี้ หรือดูครั้งล่าสุดนานกว่า 5 นาที
-          if (!lastViewTime || currentTime - lastViewTime > fiveMinutesInMs) {
-            // บันทึกเวลาที่ดูกระทู้นี้ใน localStorage
-            viewedPosts[postId] = currentTime;
-            localStorage.setItem("viewedPosts", JSON.stringify(viewedPosts));
+        // บันทึกการเข้าชมเมื่อยังไม่เคยดูกระทู้นี้ หรือดูครั้งล่าสุดนานกว่า 5 นาที
+        if (!lastViewTime || currentTime - lastViewTime > fiveMinutesInMs) {
+          // บันทึกเวลาที่ดูกระทู้นี้ใน localStorage
+          viewedPosts[postId] = currentTime;
+          localStorage.setItem("viewedPosts", JSON.stringify(viewedPosts));
 
-            // เตรียมข้อมูลสำหรับบันทึก
-            const viewData = {
-              post_id: postId,
-              viewer_type: currentUser ? "authenticated" : "anonymous",
-              viewer_id: currentUser?.id || null,
-            };
+          // เตรียมข้อมูลสำหรับบันทึก
+          const viewData = {
+            post_id: postId,
+            viewer_type: currentUser ? "authenticated" : "anonymous",
+            viewer_id: currentUser?.id || null,
+          };
 
-            // บันทึกข้อมูลการเข้าชมลงในตาราง posts_view
-            const { error } = await supabase
-              .from("posts_view")
-              .insert(viewData);
-
-            if (error) {
-              console.error("Error recording post view:", error);
-              return false;
-            }
-
-            return true;
-          }
-
-          return false;
-        } catch (error) {
-          console.error("Error in recordPostView:", error);
-          return false;
-        }
-      }
-
-      // ดึงจำนวนการเข้าชมจากตาราง posts_view
-      async function getPostViewCount(postId) {
-        try {
-          // นับจำนวนการเข้าชมทั้งหมดของกระทู้
-          const { count, error } = await supabase
+          // บันทึกข้อมูลการเข้าชมลงในตาราง posts_view
+          const { error } = await supabase
             .from("posts_view")
-            .select("*", { count: "exact", head: true })
-            .eq("post_id", postId);
+            .insert(viewData);
 
           if (error) {
-            console.error("Error getting post view count:", error);
-            return 0;
+            console.error("Error recording post view:", error);
+            return false;
           }
 
-          return count || 0;
-        } catch (error) {
-          console.error("Error in getPostViewCount:", error);
+          return true;
+        }
+
+        return false;
+      } catch (error) {
+        console.error("Error in recordPostView:", error);
+        return false;
+      }
+    }
+
+    // ดึงจำนวนการเข้าชมจากตาราง posts_view
+    async function getPostViewCount(postId) {
+      try {
+        // นับจำนวนการเข้าชมทั้งหมดของกระทู้
+        const { count, error } = await supabase
+          .from("posts_view")
+          .select("*", { count: "exact", head: true })
+          .eq("post_id", postId);
+
+        if (error) {
+          console.error("Error getting post view count:", error);
           return 0;
         }
+
+        return count || 0;
+      } catch (error) {
+        console.error("Error in getPostViewCount:", error);
+        return 0;
       }
+    }
 
-      // ฟังก์ชันเตรียมฟอร์มแก้ไขกระทู้
-      function initEditForm() {
-        // รีเซ็ตตัวแปรสำหรับการแก้ไขกระทู้
-        imagesToRemove = [];
-        newImagesToUpload = [];
+    // ฟังก์ชันเตรียมฟอร์มแก้ไขกระทู้
+    function initEditForm() {
+      // รีเซ็ตตัวแปรสำหรับการแก้ไขกระทู้
+      imagesToRemove = [];
+      newImagesToUpload = [];
 
-        // ใส่ข้อมูลกระทู้ปัจจุบันในฟอร์มแก้ไข
-        document.getElementById("edit-title").value = currentPost.title;
-        document.getElementById("edit-content").value = currentPost.content;
+      // ใส่ข้อมูลกระทู้ปัจจุบันในฟอร์มแก้ไข
+      document.getElementById("edit-title").value = currentPost.title;
+      document.getElementById("edit-content").value = currentPost.content;
 
-        // แสดงรูปภาพปัจจุบัน (ถ้ามี)
-        const editPostImages = document.getElementById("edit-post-images");
-        editPostImages.innerHTML = "";
+      // แสดงรูปภาพปัจจุบัน (ถ้ามี)
+      const editPostImages = document.getElementById("edit-post-images");
+      editPostImages.innerHTML = "";
 
-        if (currentPost.image_urls && currentPost.image_urls.length > 0) {
-          document.getElementById("current-images").classList.remove("hidden");
+      if (currentPost.image_urls && currentPost.image_urls.length > 0) {
+        document.getElementById("current-images").classList.remove("hidden");
 
-          currentPost.image_urls.forEach((imageUrl, index) => {
-            const imageContainer = document.createElement("div");
-            imageContainer.className =
-              "relative border border-gray-300 rounded-lg p-1";
-            imageContainer.dataset.url = imageUrl;
-
-            const image = document.createElement("img");
-            image.src = imageUrl;
-            image.alt = "Post image";
-            image.className = "w-full h-32 object-cover rounded";
-
-            const removeButton = document.createElement("button");
-            removeButton.type = "button";
-            removeButton.className =
-              "absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition duration-300";
-            removeButton.innerHTML = "×";
-            removeButton.addEventListener("click", () => {
-              // เพิ่ม URL ของรูปภาพที่จะลบไปยังรายการ
-              imagesToRemove.push(imageUrl);
-              // ลบ DOM element ของรูปภาพ
-              imageContainer.remove();
-
-              // ซ่อนส่วน "รูปภาพปัจจุบัน" ถ้าไม่มีรูปภาพเหลืออยู่
-              if (editPostImages.children.length === 0) {
-                document
-                  .getElementById("current-images")
-                  .classList.add("hidden");
-              }
-            });
-
-            imageContainer.appendChild(image);
-            imageContainer.appendChild(removeButton);
-            editPostImages.appendChild(imageContainer);
-          });
-        } else {
-          document.getElementById("current-images").classList.add("hidden");
-        }
-
-        // ล้างพื้นที่แสดงตัวอย่างรูปภาพใหม่
-        document.getElementById("edit-image-previews").innerHTML = "";
-
-        // ซ่อนข้อความแจ้งเตือน
-        document.getElementById("edit-error-message").classList.add("hidden");
-        document.getElementById("edit-success-message").classList.add("hidden");
-      }
-
-      // ฟังก์ชันเตรียมฟอร์มแก้ไขความคิดเห็น
-      function initEditCommentForm(comment) {
-        // เก็บข้อมูลความคิดเห็นที่กำลังแก้ไข
-        currentComment = comment;
-
-        // รีเซ็ตตัวแปรสำหรับการแก้ไขความคิดเห็น
-        removeCommentImage = false;
-        newCommentImage = null;
-
-        // ใส่ข้อมูลความคิดเห็นปัจจุบันในฟอร์ม
-        document.getElementById("edit-comment-id").value = comment.id;
-        document.getElementById("edit-comment-content").value = comment.content;
-
-        // ซ่อนข้อความแจ้งเตือน
-        document
-          .getElementById("edit-comment-error-message")
-          .classList.add("hidden");
-        document
-          .getElementById("edit-comment-success-message")
-          .classList.add("hidden");
-
-        // รีเซ็ตข้อมูลรูปภาพ
-        document.getElementById("edit-comment-image-upload").value = "";
-        document.getElementById("selected-comment-image-name").textContent = "";
-        document
-          .getElementById("edit-comment-image-preview-container")
-          .classList.add("hidden");
-
-        // แสดงรูปภาพปัจจุบัน (ถ้ามี)
-        const currentImageContainer = document.getElementById(
-          "current-comment-image"
-        );
-        if (comment.image_url) {
-          document.getElementById("edit-comment-current-image").src =
-            comment.image_url;
-          currentImageContainer.classList.remove("hidden");
-          document
-            .getElementById("add-comment-image-section")
-            .classList.add("hidden");
-        } else {
-          currentImageContainer.classList.add("hidden");
-          document
-            .getElementById("add-comment-image-section")
-            .classList.remove("hidden");
-        }
-      }
-
-      // ฟังก์ชันปิด modal แก้ไขกระทู้
-      function closeEditModal() {
-        document.getElementById("edit-modal").classList.add("hidden");
-      }
-
-      // ฟังก์ชันปิด modal แก้ไขความคิดเห็น
-      function closeEditCommentModal() {
-        document.getElementById("edit-comment-modal").classList.add("hidden");
-      }
-
-      // ฟังก์ชันจัดการอัปโหลดรูปภาพใหม่
-      function handleEditImageUpload(e) {
-        const files = Array.from(e.target.files);
-        const imagePreviews = document.getElementById("edit-image-previews");
-
-        files.forEach((file) => {
-          // เพิ่มไฟล์ในรายการที่จะอัปโหลด
-          newImagesToUpload.push(file);
-
-          // สร้างตัวอย่างรูปภาพ
-          const previewContainer = document.createElement("div");
-          previewContainer.className =
+        currentPost.image_urls.forEach((imageUrl, index) => {
+          const imageContainer = document.createElement("div");
+          imageContainer.className =
             "relative border border-gray-300 rounded-lg p-1";
+          imageContainer.dataset.url = imageUrl;
 
-          const preview = document.createElement("img");
-          preview.className = "w-full h-32 object-cover rounded";
+          const image = document.createElement("img");
+          image.src = imageUrl;
+          image.alt = "Post image";
+          image.className = "w-full h-32 object-cover rounded";
 
           const removeButton = document.createElement("button");
           removeButton.type = "button";
           removeButton.className =
             "absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition duration-300";
           removeButton.innerHTML = "×";
+          removeButton.addEventListener("click", () => {
+            // เพิ่ม URL ของรูปภาพที่จะลบไปยังรายการ
+            imagesToRemove.push(imageUrl);
+            // ลบ DOM element ของรูปภาพ
+            imageContainer.remove();
 
-          // อ่านไฟล์และแสดงตัวอย่าง
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            preview.src = e.target.result;
-          };
-          reader.readAsDataURL(file);
-
-          // เพิ่ม event listener สำหรับปุ่มลบ
-          removeButton.addEventListener("click", function () {
-            const index = newImagesToUpload.indexOf(file);
-            if (index !== -1) {
-              newImagesToUpload.splice(index, 1);
+            // ซ่อนส่วน "รูปภาพปัจจุบัน" ถ้าไม่มีรูปภาพเหลืออยู่
+            if (editPostImages.children.length === 0) {
+              document
+                .getElementById("current-images")
+                .classList.add("hidden");
             }
-            previewContainer.remove();
           });
 
-          previewContainer.appendChild(preview);
-          previewContainer.appendChild(removeButton);
-          imagePreviews.appendChild(previewContainer);
+          imageContainer.appendChild(image);
+          imageContainer.appendChild(removeButton);
+          editPostImages.appendChild(imageContainer);
         });
-
-        // รีเซ็ต input เพื่อให้สามารถเลือกไฟล์เดิมซ้ำได้
-        e.target.value = "";
+      } else {
+        document.getElementById("current-images").classList.add("hidden");
       }
 
-      // ฟังก์ชันจัดการอัปโหลดรูปภาพใหม่สำหรับความคิดเห็น
-      function handleEditCommentImageUpload(e) {
-        const file = e.target.files[0];
-        if (!file) return;
+      // ล้างพื้นที่แสดงตัวอย่างรูปภาพใหม่
+      document.getElementById("edit-image-previews").innerHTML = "";
 
-        // เก็บไฟล์ที่จะอัปโหลด
-        newCommentImage = file;
+      // ซ่อนข้อความแจ้งเตือน
+      document.getElementById("edit-error-message").classList.add("hidden");
+      document.getElementById("edit-success-message").classList.add("hidden");
+    }
 
-        // แสดงชื่อไฟล์
-        document.getElementById("selected-comment-image-name").textContent =
-          file.name;
+    // ฟังก์ชันเตรียมฟอร์มแก้ไขความคิดเห็น
+    function initEditCommentForm(comment) {
+      // เก็บข้อมูลความคิดเห็นที่กำลังแก้ไข
+      currentComment = comment;
 
-        // แสดงตัวอย่างรูปภาพ
-        const previewContainer = document.getElementById(
-          "edit-comment-image-preview-container"
-        );
-        const preview = document.getElementById("edit-comment-image-preview");
+      // รีเซ็ตตัวแปรสำหรับการแก้ไขความคิดเห็น
+      removeCommentImage = false;
+      newCommentImage = null;
 
+      // ใส่ข้อมูลความคิดเห็นปัจจุบันในฟอร์ม
+      document.getElementById("edit-comment-id").value = comment.id;
+      document.getElementById("edit-comment-content").value = comment.content;
+
+      // ซ่อนข้อความแจ้งเตือน
+      document
+        .getElementById("edit-comment-error-message")
+        .classList.add("hidden");
+      document
+        .getElementById("edit-comment-success-message")
+        .classList.add("hidden");
+
+      // รีเซ็ตข้อมูลรูปภาพ
+      document.getElementById("edit-comment-image-upload").value = "";
+      document.getElementById("selected-comment-image-name").textContent = "";
+      document
+        .getElementById("edit-comment-image-preview-container")
+        .classList.add("hidden");
+
+      // แสดงรูปภาพปัจจุบัน (ถ้ามี)
+      const currentImageContainer = document.getElementById(
+        "current-comment-image"
+      );
+      if (comment.image_url) {
+        document.getElementById("edit-comment-current-image").src =
+          comment.image_url;
+        currentImageContainer.classList.remove("hidden");
+        document
+          .getElementById("add-comment-image-section")
+          .classList.add("hidden");
+      } else {
+        currentImageContainer.classList.add("hidden");
+        document
+          .getElementById("add-comment-image-section")
+          .classList.remove("hidden");
+      }
+    }
+
+    // ฟังก์ชันปิด modal แก้ไขกระทู้
+    function closeEditModal() {
+      document.getElementById("edit-modal").classList.add("hidden");
+    }
+
+    // ฟังก์ชันปิด modal แก้ไขความคิดเห็น
+    function closeEditCommentModal() {
+      document.getElementById("edit-comment-modal").classList.add("hidden");
+    }
+
+    // ฟังก์ชันจัดการอัปโหลดรูปภาพใหม่
+    function handleEditImageUpload(e) {
+      const files = Array.from(e.target.files);
+      const imagePreviews = document.getElementById("edit-image-previews");
+
+      files.forEach((file) => {
+        // เพิ่มไฟล์ในรายการที่จะอัปโหลด
+        newImagesToUpload.push(file);
+
+        // สร้างตัวอย่างรูปภาพ
+        const previewContainer = document.createElement("div");
+        previewContainer.className =
+          "relative border border-gray-300 rounded-lg p-1";
+
+        const preview = document.createElement("img");
+        preview.className = "w-full h-32 object-cover rounded";
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className =
+          "absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition duration-300";
+        removeButton.innerHTML = "×";
+
+        // อ่านไฟล์และแสดงตัวอย่าง
         const reader = new FileReader();
         reader.onload = function (e) {
           preview.src = e.target.result;
-          previewContainer.classList.remove("hidden");
         };
         reader.readAsDataURL(file);
+
+        // เพิ่ม event listener สำหรับปุ่มลบ
+        removeButton.addEventListener("click", function () {
+          const index = newImagesToUpload.indexOf(file);
+          if (index !== -1) {
+            newImagesToUpload.splice(index, 1);
+          }
+          previewContainer.remove();
+        });
+
+        previewContainer.appendChild(preview);
+        previewContainer.appendChild(removeButton);
+        imagePreviews.appendChild(previewContainer);
+      });
+
+      // รีเซ็ต input เพื่อให้สามารถเลือกไฟล์เดิมซ้ำได้
+      e.target.value = "";
+    }
+
+    // ฟังก์ชันจัดการอัปโหลดรูปภาพใหม่สำหรับความคิดเห็น
+    function handleEditCommentImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // เก็บไฟล์ที่จะอัปโหลด
+      newCommentImage = file;
+
+      // แสดงชื่อไฟล์
+      document.getElementById("selected-comment-image-name").textContent =
+        file.name;
+
+      // แสดงตัวอย่างรูปภาพ
+      const previewContainer = document.getElementById(
+        "edit-comment-image-preview-container"
+      );
+      const preview = document.getElementById("edit-comment-image-preview");
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        previewContainer.classList.remove("hidden");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ฟังก์ชันจัดการการส่งฟอร์มแก้ไขกระทู้
+    async function handleEditFormSubmit(e) {
+      e.preventDefault();
+
+      const title = document.getElementById("edit-title").value.trim();
+      const content = document.getElementById("edit-content").value.trim();
+      const errorMessage = document.getElementById("edit-error-message");
+      const successMessage = document.getElementById("edit-success-message");
+      const saveButton = document.getElementById("save-edit-btn");
+
+      // ตรวจสอบข้อมูล
+      if (!title || !content) {
+        errorMessage.textContent = "โปรดกรอกหัวข้อและเนื้อหากระทู้";
+        errorMessage.classList.remove("hidden");
+        return;
       }
 
-      // ฟังก์ชันจัดการการส่งฟอร์มแก้ไขกระทู้
-      async function handleEditFormSubmit(e) {
-        e.preventDefault();
+      // แสดงสถานะกำลังบันทึก
+      saveButton.disabled = true;
+      saveButton.textContent = "กำลังบันทึก...";
+      errorMessage.classList.add("hidden");
+      successMessage.classList.add("hidden");
 
-        const title = document.getElementById("edit-title").value.trim();
-        const content = document.getElementById("edit-content").value.trim();
-        const errorMessage = document.getElementById("edit-error-message");
-        const successMessage = document.getElementById("edit-success-message");
-        const saveButton = document.getElementById("save-edit-btn");
-
-        // ตรวจสอบข้อมูล
-        if (!title || !content) {
-          errorMessage.textContent = "โปรดกรอกหัวข้อและเนื้อหากระทู้";
-          errorMessage.classList.remove("hidden");
-          return;
+      try {
+        // ดึงรายการรูปภาพปัจจุบันที่ไม่ได้ถูกลบ
+        let updatedImageUrls = [];
+        if (currentPost.image_urls) {
+          updatedImageUrls = currentPost.image_urls.filter(
+            (url) => !imagesToRemove.includes(url)
+          );
         }
 
-        // แสดงสถานะกำลังบันทึก
-        saveButton.disabled = true;
-        saveButton.textContent = "กำลังบันทึก...";
-        errorMessage.classList.add("hidden");
-        successMessage.classList.add("hidden");
-
-        try {
-          // ดึงรายการรูปภาพปัจจุบันที่ไม่ได้ถูกลบ
-          let updatedImageUrls = [];
-          if (currentPost.image_urls) {
-            updatedImageUrls = currentPost.image_urls.filter(
-              (url) => !imagesToRemove.includes(url)
-            );
+        // อัปโหลดรูปภาพใหม่
+        for (const file of newImagesToUpload) {
+          try {
+            const imageUrl = await uploadImage(file, "posts");
+            updatedImageUrls.push(imageUrl);
+          } catch (uploadError) {
+            console.error("Error uploading image:", uploadError);
+            // ทำต่อไปแม้มีรูปบางรูปอัปโหลดไม่สำเร็จ
           }
-
-          // อัปโหลดรูปภาพใหม่
-          for (const file of newImagesToUpload) {
-            try {
-              const imageUrl = await uploadImage(file, "posts");
-              updatedImageUrls.push(imageUrl);
-            } catch (uploadError) {
-              console.error("Error uploading image:", uploadError);
-              // ทำต่อไปแม้มีรูปบางรูปอัปโหลดไม่สำเร็จ
-            }
-          }
-
-          // อัปเดตข้อมูลกระทู้
-          const { error } = await supabase
-            .from("posts")
-            .update({
-              title,
-              content,
-              image_urls: updatedImageUrls,
-              updated_at: new Date().toISOString(),
-            })
-            .eq("id", currentPost.id);
-
-          if (error) throw error;
-
-          // แสดงข้อความสำเร็จ
-          successMessage.textContent = "แก้ไขกระทู้สำเร็จ";
-          successMessage.classList.remove("hidden");
-
-          // รีโหลดข้อมูลกระทู้เพื่อแสดงการเปลี่ยนแปลง
-          setTimeout(async () => {
-            const {
-              data: { user },
-            } = await supabase.auth.getUser();
-
-            await loadPost(currentPost.id, user);
-            closeEditModal();
-          }, 1500);
-        } catch (error) {
-          console.error("Error updating post:", error);
-
-          errorMessage.textContent =
-            "เกิดข้อผิดพลาดในการแก้ไขกระทู้ โปรดลองอีกครั้ง";
-          errorMessage.classList.remove("hidden");
-        } finally {
-          // คืนสถานะปุ่มบันทึก
-          saveButton.disabled = false;
-          saveButton.textContent = "บันทึกการแก้ไข";
-        }
-      }
-
-      // ฟังก์ชันจัดการการส่งฟอร์มแก้ไขความคิดเห็น
-      async function handleEditCommentFormSubmit(e) {
-        e.preventDefault();
-
-        const commentId = document.getElementById("edit-comment-id").value;
-        const content = document
-          .getElementById("edit-comment-content")
-          .value.trim();
-        const errorMessage = document.getElementById(
-          "edit-comment-error-message"
-        );
-        const successMessage = document.getElementById(
-          "edit-comment-success-message"
-        );
-        const saveButton = document.getElementById("save-edit-comment-btn");
-
-        // ตรวจสอบข้อมูล
-        if (!content && !currentComment.image_url && !newCommentImage) {
-          errorMessage.textContent = "โปรดใส่ข้อความหรือรูปภาพ";
-          errorMessage.classList.remove("hidden");
-          return;
         }
 
-        // แสดงสถานะกำลังบันทึก
-        saveButton.disabled = true;
-        saveButton.textContent = "กำลังบันทึก...";
-        errorMessage.classList.add("hidden");
-        successMessage.classList.add("hidden");
-
-        try {
-          // เตรียมข้อมูลสำหรับอัปเดต
-          const updateData = {
+        // อัปเดตข้อมูลกระทู้
+        const { error } = await supabase
+          .from("posts")
+          .update({
+            title,
             content,
+            image_urls: updatedImageUrls,
             updated_at: new Date().toISOString(),
-          };
+          })
+          .eq("id", currentPost.id);
 
-          // จัดการรูปภาพ
-          if (removeCommentImage) {
-            // ลบรูปภาพ
-            updateData.image_url = null;
-          } else if (newCommentImage) {
-            // อัปโหลดรูปภาพใหม่
-            try {
-              const imageUrl = await uploadImage(newCommentImage, "comments");
-              updateData.image_url = imageUrl;
-            } catch (uploadError) {
-              console.error("Error uploading image:", uploadError);
-              // อาจจะแสดงข้อความเตือนแต่ยังอัปเดตข้อความได้
-            }
-          }
+        if (error) throw error;
 
-          // อัปเดตข้อมูลความคิดเห็น
-          const { error } = await supabase
-            .from("comments")
-            .update(updateData)
-            .eq("id", commentId);
+        // แสดงข้อความสำเร็จ
+        successMessage.textContent = "แก้ไขกระทู้สำเร็จ";
+        successMessage.classList.remove("hidden");
 
-          if (error) throw error;
+        // รีโหลดข้อมูลกระทู้เพื่อแสดงการเปลี่ยนแปลง
+        setTimeout(async () => {
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
 
-          // แสดงข้อความสำเร็จ
-          successMessage.textContent = "แก้ไขความคิดเห็นสำเร็จ";
-          successMessage.classList.remove("hidden");
+          await loadPost(currentPost.id, user);
+          closeEditModal();
+        }, 1500);
+      } catch (error) {
+        console.error("Error updating post:", error);
 
-          // รีโหลดความคิดเห็นเพื่อแสดงการเปลี่ยนแปลง
-          setTimeout(async () => {
-            const {
-              data: { user },
-            } = await supabase.auth.getUser();
-
-            const postId = currentPost.id;
-            await loadComments(postId, user);
-            closeEditCommentModal();
-          }, 1500);
-        } catch (error) {
-          console.error("Error updating comment:", error);
-
-          errorMessage.textContent =
-            "เกิดข้อผิดพลาดในการแก้ไขความคิดเห็น โปรดลองอีกครั้ง";
-          errorMessage.classList.remove("hidden");
-        } finally {
-          // คืนสถานะปุ่มบันทึก
-          saveButton.disabled = false;
-          saveButton.textContent = "บันทึกการแก้ไข";
-        }
+        errorMessage.textContent =
+          "เกิดข้อผิดพลาดในการแก้ไขกระทู้ โปรดลองอีกครั้ง";
+        errorMessage.classList.remove("hidden");
+      } finally {
+        // คืนสถานะปุ่มบันทึก
+        saveButton.disabled = false;
+        saveButton.textContent = "บันทึกการแก้ไข";
       }
-    </script>
-  </body>
+    }
+
+    // ฟังก์ชันจัดการการส่งฟอร์มแก้ไขความคิดเห็น
+    async function handleEditCommentFormSubmit(e) {
+      e.preventDefault();
+
+      const commentId = document.getElementById("edit-comment-id").value;
+      const content = document
+        .getElementById("edit-comment-content")
+        .value.trim();
+      const errorMessage = document.getElementById(
+        "edit-comment-error-message"
+      );
+      const successMessage = document.getElementById(
+        "edit-comment-success-message"
+      );
+      const saveButton = document.getElementById("save-edit-comment-btn");
+
+      // ตรวจสอบข้อมูล
+      if (!content && !currentComment.image_url && !newCommentImage) {
+        errorMessage.textContent = "โปรดใส่ข้อความหรือรูปภาพ";
+        errorMessage.classList.remove("hidden");
+        return;
+      }
+
+      // แสดงสถานะกำลังบันทึก
+      saveButton.disabled = true;
+      saveButton.textContent = "กำลังบันทึก...";
+      errorMessage.classList.add("hidden");
+      successMessage.classList.add("hidden");
+
+      try {
+        // เตรียมข้อมูลสำหรับอัปเดต
+        const updateData = {
+          content,
+          updated_at: new Date().toISOString(),
+        };
+
+        // จัดการรูปภาพ
+        if (removeCommentImage) {
+          // ลบรูปภาพ
+          updateData.image_url = null;
+        } else if (newCommentImage) {
+          // อัปโหลดรูปภาพใหม่
+          try {
+            const imageUrl = await uploadImage(newCommentImage, "comments");
+            updateData.image_url = imageUrl;
+          } catch (uploadError) {
+            console.error("Error uploading image:", uploadError);
+            // อาจจะแสดงข้อความเตือนแต่ยังอัปเดตข้อความได้
+          }
+        }
+
+        // อัปเดตข้อมูลความคิดเห็น
+        const { error } = await supabase
+          .from("comments")
+          .update(updateData)
+          .eq("id", commentId);
+
+        if (error) throw error;
+
+        // แสดงข้อความสำเร็จ
+        successMessage.textContent = "แก้ไขความคิดเห็นสำเร็จ";
+        successMessage.classList.remove("hidden");
+
+        // รีโหลดความคิดเห็นเพื่อแสดงการเปลี่ยนแปลง
+        setTimeout(async () => {
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+
+          const postId = currentPost.id;
+          await loadComments(postId, user);
+          closeEditCommentModal();
+        }, 1500);
+      } catch (error) {
+        console.error("Error updating comment:", error);
+
+        errorMessage.textContent =
+          "เกิดข้อผิดพลาดในการแก้ไขความคิดเห็น โปรดลองอีกครั้ง";
+        errorMessage.classList.remove("hidden");
+      } finally {
+        // คืนสถานะปุ่มบันทึก
+        saveButton.disabled = false;
+        saveButton.textContent = "บันทึกการแก้ไข";
+      }
+    }
+  </script>
+</body>
+
 </html>
