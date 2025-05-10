@@ -24,11 +24,11 @@
     }
 
     .modal input {
-      width: 100%;
+      width: 90%;
       padding: 10px;
       margin-top: 8px;
       margin-bottom: 12px;
-      border: 1px solid #ccc;
+      border: 1px solid #000000;
       border-radius: 5px;
     }
 
@@ -40,7 +40,7 @@
     }
 
     .save-btn {
-      background: green;
+      background: rgb(31, 137, 224);
       color: white;
     }
 
@@ -54,7 +54,7 @@
 <body>
 
 <!-- ปุ่มเปิด popup -->
-<button onclick="showPasswordModal()">เปลี่ยนรหัสผ่าน</button>
+<button onclick="showPasswordModal()">เเก้ไขรหัสผ่าน</button>
 
 <!-- Modal -->
 <div class="modal-overlay" id="passwordModal">
@@ -83,7 +83,7 @@
     const newPass = document.getElementById('newPassword').value;
     const confirm = document.getElementById('confirmPassword').value;
 
-    // สมมุติว่ารหัสเดิมถูกต้องคือ "123456" (ในจริงควรตรวจสอบกับ server)
+    // สมมุติว่ารหัสเดิมถูกต้องคือ "1234567" (ในจริงควรตรวจสอบกับ server)
     if (current !== "1234567") {
       alert("รหัสผ่านเดิมไม่ถูกต้อง");
       return;
