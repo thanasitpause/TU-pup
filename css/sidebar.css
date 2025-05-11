@@ -2,128 +2,186 @@
 
 /* Sidebar Custom Styles */
 #sidebar {
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
-    z-index: 50;
-    width: 15rem; /* 240px = 15rem */
-  }
-  
-  /* Page Content Wrapper Styles */
-  #page-content {
-    transition: margin-left 0.3s ease;
-    width: 100%;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+  z-index: 50;
+  width: 15rem; /* 240px = 15rem */
+  background-color: white;
+}
+
+/* TU Branding Styles */
+.tu-gradient {
+  background: linear-gradient(135deg, #E60000 0%, #FFCC00 100%);
+}
+
+.tu-gradient-text {
+  background: linear-gradient(135deg, #E60000 0%, #FFCC00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.tu-red-border {
+  border-color: #E60000;
+}
+
+/* Active Menu Item */
+.sidebar-active-item {
+  background-color: rgba(230, 0, 0, 0.1); /* tu-red with opacity */
+  color: #E60000; /* tu-red */
+  font-weight: 500;
+}
+
+.sidebar-active-item svg {
+  color: #E60000 !important; /* tu-red for icon */
+}
+
+/* Page Content Wrapper Styles */
+#page-content {
+  transition: margin-left 0.3s ease;
+  width: 100%;
+}
+
+#page-content.ml-60 {
+  margin-left: 15rem; /* 240px = 15rem */
+}
+
+/* Toggle Button Animation */
+#sidebar-toggle {
+  transition: transform 0.2s ease;
+}
+
+#sidebar-toggle:hover {
+  transform: rotate(90deg);
+  color: #E60000; /* tu-red on hover */
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  #sidebar {
+    width: 80%;
+    max-width: 15rem;
   }
   
   #page-content.ml-60 {
-    margin-left: 15rem; /* 240px = 15rem */
+    margin-left: 0;
   }
-  
-  /* Toggle Button Animation */
-  #sidebar-toggle {
-    transition: transform 0.2s ease;
+}
+
+/* Medium screen adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  #page-content.ml-60 {
+    margin-left: 15rem;
   }
-  
-  #sidebar-toggle:hover {
-    transform: rotate(90deg);
-  }
-  
-  /* Mobile Adjustments */
-  @media (max-width: 768px) {
-    #sidebar {
-      width: 80%;
-      max-width: 15rem;
-    }
-    
-    #page-content.ml-60 {
-      margin-left: 0;
-    }
-  }
-  
-  /* Medium screen adjustments */
-  @media (min-width: 769px) and (max-width: 1024px) {
-    #page-content.ml-60 {
-      margin-left: 15rem;
-    }
-  }
-  
-  /* Custom Scrollbar */
-  #sidebar::-webkit-scrollbar {
-    width: 3px;
-  }
-  
-  #sidebar::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-  
-  #sidebar::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 3px;
-  }
-  
-  #sidebar::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
-  }
-  
-  /* Menu Item Hover Effects */
-  #sidebar nav a {
-    transition: all 0.2s ease;
-  }
-  
-  #sidebar nav a:hover {
-    transform: translateX(4px);
-  }
-  
-  /* User Profile Hover Effect */
-  #sidebar-user-authenticated:hover img {
-    transform: scale(1.05);
-    transition: transform 0.3s ease;
-  }
-  
-  /* Logout Button Animation */
-  #sidebar-logout-btn {
-    transition: all 0.2s ease;
-  }
-  
-  #sidebar-logout-btn:hover svg {
-    transform: translateX(2px);
-  }
-  
-  /* Animation for Menu Items */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  #sidebar nav a {
-    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Custom Scrollbar */
+#sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+#sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+#sidebar::-webkit-scrollbar-thumb {
+  background: rgba(230, 0, 0, 0.4); /* tu-red with opacity */
+  border-radius: 3px;
+}
+
+#sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(230, 0, 0, 0.7); /* darker tu-red on hover */
+}
+
+/* Menu Item Hover Effects */
+#sidebar nav a {
+  transition: all 0.2s ease;
+  border-radius: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+#sidebar nav a:hover {
+  transform: translateX(4px);
+  background-color: rgba(230, 0, 0, 0.05); /* very light tu-red */
+}
+
+/* User Profile Hover Effect */
+#sidebar-user-authenticated:hover img {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
+  border-color: #E60000; /* tu-red border on hover */
+}
+
+/* Logout Button Animation */
+#sidebar-logout-btn {
+  transition: all 0.2s ease;
+  color: #E60000; /* tu-red */
+}
+
+#sidebar-logout-btn:hover {
+  background-color: rgba(230, 0, 0, 0.1); /* light tu-red background */
+}
+
+#sidebar-logout-btn:hover svg {
+  transform: translateX(2px);
+}
+
+/* Animation for Menu Items */
+@keyframes fadeIn {
+  from {
     opacity: 0;
+    transform: translateY(10px);
   }
-  
-  #sidebar nav a:nth-child(1) {
-    animation-delay: 0.1s;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  #sidebar nav a:nth-child(2) {
-    animation-delay: 0.2s;
+}
+
+#sidebar nav a {
+  animation: fadeIn 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+#sidebar nav a:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+#sidebar nav a:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+#sidebar nav a:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+#sidebar nav a:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+/* สำหรับพื้นที่แสดงผลที่แคบมาก */
+@media (max-width: 500px) {
+  #sidebar {
+    width: 90%;
+    max-width: 15rem;
   }
-  
-  #sidebar nav a:nth-child(3) {
-    animation-delay: 0.3s;
-  }
-  
-  #sidebar nav a:nth-child(4) {
-    animation-delay: 0.4s;
-  }
-  
-  /* สำหรับพื้นที่แสดงผลที่แคบมาก */
-  @media (max-width: 500px) {
-    #sidebar {
-      width: 90%;
-      max-width: 15rem;
-    }
-  }
+}
+
+/* เพิ่ม animation สำหรับการเปิด-ปิด sidebar */
+.slide-in {
+  animation: slideIn 0.3s forwards;
+}
+
+.slide-out {
+  animation: slideOut 0.3s forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideOut {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
