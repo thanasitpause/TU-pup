@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="th">
-
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,9 +14,7 @@
         <link rel="stylesheet" href="css/sidebar.css">
         <!-- Sidebar JS -->
         <script src="js/sidebar.js"></script>
-
     </head>
-
     <body>
         <!-- Navbar -->
     <nav class="bg-white shadow-md sticky top-0 z-10">
@@ -104,9 +101,108 @@
           </div>
         </div>
       </nav>
-
-      <h1>My post</h1>
-
+      <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+          const { data: { user } } = await supabase.auth.getUser();
+      
+          if (user) {
+            document.getElementById("login-menu").style.display = "none";
+            document.getElementById("user-menu").style.display = "flex";
+            document.getElementById("user-name").textContent = user.email;
+      
+            loadUserPosts(user.id);
+          }
+        });
+      
+        async function loadUserPosts(userId) {
+          const { data: posts, error } = await supabase
+            .from('id') // แทน 'posts' ด้วยชื่อ table จริงใน Supabase ของคุณ
+            .select('*')
+            .eq('author_id', userId)
+            .order('created_at', { ascending: false });
+      
+          if (error) {
+            console.error("Error loading posts:", error);
+            return;
+          }
+      
+          const postContainer = document.createElement("div");
+          postContainer.className = "container mx-auto px-4 py-6 grid gap-4";
+      
+          posts.forEach(post => {
+            const postEl = document.createElement("div");
+            postEl.className = "p-4 bg-white rounded shadow";
+            postEl.innerHTML = `
+              <h2 class="text-xl font-semibold">${post.title}</h2>
+              <p class="text-gray-700 mt-2">${post.content}</p>
+            `;
+            postContainer.appendChild(postEl);
+          });
+      
+          document.body.appendChild(postContainer);
+        }
+      </script>    
     </body>
+    <main class="container mx-auto px-4 py-8">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold text-gray-800">กระทู้ของฉัน</h1>
+        <button
+          id="mobile-new-post-btn"
+          class="md:hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition duration-300"
+        >
+          สร้างกระทู้
+        </button>
+      </div>
 
+      <!-- Posts List -->
+      <div
+        id="posts-container"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        <!-- Posts will be dynamically inserted here -->
+        <div class="animate-pulse bg-white rounded-lg shadow-md p-4">
+          <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+          <div class="flex justify-between">
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+          </div>
+        </div>
+        <div class="animate-pulse bg-white rounded-lg shadow-md p-4">
+          <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+          <div class="flex justify-between">
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+          </div>
+        </div>
+        <div class="animate-pulse bg-white rounded-lg shadow-md p-4">
+          <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+          <div class="flex justify-between">
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Posts Message -->
+      <div id="no-posts-message" class="hidden text-center py-8 text-gray-500">
+        ยังไม่มีกระทู้ เริ่มสร้างกระทู้แรกของคุณเลย!
+      </div>
+
+      <!-- Load More Button -->
+      <div class="mt-8 text-center">
+        <button
+          id="load-more-btn"
+          class="bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 font-medium px-6 py-2 rounded-full transition duration-300"
+        >
+          โหลดเพิ่มเติม
+        </button>
+      </div>
+    </main>    
 </html>
