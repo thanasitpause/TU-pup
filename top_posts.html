@@ -32,7 +32,7 @@
       position: relative;
       overflow: hidden;
     }
-    
+
     .post-card::before {
       content: '';
       position: absolute;
@@ -44,20 +44,20 @@
       transform: translateY(-100%);
       transition: transform 0.3s ease;
     }
-    
+
     .post-card:hover::before {
       transform: translateY(0);
     }
-    
+
     .post-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
     }
-    
+
     .tu-shadow {
       box-shadow: 0 10px 25px -5px rgba(230, 0, 0, 0.1), 0 10px 10px -5px rgba(255, 204, 0, 0.04);
     }
-    
+
     .rank-badge {
       position: absolute;
       top: -10px;
@@ -72,62 +72,75 @@
       transform: rotate(-15deg);
       z-index: 10;
     }
-    
+
     .rank-badge-1 {
       background: linear-gradient(135deg, #FFD700, #FFA500);
       box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
       color: white;
     }
-    
+
     .rank-badge-2 {
       background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
       box-shadow: 0 2px 10px rgba(192, 192, 192, 0.3);
       color: white;
     }
-    
+
     .rank-badge-3 {
       background: linear-gradient(135deg, #CD7F32, #B87333);
       box-shadow: 0 2px 10px rgba(205, 127, 50, 0.3);
       color: white;
     }
-    
+
     .trending-icon {
       animation: pulse 1.5s infinite;
     }
-    
+
     @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+      }
     }
-    
+
     .period-btn.active {
       background: linear-gradient(135deg, #E60000, #FFCC00);
       color: white;
       box-shadow: 0 4px 10px rgba(230, 0, 0, 0.2);
     }
-    
+
     .search-container {
       position: relative;
     }
-    
+
     .search-container input:focus {
       box-shadow: 0 0 0 3px rgba(230, 0, 0, 0.2);
       border-color: #E60000;
     }
-    
+
     .shimmer {
-      background: linear-gradient(90deg, 
-        rgba(255,255,255,0) 0%, 
-        rgba(255,255,255,0.6) 50%, 
-        rgba(255,255,255,0) 100%);
+      background: linear-gradient(90deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.6) 50%,
+          rgba(255, 255, 255, 0) 100%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
     }
-    
+
     @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
+      0% {
+        background-position: -200% 0;
+      }
+
+      100% {
+        background-position: 200% 0;
+      }
     }
   </style>
 </head>
@@ -135,7 +148,7 @@
 <body class="bg-gradient-to-br from-white to-gray-100 min-h-screen">
   <!-- Decorative Elements -->
   <div class="fixed top-0 left-0 w-full h-1 tu-gradient opacity-80 z-50"></div>
-  
+
   <!-- Navbar -->
   <nav class="bg-white shadow-md sticky top-0 z-40">
     <div class="container mx-auto px-4 py-3">
@@ -143,12 +156,15 @@
         <!-- Logo & Hamburger Menu -->
         <div class="flex items-center space-x-4">
           <button id="sidebar-toggle" class="text-gray-500 hover:text-tu-red-500 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
           <a href="index.html" class="flex items-center space-x-2">
-            <div class="h-8 w-8 rounded-full tu-gradient flex items-center justify-center text-white font-bold text-xs shadow-md">TU</div>
+            <div
+              class="h-8 w-8 rounded-full tu-gradient flex items-center justify-center text-white font-bold text-xs shadow-md">
+              TU</div>
             <span class="font-bold text-2xl tu-gradient-text">TU-PUP</span>
           </a>
         </div>
@@ -160,18 +176,24 @@
               class="w-full px-4 py-2 pl-10 rounded-full border border-gray-300 focus:outline-none transition-all duration-300"
               placeholder="ค้นหากระทู้..." />
             <div class="absolute left-3 top-2.5 text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <button id="search-btn" class="absolute right-3 top-2 text-gray-500 hover:text-tu-red-500 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button id="search-btn"
+              class="absolute right-3 top-2 text-gray-500 hover:text-tu-red-500 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </button>
             <!-- Clear Search Button (จะแสดงเมื่อมีข้อความค้นหา) -->
-            <button id="clear-search-btn" class="absolute right-10 top-2 text-gray-400 hover:text-tu-red-500 hidden transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button id="clear-search-btn"
+              class="absolute right-10 top-2 text-gray-400 hover:text-tu-red-500 hidden transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -183,7 +205,8 @@
           <button id="new-post-btn"
             class="hidden bg-gradient-to-r from-tu-red to-tu-yellow hover:from-tu-red-600 hover:to-tu-yellow-600 text-white font-medium px-4 py-2 rounded-full transition duration-300 transform hover:scale-105 shadow-md">
             <span class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
               </svg>
               สร้างกระทู้ใหม่
@@ -193,42 +216,55 @@
           <div id="user-menu" class="hidden relative group">
             <button class="flex items-center space-x-2 focus:outline-none">
               <div class="relative">
-                <img id="user-avatar" src="img/default-avatar.png" alt="User" class="w-8 h-8 rounded-full border-2 border-tu-red-200 transition-transform duration-300 group-hover:scale-110">
+                <img id="user-avatar" src="img/default-avatar.png" alt="User"
+                  class="w-8 h-8 rounded-full border-2 border-tu-red-200 transition-transform duration-300 group-hover:scale-110">
                 <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-white"></div>
               </div>
               <span id="user-name" class="hidden md:inline text-sm font-medium"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 group-hover:text-tu-red-500 transition-transform duration-300 group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 text-gray-400 group-hover:text-tu-red-500 transition-transform duration-300 group-hover:rotate-180"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-            
+
             <!-- Dropdown menu -->
-            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+            <div
+              class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
               <div class="px-4 py-2 border-b border-gray-100">
                 <p class="text-sm font-medium text-gray-900" id="dropdown-user-name"></p>
                 <p class="text-xs text-gray-500 truncate" id="dropdown-user-email"></p>
               </div>
-              <a href="my_posts.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-tu-red-50 hover:text-tu-red-500">
+              <a href="my_posts.html"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-tu-red-50 hover:text-tu-red-500">
                 <div class="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                   </svg>
                   กระทู้ของฉัน
                 </div>
               </a>
-              <a href="edit-profile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-tu-red-50 hover:text-tu-red-500">
+              <a href="edit-profile.html"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-tu-red-50 hover:text-tu-red-500">
                 <div class="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   แก้ไขโปรไฟล์
                 </div>
               </a>
               <hr class="my-1 border-gray-100">
-              <button id="logout-btn" class="w-full text-left block px-4 py-2 text-sm text-tu-red-500 hover:bg-tu-red-50">
+              <button id="logout-btn"
+                class="w-full text-left block px-4 py-2 text-sm text-tu-red-500 hover:bg-tu-red-50">
                 <div class="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
                   ออกจากระบบ
                 </div>
@@ -237,9 +273,11 @@
           </div>
 
           <div id="login-menu" class="flex items-center space-x-3">
-            <a href="login.html" class="text-tu-red-500 hover:text-tu-red-600 font-medium transition-colors">เข้าสู่ระบบ</a>
+            <a href="login.html"
+              class="text-tu-red-500 hover:text-tu-red-600 font-medium transition-colors">เข้าสู่ระบบ</a>
             <div class="w-px h-5 bg-gray-300"></div>
-            <a href="register.html" class="text-tu-red-500 hover:text-tu-red-600 font-medium transition-colors">สมัครสมาชิก</a>
+            <a href="register.html"
+              class="text-tu-red-500 hover:text-tu-red-600 font-medium transition-colors">สมัครสมาชิก</a>
           </div>
         </div>
       </div>
@@ -254,16 +292,19 @@
         placeholder="ค้นหากระทู้..." />
       <div class="absolute left-3 top-2.5 text-gray-400">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </div>
-      <button id="mobile-search-btn" class="absolute right-3 top-2 text-gray-500 hover:text-tu-red-500 transition-colors">
+      <button id="mobile-search-btn"
+        class="absolute right-3 top-2 text-gray-500 hover:text-tu-red-500 transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
         </svg>
       </button>
       <!-- Clear Search Button (Mobile) -->
-      <button id="mobile-clear-search-btn" class="absolute right-10 top-2 text-gray-400 hover:text-tu-red-500 hidden transition-colors">
+      <button id="mobile-clear-search-btn"
+        class="absolute right-10 top-2 text-gray-400 hover:text-tu-red-500 hidden transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -280,8 +321,10 @@
           <div class="mb-4 md:mb-0">
             <div class="flex items-center space-x-3 mb-2">
               <a href="index.html" class="flex items-center text-tu-red-500 hover:text-tu-red-600 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
                 <span>กลับไปหน้าหลัก</span>
               </a>
@@ -289,30 +332,41 @@
             <div class="flex items-center">
               <h1 class="text-3xl font-bold text-gray-800 relative inline-block mr-3" id="page-title">
                 กระทู้ยอดนิยม
-                <div class="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-tu-red to-tu-yellow rounded-full"></div>
+                <div
+                  class="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-tu-red to-tu-yellow rounded-full">
+                </div>
               </h1>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-tu-red-500 trending-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-tu-red-500 trending-icon" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
             <p class="text-gray-500 mt-2">กระทู้ที่ได้รับความนิยมสูงสุดเรียงตามจำนวนการเข้าชม</p>
           </div>
-          <button id="mobile-new-post-btn"
-            class="md:hidden bg-gradient-to-r from-tu-red to-tu-yellow hover:from-tu-red-600 hover:to-tu-yellow-600 text-white font-medium px-4 py-2 rounded-full transition duration-300 transform hover:scale-105 shadow-md">
-            <span class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              สร้างกระทู้
-            </span>
-          </button>
+          <div class="flex items-center">
+            <!-- เพิ่มรูปภาพด้านขวา -->
+            <img src="img/bird-top-post.png" alt="Top Posts" class="hidden md:block w-32 h-32 opacity-80">
+            <button id="mobile-new-post-btn"
+              class="md:hidden bg-gradient-to-r from-tu-red to-tu-yellow hover:from-tu-red-600 hover:to-tu-yellow-600 text-white font-medium px-4 py-2 rounded-full transition duration-300 transform hover:scale-105 shadow-md">
+              <span class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                สร้างกระทู้
+              </span>
+            </button>
+          </div>
         </div>
       </div>
       <!-- Filter Options -->
       <div class="mb-6 bg-white rounded-xl shadow-md p-4 flex flex-wrap gap-3">
         <h3 class="w-full md:w-auto text-sm font-semibold text-gray-500 md:mr-3 mb-2 md:mb-0 flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-tu-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-tu-red-400" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
           </svg>
           ช่วงเวลา:
         </h3>
@@ -344,7 +398,7 @@
             <p class="text-gray-500">กำลังโหลดกระทู้ยอดนิยม...</p>
           </div>
         </div>
-        
+
         <div class="mt-6 px-6 space-y-6">
           <div class="flex items-center space-x-4">
             <div class="w-12 h-12 bg-gray-200 rounded-full shimmer"></div>
@@ -380,13 +434,17 @@
 
       <!-- No Posts Message -->
       <div id="no-posts-message" class="hidden py-12 text-center bg-white rounded-xl shadow-md">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
         <h3 class="text-xl font-semibold text-gray-700 mb-2">ไม่พบกระทู้ในช่วงเวลาที่เลือก</h3>
         <p class="text-gray-500 mb-6">ลองเลือกช่วงเวลาอื่น หรือค้นหาด้วยคำที่แตกต่าง</p>
-        <a href="new-post.html" class="inline-flex items-center bg-gradient-to-r from-tu-red to-tu-yellow text-white font-medium px-5 py-2 rounded-full transition duration-300 transform hover:scale-105 shadow-md">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <a href="new-post.html"
+          class="inline-flex items-center bg-gradient-to-r from-tu-red to-tu-yellow text-white font-medium px-5 py-2 rounded-full transition duration-300 transform hover:scale-105 shadow-md">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
           สร้างกระทู้ใหม่
@@ -402,7 +460,8 @@
       <div class="mt-8 text-center">
         <button id="load-more-btn"
           class="hidden bg-white border-2 border-tu-red hover:bg-tu-red-50 text-tu-red-500 font-medium px-6 py-2 rounded-full transition duration-300 transform hover:scale-105 flex items-center mx-auto">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
           โหลดเพิ่มเติม
@@ -412,7 +471,8 @@
   </main>
 
   <!-- Back to Top Button -->
-  <button id="back-to-top" class="fixed bottom-6 right-6 bg-gradient-to-r from-tu-red to-tu-yellow text-white rounded-full p-3 shadow-lg hover:shadow-xl transform transition-transform hover:scale-110 opacity-0 invisible">
+  <button id="back-to-top"
+    class="fixed bottom-6 right-6 bg-gradient-to-r from-tu-red to-tu-yellow text-white rounded-full p-3 shadow-lg hover:shadow-xl transform transition-transform hover:scale-110 opacity-0 invisible">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11l7-7 7 7M5 19l7-7 7 7" />
     </svg>
@@ -424,10 +484,12 @@
       <div class="flex flex-col md:flex-row justify-between items-center">
         <div class="mb-6 md:mb-0">
           <div class="flex items-center space-x-2 mb-3">
-            <div class="h-8 w-8 rounded-full tu-gradient flex items-center justify-center text-white font-bold text-xs">TU</div>
+            <div class="h-8 w-8 rounded-full tu-gradient flex items-center justify-center text-white font-bold text-xs">
+              TU</div>
             <span class="font-bold text-2xl tu-gradient-text">TU-PUP</span>
           </div>
-          <p class="text-gray-600 max-w-md">ระบบกระดานสนทนาสำหรับประชาคมธรรมศาสตร์ แลกเปลี่ยนความคิดเห็น ถาม-ตอบปัญหา แชร์ประสบการณ์</p>
+          <p class="text-gray-600 max-w-md">ระบบกระดานสนทนาสำหรับประชาคมธรรมศาสตร์ แลกเปลี่ยนความคิดเห็น ถาม-ตอบปัญหา
+            แชร์ประสบการณ์</p>
         </div>
         <p class="text-gray-600 text-sm">&copy; 2025 TU-PUP. สงวนลิขสิทธิ์.</p>
       </div>
@@ -528,9 +590,9 @@
 
       // Event listener สำหรับปุ่ม Back to Top
       const backToTopButton = document.getElementById('back-to-top');
-      
+
       // แสดงหรือซ่อนปุ่ม Back to Top เมื่อเลื่อนหน้า
-      window.addEventListener('scroll', function() {
+      window.addEventListener('scroll', function () {
         if (window.scrollY > 500) {
           backToTopButton.classList.remove('opacity-0', 'invisible');
           backToTopButton.classList.add('opacity-100', 'visible');
@@ -539,9 +601,9 @@
           backToTopButton.classList.add('opacity-0', 'invisible');
         }
       });
-      
+
       // เลื่อนขึ้นด้านบนเมื่อกดปุ่ม
-      backToTopButton.addEventListener('click', function() {
+      backToTopButton.addEventListener('click', function () {
         window.scrollTo({
           top: 0,
           behavior: 'smooth'
@@ -560,43 +622,43 @@
       // Desktop Search
       const searchInput = document.getElementById("search-input");
       const clearSearchBtn = document.getElementById("clear-search-btn");
-      
+
       // เพิ่ม Event Listener สำหรับการพิมพ์ค้นหา (desktop)
-      searchInput.addEventListener("input", function() {
+      searchInput.addEventListener("input", function () {
         handleSearchInput(this.value.trim(), clearSearchBtn);
       });
-      
+
       // ปุ่มล้างการค้นหา (desktop)
-      clearSearchBtn.addEventListener("click", function() {
+      clearSearchBtn.addEventListener("click", function () {
         clearSearch(searchInput, clearSearchBtn);
       });
-      
+
       // Mobile Search
       const mobileSearchInput = document.getElementById("mobile-search-input");
       const mobileClearSearchBtn = document.getElementById("mobile-clear-search-btn");
-      
+
       // เพิ่ม Event Listener สำหรับการพิมพ์ค้นหา (mobile)
-      mobileSearchInput.addEventListener("input", function() {
+      mobileSearchInput.addEventListener("input", function () {
         // ซิงค์ค่ากับ desktop search
         searchInput.value = this.value;
         handleSearchInput(this.value.trim(), mobileClearSearchBtn);
       });
-      
+
       // ปุ่มล้างการค้นหา (mobile)
-      mobileClearSearchBtn.addEventListener("click", function() {
+      mobileClearSearchBtn.addEventListener("click", function () {
         clearSearch(mobileSearchInput, mobileClearSearchBtn);
         searchInput.value = ''; // ซิงค์ค่ากับ desktop search
       });
-      
+
       // เพิ่ม Event Listener สำหรับปุ่มค้นหา (สำหรับการกดปุ่มค้นหาโดยตรง)
-      document.getElementById("search-btn").addEventListener("click", function() {
+      document.getElementById("search-btn").addEventListener("click", function () {
         const query = searchInput.value.trim();
         if (query) {
           performSearch(query);
         }
       });
-      
-      document.getElementById("mobile-search-btn").addEventListener("click", function() {
+
+      document.getElementById("mobile-search-btn").addEventListener("click", function () {
         const query = mobileSearchInput.value.trim();
         if (query) {
           searchInput.value = query; // ซิงค์ค่ากับ desktop search
@@ -610,24 +672,24 @@
       // แสดงหรือซ่อนปุ่มล้างการค้นหา
       if (query) {
         clearButton.classList.remove("hidden");
-        
+
         // ยกเลิก timeout เดิม (ถ้ามี) และตั้ง timeout ใหม่
         if (searchTimeout) {
           clearTimeout(searchTimeout);
         }
-        
+
         // แสดง Loading Indicator
         if (query !== currentSearchQuery) {
           document.getElementById("search-loading").classList.remove("hidden");
         }
-        
+
         // ตั้ง timeout เพื่อไม่ให้ค้นหาทุกครั้งที่พิมพ์
         searchTimeout = setTimeout(() => {
           performSearch(query);
         }, 500); // รอ 500ms หลังจากหยุดพิมพ์แล้วค่อยค้นหา
       } else {
         clearButton.classList.add("hidden");
-        
+
         // ถ้าล้างการค้นหา ให้กลับไปแสดงกระทู้ทั้งหมด
         if (isSearchMode) {
           resetSearch();
@@ -660,16 +722,16 @@
         document.getElementById("search-loading").classList.add("hidden");
         return;
       }
-      
+
       currentSearchQuery = query;
       isSearchMode = !!query;
-      
+
       if (!query) {
         // ถ้าไม่มีคำค้นหา กลับไปแสดงกระทู้ทั้งหมด
         await resetSearch();
         return;
       }
-      
+
       await searchPosts(query);
     }
 
@@ -681,7 +743,7 @@
         const noPostsMessage = document.getElementById("no-posts-message");
         const loadMoreBtn = document.getElementById("load-more-btn");
         const searchLoading = document.getElementById("search-loading");
-        
+
         // แสดง loading indicator
         loadingIndicator.classList.remove("hidden");
         searchLoading.classList.add("hidden");
@@ -888,13 +950,13 @@
         const loadMoreBtn = document.getElementById("load-more-btn");
         const searchLoading = document.getElementById("search-loading");
         const pageTitle = document.getElementById("page-title");
-        
+
         // แสดง loading indicator
         searchLoading.classList.remove("hidden");
-        
+
         // ซ่อนข้อความไม่มีกระทู้
         noPostsMessage.classList.add("hidden");
-        
+
         // อัปเดตชื่อหน้า
         pageTitle.innerHTML = `
           ผลการค้นหา: <span class="text-tu-red-500">"${query}"</span>
@@ -911,7 +973,7 @@
         // ล้างคอนเทนเนอร์
         postsContainer.innerHTML = "";
         postsContainer.classList.add("hidden");
-        
+
         // ซ่อน loading indicator
         searchLoading.classList.add("hidden");
 
@@ -937,13 +999,13 @@
 
         // ดึงข้อมูลจำนวนการเข้าชม
         const viewCounts = await getPostsViewCounts(posts);
-        
+
         // เพิ่มข้อมูลจำนวนการเข้าชม
         postsData = posts.map(post => ({
           ...post,
           viewCount: viewCounts[post.id] || 0
         }));
-        
+
         // เรียงลำดับตามจำนวนการเข้าชม
         postsData.sort((a, b) => b.viewCount - a.viewCount);
 
@@ -963,10 +1025,10 @@
         }
       } catch (error) {
         console.error("Error searching posts:", error);
-        
+
         // ซ่อน loading indicator ในกรณีเกิดข้อผิดพลาด
         document.getElementById("search-loading").classList.add("hidden");
-        
+
         // แสดงข้อความผิดพลาด
         const noPostsMessage = document.getElementById("no-posts-message");
         noPostsMessage.innerHTML = `
@@ -1058,7 +1120,7 @@
         // สร้างการ์ดกระทู้
         const postCard = document.createElement("div");
         postCard.className = "post-card bg-white rounded-xl shadow-md p-5 relative";
-        
+
         // เพิ่ม Badge แสดงลำดับสำหรับ 10 อันดับแรก
         if (rank <= 10) {
           const rankBadge = document.createElement("div");
@@ -1066,60 +1128,63 @@
           rankBadge.textContent = rank;
           postCard.appendChild(rankBadge);
         }
-        
+
         // เนื้อหาการ์ด
         postCard.innerHTML += `
-          <a href="${postUrl}" class="block">
-            <div class="pt-1.5">
-              <h2 class="post-title text-lg font-semibold text-gray-800 mb-2 pr-2 pl-2">${post.title}</h2>
-              <p class="post-content text-gray-600 mb-3 pl-2">${shortContent}</p>
-              
-              <div class="flex flex-wrap items-center justify-between mt-4">
-                <div class="flex items-center mb-2 sm:mb-0">
-                  <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium overflow-hidden mr-2">
-                    ${post.author_name ? post.author_name.charAt(0).toUpperCase() : 'U'}
-                  </div>
-                  <span class="post-author text-gray-700 font-medium">${post.author_name || "ไม่ระบุชื่อ"}</span>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                  <span class="flex items-center text-sm bg-tu-red-50 text-tu-red-500 py-1 px-2 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    ${post.viewCount || 0}
-                  </span>
-                  <span class="flex items-center text-sm bg-tu-yellow-50 text-tu-yellow-700 py-1 px-2 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                    </svg>
-                    ${post.comment_count || 0}
-                  </span>
-                </div>
+      <a href="${postUrl}" class="block">
+        <div class="pt-1.5">
+          <h2 class="post-title text-lg font-semibold text-gray-800 mb-2 pr-2 pl-2">${post.title}</h2>
+          <p class="post-content text-gray-600 mb-3 pl-2">${shortContent}</p>
+          
+          <div class="flex flex-wrap items-center justify-between mt-4">
+            <div class="flex items-center mb-2 sm:mb-0">
+              <!-- เปลี่ยนจากตัวอักษรตัวแรกเป็นไอคอนผู้ใช้ -->
+              <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
               </div>
-              
-              <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
-                <div class="flex items-center">
-                  ${post.image_urls && post.image_urls.length > 0 ? `
-                    <span class="flex items-center text-xs text-gray-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      มีรูปภาพ (${post.image_urls.length})
-                    </span>
-                  ` : ''}
-                </div>
-                <div class="text-xs text-gray-400">${formattedDate}</div>
-              </div>
+              <span class="post-author text-gray-700 font-medium">${post.author_name || "ไม่ระบุชื่อ"}</span>
             </div>
-          </a>
-        `;
+            
+            <div class="flex items-center space-x-4">
+              <span class="flex items-center text-sm bg-tu-red-50 text-tu-red-500 py-1 px-2 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                ${post.viewCount || 0}
+              </span>
+              <span class="flex items-center text-sm bg-tu-yellow-50 text-tu-yellow-700 py-1 px-2 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                </svg>
+                ${post.comment_count || 0}
+              </span>
+            </div>
+          </div>
+          
+          <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+            <div class="flex items-center">
+              ${post.image_urls && post.image_urls.length > 0 ? `
+                <span class="flex items-center text-xs text-gray-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  มีรูปภาพ (${post.image_urls.length})
+                </span>
+              ` : ''}
+            </div>
+            <div class="text-xs text-gray-400">${formattedDate}</div>
+          </div>
+        </div>
+      </a>
+    `;
 
         postsContainer.appendChild(postCard);
       });
     }
   </script>
 </body>
+
 </html>
-      
