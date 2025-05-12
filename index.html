@@ -4,94 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TU-PUP - หน้าหลัก</title>
-    <!-- Tailwind CSS -->
+    <!-- ตั้งค่าการโหลดทรัพยากร -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Custom styles -->
+    <link href="css/tu-common.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <!-- Tailwind Config & CDN -->
+    <script src="js/tailwind-config.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // ใช้คอนฟิกจากไฟล์ภายนอก
+      tailwind.config = window.tailwindConfig;
+    </script>
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Supabase Config -->
     <script src="js/supabase-config.js"></script>
-    <!-- Sidebar CSS -->
-    <link rel="stylesheet" href="css/sidebar.css">
     <!-- Sidebar JS -->
     <script src="js/sidebar.js"></script>
-    <!-- Custom Style CSS -->
-    <link rel="stylesheet" href="css/style.css">
-    <!-- Custom TU Theme -->
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'tu-red': {
-                DEFAULT: '#E60000',
-                '50': '#FFE5E5',
-                '100': '#FFCCCC',
-                '200': '#FF9999',
-                '300': '#FF6666',
-                '400': '#FF3333',
-                '500': '#E60000',
-                '600': '#B30000',
-                '700': '#800000',
-                '800': '#4D0000',
-                '900': '#1A0000',
-              },
-              'tu-yellow': {
-                DEFAULT: '#FFCC00',
-                '50': '#FFF8E5',
-                '100': '#FFF2CC',
-                '200': '#FFE699',
-                '300': '#FFD966',
-                '400': '#FFCC33',
-                '500': '#FFCC00',
-                '600': '#CCA300',
-                '700': '#997A00',
-                '800': '#664D00',
-                '900': '#332600',
-              },
-            }
-          }
-        }
-      }
-    </script>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
-      body {
-        font-family: 'Sarabun', sans-serif;
-      }
-      .tu-gradient {
-        background: linear-gradient(135deg, #E60000 0%, #FFCC00 100%);
-      }
-      .tu-gradient-text {
-        background: linear-gradient(135deg, #E60000 0%, #FFCC00 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-fill-color: transparent;
-      }
-      
-      /* Post Card Animation */
-      .post-card {
-        transition: all 0.3s ease;
-      }
-      
-      .post-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-      }
-      
-      /* Gradient backgrounds for cards */
-      .bg-gradient-red-to-white {
-        background-image: linear-gradient(to bottom right, rgba(255, 229, 229, 1), white);
-      }
-      
-      .bg-gradient-yellow-to-white {
-        background-image: linear-gradient(to bottom right, rgba(255, 248, 229, 1), white);
-      }
-      
-      .bg-gradient-blue-to-white {
-        background-image: linear-gradient(to bottom right, rgba(239, 246, 255, 1), white);
-      }
-    </style>
   </head>
   <body class="bg-gray-50 min-h-screen">
     

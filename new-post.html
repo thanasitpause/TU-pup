@@ -3,32 +3,132 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>สร้างกระทู้ใหม่ - TU-pup</title>
-  <!-- Tailwind CSS -->
+  <title>สร้างกระทู้ใหม่ - TU-PUP</title>
+  <!-- ตั้งค่าการโหลดทรัพยากร -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Custom styles -->
+  <link href="css/tu-common.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <!-- Tailwind Config & CDN -->
+  <script src="js/tailwind-config.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // ใช้คอนฟิกจากไฟล์ภายนอก
+    tailwind.config = window.tailwindConfig;
+  </script>
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Supabase Config -->
   <script src="js/supabase-config.js"></script>
-  <!-- Sidebar CSS -->
-  <link rel="stylesheet" href="css/sidebar.css">
   <!-- Sidebar JS -->
   <script src="js/sidebar.js"></script>
+  <style>
+    /* เพิ่มเติม CSS เฉพาะหน้านี้ */
+    .form-control-focus:focus-within {
+      box-shadow: 0 0 0 3px rgba(230, 0, 0, 0.2);
+      border-color: #E60000;
+    }
+    
+    .tu-shadow {
+      box-shadow: 0 10px 25px -5px rgba(230, 0, 0, 0.1), 0 10px 10px -5px rgba(255, 204, 0, 0.04);
+    }
+    
+    .tu-input-icon {
+      color: #cccccc;
+      transition: color 0.3s ease;
+    }
+    
+    .form-control-focus:focus-within .tu-input-icon {
+      color: #E60000;
+    }
+    
+    /* Animation for upload */
+    @keyframes pulse-border {
+      0% { border-color: #E60000; }
+      50% { border-color: #FFCC00; }
+      100% { border-color: #E60000; }
+    }
+    
+    .uploading {
+      animation: pulse-border 2s infinite;
+    }
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gradient-to-br from-white to-gray-100 min-h-screen">
+  <!-- Decorative Elements -->
+  <div class="fixed top-0 left-0 w-full h-1 tu-gradient opacity-80 z-50"></div>
+  
   <!-- Navbar -->
-  <nav class="bg-white shadow-md sticky top-0 z-10">
+  <nav class="bg-white shadow-md sticky top-0 z-40">
     <div class="container mx-auto px-4 py-3">
       <div class="flex justify-between items-center">
-        <!-- Logo -->
-        <a href="index.html" class="font-bold text-2xl text-blue-600">TU-PUP</a>
-        
+        <!-- Logo & Hamburger Menu -->
+        <div class="flex items-center space-x-4">
+          <button id="sidebar-toggle" class="text-gray-500 hover:text-tu-red-500 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <a href="index.html" class="flex items-center space-x-2">
+            <div class="h-8 w-8 rounded-full tu-gradient flex items-center justify-center text-white font-bold text-xs shadow-md">TU</div>
+            <span class="font-bold text-2xl tu-gradient-text">TU-PUP</span>
+          </a>
+        </div>
+
         <!-- User Menu -->
         <div class="flex items-center space-x-4">
-          <div id="user-menu" class="flex items-center space-x-2">
-            <img id="user-avatar" src="img/default-avatar.png" alt="User" class="w-8 h-8 rounded-full">
-            <span id="user-name" class="hidden md:inline text-sm font-medium"></span>
-            <button id="logout-btn" class="text-sm text-gray-600 hover:text-gray-800">ออกจากระบบ</button>
+          <div id="user-menu" class="hidden relative group">
+            <button class="flex items-center space-x-2 focus:outline-none">
+              <div class="relative">
+                <img id="user-avatar" src="img/default-avatar.png" alt="User" class="w-8 h-8 rounded-full border-2 border-tu-red-200 transition-transform duration-300 group-hover:scale-110">
+                <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-white"></div>
+              </div>
+              <span id="user-name" class="hidden md:inline text-sm font-medium"></span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 group-hover:text-tu-red-500 transition-transform duration-300 group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            <!-- Dropdown menu -->
+            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+              <div class="px-4 py-2 border-b border-gray-100">
+                <p class="text-sm font-medium text-gray-900" id="dropdown-user-name"></p>
+                <p class="text-xs text-gray-500 truncate" id="dropdown-user-email"></p>
+              </div>
+              <a href="my_posts.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-tu-red-50 hover:text-tu-red-500">
+                <div class="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                  กระทู้ของฉัน
+                </div>
+              </a>
+              <a href="edit-profile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-tu-red-50 hover:text-tu-red-500">
+                <div class="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  แก้ไขโปรไฟล์
+                </div>
+              </a>
+              <hr class="my-1 border-gray-100">
+              <button id="logout-btn" class="w-full text-left block px-4 py-2 text-sm text-tu-red-500 hover:bg-tu-red-50">
+                <div class="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  ออกจากระบบ
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div id="login-menu" class="flex items-center space-x-3">
+            <a href="login.html" class="text-tu-red-500 hover:text-tu-red-600 font-medium transition-colors">เข้าสู่ระบบ</a>
+            <div class="w-px h-5 bg-gray-300"></div>
+            <a href="register.html" class="text-tu-red-500 hover:text-tu-red-600 font-medium transition-colors">สมัครสมาชิก</a>
           </div>
         </div>
       </div>
@@ -37,74 +137,176 @@
 
   <!-- Main Content -->
   <main class="container mx-auto px-4 py-8">
-    <!-- Back Button -->
-    <div class="mb-4">
-      <a href="index.html" class="flex items-center text-blue-600 hover:text-blue-800 transition duration-300">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        กลับไปหน้าหลัก
-      </a>
-    </div>
-    
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <h1 class="text-2xl font-bold text-gray-800 mb-6">สร้างกระทู้ใหม่</h1>
-      
-      <form id="new-post-form" class="space-y-6">
-        <div>
-          <label for="post-title" class="block text-gray-700 font-medium mb-2">หัวข้อกระทู้</label>
-          <input type="text" id="post-title" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300" placeholder="ใส่หัวข้อกระทู้ของคุณที่นี่" required>
-        </div>
-        
-        <div>
-          <label for="post-content" class="block text-gray-700 font-medium mb-2">เนื้อหากระทู้</label>
-          <textarea id="post-content" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300" rows="10" placeholder="เล่าเรื่องของคุณที่นี่..." required></textarea>
-        </div>
-        
-        <!-- Image Upload -->
-        <div>
-          <label class="block text-gray-700 font-medium mb-2">รูปภาพประกอบ (ไม่บังคับ)</label>
-          <div id="image-upload-container">
-            <div class="flex flex-wrap items-center mb-3">
-              <label class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    <div class="max-w-4xl mx-auto">
+      <!-- Page Header -->
+      <div class="mb-8 relative">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="flex items-center space-x-3 mb-2">
+              <a href="index.html" class="flex items-center text-tu-red-500 hover:text-tu-red-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                เลือกรูปภาพ
-                <input type="file" id="image-upload" accept="image/*" class="hidden" multiple>
-              </label>
-              <span class="ml-3 text-gray-600 text-sm">สามารถเลือกได้หลายรูป</span>
+                <span>กลับไปหน้าหลัก</span>
+              </a>
             </div>
+            <h1 class="text-3xl font-bold text-gray-800 relative inline-block">
+              สร้างกระทู้ใหม่
+              <div class="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-tu-red to-tu-yellow rounded-full"></div>
+            </h1>
+            <p class="text-gray-500 mt-2">แบ่งปันความคิดเห็นและสร้างกระทู้ใหม่ให้กับชุมชน</p>
+          </div>
+          <img src="img/cat-new-post.png" alt="Post Creation" class="hidden md:block w-32 h-32 opacity-80">
+        </div>
+      </div>
+      
+      <!-- Create Post Card -->
+      <div class="bg-white rounded-xl shadow-lg p-8 tu-shadow">
+        <!-- Progress Steps -->
+        <div class="mb-8 hidden">
+          <div class="flex items-center justify-between relative">
+            <div class="absolute left-0 top-1/2 w-full h-1 bg-gray-200 -z-10"></div>
+            <div class="w-8 h-8 rounded-full bg-tu-red-500 text-white flex items-center justify-center text-sm font-bold z-10">1</div>
+            <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-bold z-10">2</div>
+            <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-bold z-10">3</div>
+          </div>
+          <div class="flex justify-between mt-2 text-sm">
+            <div class="text-tu-red-500 font-medium">รายละเอียด</div>
+            <div class="text-gray-400">รูปภาพ</div>
+            <div class="text-gray-400">เผยแพร่</div>
+          </div>
+        </div>
+        
+        <!-- Post Form -->
+        <form id="new-post-form" class="space-y-6">
+          <div>
+            <label for="post-title" class="block text-gray-700 font-medium mb-2">หัวข้อกระทู้</label>
+            <div class="relative form-control-focus rounded-lg transition-all duration-300">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 tu-input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
+              <input type="text" id="post-title" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-0 bg-white" placeholder="ใส่หัวข้อกระทู้ที่น่าสนใจ" required>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">หัวข้อที่ดีควรสั้น กระชับ และสื่อถึงเนื้อหาหลักของกระทู้</p>
           </div>
           
-          <!-- Image Previews -->
-          <div id="image-previews" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3"></div>
-        </div>
-        
-        <div id="error-message" class="hidden p-3 bg-red-100 text-red-700 rounded-lg"></div>
-        <div id="success-message" class="hidden p-3 bg-green-100 text-green-700 rounded-lg"></div>
-        
-        <div class="flex justify-end space-x-3">
-          <button type="button" id="cancel-btn" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-6 rounded-lg transition duration-300">
-            ยกเลิก
-          </button>
-          <button type="submit" id="submit-post-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
-            โพสต์กระทู้
-          </button>
-        </div>
-      </form>
+          <div>
+            <label for="post-content" class="block text-gray-700 font-medium mb-2">เนื้อหากระทู้</label>
+            <div class="form-control-focus rounded-lg transition-all duration-300">
+              <textarea id="post-content" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-0 bg-white min-h-[200px]" placeholder="เล่าเรื่องราวของคุณให้ละเอียด เพื่อให้ผู้อ่านเข้าใจได้ง่าย..." required></textarea>
+            </div>
+            <p class="text-xs text-gray-500 mt-1 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-tu-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              คุณสามารถใส่รายละเอียดได้มากที่สุด เพื่อให้ได้คำตอบที่ตรงประเด็น
+            </p>
+          </div>
+          
+          <!-- Image Upload -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-2">รูปภาพประกอบ (ไม่บังคับ)</label>
+            <div id="image-upload-container" class="mt-2">
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-tu-red-300 transition-colors">
+                <div class="space-y-2">
+                  <div class="mx-auto flex justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h3 class="text-gray-700 font-medium">ลากไฟล์มาวางที่นี่ หรือ</h3>
+                  <div class="flex justify-center">
+                    <label class="cursor-pointer bg-gradient-to-r from-tu-red-500 to-tu-yellow-500 text-white font-medium py-2 px-4 rounded-full hover:shadow-md transition duration-300 transform hover:scale-105 active:scale-95">
+                      เลือกรูปภาพ
+                      <input type="file" id="image-upload" accept="image/*" class="hidden" multiple>
+                    </label>
+                  </div>
+                  <p class="text-xs text-gray-500">รองรับไฟล์ JPG, PNG หรือ GIF (ขนาดไม่เกิน 5MB ต่อไฟล์)</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Image Previews -->
+            <div id="image-previews" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3"></div>
+          </div>
+          
+          <!-- Error and Success Messages -->
+          <div id="error-message" class="hidden p-4 bg-red-50 border-l-4 border-red-500 rounded-lg text-red-700 animate-pulse"></div>
+          <div id="success-message" class="hidden p-4 bg-green-50 border-l-4 border-green-500 rounded-lg text-green-700"></div>
+          
+          <!-- Form Actions -->
+          <div class="flex justify-end space-x-3 pt-3 border-t border-gray-100">
+            <button type="button" id="cancel-btn" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-6 rounded-lg transition duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              ยกเลิก
+            </button>
+            <button type="submit" id="submit-post-btn" class="bg-gradient-to-r from-tu-red to-tu-yellow hover:from-tu-red-600 hover:to-tu-yellow-600 text-white font-medium py-2.5 px-6 rounded-lg transition duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+              </svg>
+              โพสต์กระทู้
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Tips Card -->
+      <div class="mt-8 bg-gradient-to-br from-tu-red-50 to-tu-yellow-50 rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-tu-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          เคล็ดลับการสร้างกระทู้ที่ดี
+        </h3>
+        <ul class="space-y-2 text-gray-600">
+          <li class="flex items-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-tu-yellow-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>ตั้งหัวข้อที่ชัดเจนและตรงประเด็น</span>
+          </li>
+          <li class="flex items-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-tu-yellow-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>เขียนเนื้อหาที่ละเอียด อธิบายสถานการณ์หรือคำถามให้ชัดเจน</span>
+          </li>
+          <li class="flex items-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-tu-yellow-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>แนบรูปภาพที่เกี่ยวข้องเพื่อให้เข้าใจง่ายขึ้น</span>
+          </li>
+          <li class="flex items-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-tu-yellow-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>ใช้ภาษาที่สุภาพและเคารพผู้อื่น</span>
+          </li>
+        </ul>
+      </div>
     </div>
   </main>
 
   <!-- Footer -->
-  <footer class="bg-white border-t mt-12 py-6">
+  <footer class="bg-white border-t mt-12 py-8">
     <div class="container mx-auto px-4">
-      <div class="text-center text-gray-600 text-sm">
-        <p>&copy; 2025 TU-pansas. สงวนลิขสิทธิ์.</p>
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-6 md:mb-0">
+          <div class="flex items-center space-x-2 mb-3">
+            <div class="h-8 w-8 rounded-full tu-gradient flex items-center justify-center text-white font-bold text-xs">TU</div>
+            <span class="font-bold text-2xl tu-gradient-text">TU-PUP</span>
+          </div>
+          <p class="text-gray-600 max-w-md">ระบบกระดานสนทนาสำหรับประชาคมธรรมศาสตร์ แลกเปลี่ยนความคิดเห็น ถาม-ตอบปัญหา แชร์ประสบการณ์</p>
+        </div>
+        <p class="text-gray-600 text-sm">&copy; 2025 TU-PUP. สงวนลิขสิทธิ์.</p>
       </div>
     </div>
   </footer>
-
   <script>
     document.addEventListener('DOMContentLoaded', async function() {
       // ตรวจสอบสถานะการล็อกอิน
@@ -119,6 +321,12 @@
       // แสดงข้อมูลผู้ใช้
       const displayName = user.user_metadata?.display_name || user.email;
       document.getElementById('user-name').textContent = displayName;
+      document.getElementById('dropdown-user-name').textContent = displayName;
+      document.getElementById('dropdown-user-email').textContent = user.email;
+      
+      // ซ่อนเมนูล็อกอินและแสดงเมนูผู้ใช้
+      document.getElementById('login-menu').classList.add('hidden');
+      document.getElementById('user-menu').classList.remove('hidden');
       
       // ตรวจสอบรูปโปรไฟล์
       if (user.user_metadata?.avatar_url) {
@@ -133,58 +341,168 @@
         }
       });
       
-      // จัดการรูปภาพที่อัปโหลด
+      // เพิ่มความสามารถ Drag and Drop สำหรับอัปโหลดรูปภาพ
+      const dropArea = document.querySelector('#image-upload-container .border-dashed');
       const imageUpload = document.getElementById('image-upload');
       const imagePreviews = document.getElementById('image-previews');
       const selectedFiles = [];
       
-      imageUpload.addEventListener('change', function(e) {
-        const files = Array.from(e.target.files);
+      // ฟังก์ชัน highlight dropzone
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+      });
+      
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+      });
+      
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+      });
+      
+      function highlight() {
+        dropArea.classList.add('border-tu-red-400', 'bg-tu-red-50');
+      }
+      
+      function unhighlight() {
+        dropArea.classList.remove('border-tu-red-400', 'bg-tu-red-50');
+      }
+      
+      // จัดการไฟล์ที่ drop
+      dropArea.addEventListener('drop', handleDrop, false);
+      
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles(files);
+      }
+      
+      function handleFiles(files) {
+        files = [...files];
+        files.forEach(previewFile);
+      }
+      
+      // เพิ่มฟังก์ชันแสดงตัวอย่างไฟล์
+      function previewFile(file) {
+        // ตรวจสอบว่าเป็นไฟล์รูปภาพหรือไม่
+        if (!file.type.match('image.*')) {
+          showError('กรุณาอัปโหลดไฟล์รูปภาพเท่านั้น');
+          return;
+        }
         
-        files.forEach(file => {
-          // เพิ่มไฟล์ในรายการที่เลือก
-          selectedFiles.push(file);
-          
-          // สร้างตัวอย่างรูปภาพ
-          const previewContainer = document.createElement('div');
-          previewContainer.className = 'relative';
-          
-          const preview = document.createElement('img');
-          preview.className = 'w-full h-32 object-cover rounded-lg';
-          
-          const removeButton = document.createElement('button');
-          removeButton.className = 'absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center';
-          removeButton.innerHTML = '&times;';
-          removeButton.type = 'button';
-          
-          // อ่านไฟล์และแสดงตัวอย่าง
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            preview.src = e.target.result;
+        // ตรวจสอบขนาดไฟล์ (ไม่เกิน 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          showError('ขนาดไฟล์ต้องไม่เกิน 5MB');
+          return;
+        }
+        
+        // เพิ่มไฟล์ในรายการที่เลือก
+        selectedFiles.push(file);
+        
+        // สร้างตัวอย่างรูปภาพ
+        const previewContainer = document.createElement('div');
+        previewContainer.className = 'relative group overflow-hidden rounded-lg border border-gray-200 hover:shadow-md transition-all duration-300';
+        
+        const preview = document.createElement('div');
+        preview.className = 'w-full h-32 bg-gray-100 flex items-center justify-center relative';
+        
+        const image = document.createElement('img');
+        image.className = 'w-full h-full object-cover';
+        
+        const spinner = document.createElement('div');
+        spinner.className = 'absolute inset-0 flex items-center justify-center bg-white bg-opacity-80';
+        spinner.innerHTML = `<div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-tu-red-500"></div>`;
+        
+        preview.appendChild(image);
+        preview.appendChild(spinner);
+        
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'absolute top-2 right-2 bg-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-red-50';
+        removeButton.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        `;
+        
+        const filename = document.createElement('div');
+        filename.className = 'px-3 py-2 text-xs text-gray-500 truncate';
+        filename.textContent = file.name;
+        
+        // อ่านไฟล์และแสดงตัวอย่าง
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          image.src = e.target.result;
+          spinner.remove(); // ลบ spinner เมื่อโหลดเสร็จ
+        }
+        reader.readAsDataURL(file);
+        
+        // เพิ่ม event listener สำหรับปุ่มลบ
+        removeButton.addEventListener('click', function() {
+          const index = selectedFiles.indexOf(file);
+          if (index !== -1) {
+            selectedFiles.splice(index, 1);
           }
-          reader.readAsDataURL(file);
+          previewContainer.remove();
           
-          // เพิ่ม event listener สำหรับปุ่มลบ
-          removeButton.addEventListener('click', function() {
-            const index = selectedFiles.indexOf(file);
-            if (index !== -1) {
-              selectedFiles.splice(index, 1);
-            }
-            previewContainer.remove();
-          });
-          
-          previewContainer.appendChild(preview);
-          previewContainer.appendChild(removeButton);
-          imagePreviews.appendChild(previewContainer);
+          // ถ้าไม่มีรูปเหลือแล้ว ให้ซ่อนพื้นที่แสดงตัวอย่าง
+          if (imagePreviews.children.length === 0) {
+            imagePreviews.classList.add('hidden');
+          }
         });
         
+        previewContainer.appendChild(preview);
+        previewContainer.appendChild(removeButton);
+        previewContainer.appendChild(filename);
+        
+        imagePreviews.appendChild(previewContainer);
+        imagePreviews.classList.remove('hidden');
+      }
+      
+      // จัดการกับไฟล์ที่อัปโหลดผ่าน input
+      imageUpload.addEventListener('change', function(e) {
+        handleFiles(e.target.files);
         // รีเซ็ต input เพื่อให้สามารถเลือกไฟล์เดิมซ้ำได้
         imageUpload.value = '';
       });
       
+      // แสดงข้อความผิดพลาด
+      function showError(message) {
+        const errorMessage = document.getElementById('error-message');
+        errorMessage.textContent = message;
+        errorMessage.classList.remove('hidden');
+        
+        // ซ่อนข้อความหลังจาก 5 วินาที
+        setTimeout(() => {
+          errorMessage.classList.add('hidden');
+        }, 5000);
+      }
+      
+      // แสดงข้อความสำเร็จ
+      function showSuccess(message) {
+        const successMessage = document.getElementById('success-message');
+        successMessage.textContent = message;
+        successMessage.classList.remove('hidden');
+      }
+      
       // Event listener สำหรับปุ่มยกเลิก
       document.getElementById('cancel-btn').addEventListener('click', function() {
-        window.location.href = 'index.html';
+        // ยืนยันก่อนยกเลิก (ถ้ามีการกรอกข้อมูลบางส่วนแล้ว)
+        const title = document.getElementById('post-title').value.trim();
+        const content = document.getElementById('post-content').value.trim();
+        
+        if (title || content || selectedFiles.length > 0) {
+          if(confirm('คุณแน่ใจหรือไม่ว่าต้องการยกเลิก? ข้อมูลที่กรอกจะหายไป')) {
+            window.location.href = 'index.html';
+          }
+        } else {
+          window.location.href = 'index.html';
+        }
       });
       
       // Event listener สำหรับการส่งฟอร์ม
@@ -201,24 +519,44 @@
         errorMessage.classList.add('hidden');
         successMessage.classList.add('hidden');
         
-        if (!title || !content) {
-          errorMessage.textContent = 'โปรดกรอกหัวข้อและเนื้อหากระทู้';
-          errorMessage.classList.remove('hidden');
+        // ตรวจสอบข้อมูล
+        if (!title) {
+          showError('โปรดกรอกหัวข้อกระทู้');
+          document.getElementById('post-title').focus();
           return;
         }
         
-        // ปิดปุ่มส่งระหว่างที่กำลังสร้างกระทู้
+        if (!content) {
+          showError('โปรดกรอกเนื้อหากระทู้');
+          document.getElementById('post-content').focus();
+          return;
+        }
+        
+        // เพิ่มคลาส uploading ให้กับปุ่มและปิดใช้งาน
         submitButton.disabled = true;
-        submitButton.textContent = 'กำลังโพสต์...';
+        submitButton.classList.add('uploading');
+        submitButton.innerHTML = `
+          <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          กำลังโพสต์...
+        `;
         
         try {
           const imageURLs = [];
           
           // อัปโหลดรูปภาพทั้งหมด
           for (let i = 0; i < selectedFiles.length; i++) {
-            const file = selectedFiles[i];
-            const imageUrl = await uploadImage(file, 'posts');
-            imageURLs.push(imageUrl);
+            try {
+              const file = selectedFiles[i];
+              const imageUrl = await uploadImage(file, 'posts');
+              imageURLs.push(imageUrl);
+            } catch (uploadError) {
+              console.error('Error uploading image:', uploadError);
+              // ไม่หยุดการทำงาน แต่แสดงข้อความเตือน
+              showError('มีปัญหาในการอัปโหลดรูปภาพบางรูป แต่กระทู้ยังคงถูกสร้าง');
+            }
           }
           
           // สร้างกระทู้ใหม่
@@ -237,25 +575,122 @@
           
           if (error) throw error;
           
-          // แสดงข้อความสำเร็จ
-          successMessage.textContent = 'สร้างกระทู้สำเร็จ! กำลังนำคุณไปยังหน้ากระทู้...';
+          // แสดงข้อความสำเร็จพร้อมเอฟเฟกต์
+          successMessage.innerHTML = `
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              สร้างกระทู้สำเร็จ! กำลังนำคุณไปยังหน้ากระทู้...
+            </div>
+          `;
           successMessage.classList.remove('hidden');
+          
+          // แสดงเอฟเฟกต์ภาพเคลื่อนไหวเมื่อสำเร็จ
+          confetti();
           
           // ไปยังหน้ากระทู้ที่สร้าง
           setTimeout(() => {
             window.location.href = `post.html?id=${data[0].id}`;
-          }, 1500);
+          }, 2000);
         } catch (error) {
           console.error('Error creating post:', error);
           
-          errorMessage.textContent = 'เกิดข้อผิดพลาดในการสร้างกระทู้ โปรดลองอีกครั้ง';
+          // แสดงข้อความผิดพลาดแบบมีรายละเอียด
+          errorMessage.innerHTML = `
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span>เกิดข้อผิดพลาดในการสร้างกระทู้: ${error.message || 'โปรดลองอีกครั้ง'}</span>
+            </div>
+          `;
           errorMessage.classList.remove('hidden');
+          
+          // เลื่อนไปยังข้อความผิดพลาด
+          errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
           
           // เปิดปุ่มส่งอีกครั้ง
           submitButton.disabled = false;
-          submitButton.textContent = 'โพสต์กระทู้';
+          submitButton.classList.remove('uploading');
+          submitButton.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+            </svg>
+            โพสต์กระทู้
+          `;
         }
       });
+      
+      // ฟังก์ชัน Confetti เมื่อสร้างกระทู้สำเร็จ
+      function confetti() {
+        const canvas = document.createElement('canvas');
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.pointerEvents = 'none';
+        canvas.style.width = '100vw';
+        canvas.style.height = '100vh';
+        canvas.style.zIndex = '9999';
+        document.body.appendChild(canvas);
+        
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const particles = [];
+        const colors = ['#E60000', '#FFCC00', '#FF6666', '#FFD966'];
+        
+        for (let i = 0; i < 150; i++) {
+          particles.push({
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            size: Math.random() * 10 + 5,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            vx: Math.random() * 10 - 5,
+            vy: Math.random() * -15 - 5,
+            gravity: 0.2,
+            rotation: Math.random() * 360,
+            rotationSpeed: Math.random() * 10 - 5
+          });
+        }
+        
+        function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          
+          let finished = true;
+          
+          particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += p.gravity;
+            p.rotation += p.rotationSpeed;
+            
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation * Math.PI / 180);
+            
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+            
+            ctx.restore();
+            
+            // ตรวจสอบว่ายังมี particle ที่อยู่ในหน้าจอหรือไม่
+            if (p.y < canvas.height) {
+              finished = false;
+            }
+          });
+          
+          if (!finished) {
+            requestAnimationFrame(animate);
+          } else {
+            // ลบ canvas เมื่อเอฟเฟกต์เสร็จสิ้น
+            document.body.removeChild(canvas);
+          }
+        }
+        
+        animate();
+      }
     });
   </script>
 </body>

@@ -4,73 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>สมัครสมาชิก - TU-PUP</title>
-  <!-- Tailwind CSS -->
+  <!-- ตั้งค่าการโหลดทรัพยากร -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Custom styles -->
+  <link href="css/tu-common.css" rel="stylesheet">
+  <!-- Tailwind Config & CDN -->
+  <script src="js/tailwind-config.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // ใช้คอนฟิกจากไฟล์ภายนอก
+    tailwind.config = window.tailwindConfig;
+  </script>
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Supabase Config -->
   <script src="js/supabase-config.js"></script>
-  <!-- Custom TU Theme -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'tu-red': {
-              DEFAULT: '#E60000',
-              '50': '#FFE5E5',
-              '100': '#FFCCCC',
-              '200': '#FF9999',
-              '300': '#FF6666',
-              '400': '#FF3333',
-              '500': '#E60000',
-              '600': '#B30000',
-              '700': '#800000',
-              '800': '#4D0000',
-              '900': '#1A0000',
-            },
-            'tu-yellow': {
-              DEFAULT: '#FFCC00',
-              '50': '#FFF8E5',
-              '100': '#FFF2CC',
-              '200': '#FFE699',
-              '300': '#FFD966',
-              '400': '#FFCC33',
-              '500': '#FFCC00',
-              '600': '#CCA300',
-              '700': '#997A00',
-              '800': '#664D00',
-              '900': '#332600',
-            },
-          }
-        }
-      }
-    }
-  </script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
-    body {
-      font-family: 'Sarabun', sans-serif;
-    }
-    .tu-gradient {
-      background: linear-gradient(135deg, #E60000 0%, #FFCC00 100%);
-    }
-    .tu-gradient-text {
-      background: linear-gradient(135deg, #E60000 0%, #FFCC00 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-fill-color: transparent;
-    }
-    .floating {
-      animation: float 6s ease-in-out infinite;
-    }
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
-      100% { transform: translateY(0px); }
-    }
-  </style>
 </head>
 <body class="bg-gradient-to-tr from-gray-100 to-gray-50 min-h-screen flex items-center justify-center">
   <!-- Decorative Elements -->
