@@ -141,13 +141,11 @@
 <div class="edit-form">
   <h2>แก้ไขบัญชีผู้ใช้</h2>
   <form action="/update-account" method="POST" enctype="multipart/form-data">
-    <label for="firstname">ชื่อจริง</label>
-    <input type="text" id="firstname" name="firstname" class="input-full" value="...">
 
-    <label for="lastname">นามสกุล</label>
+    <label for="lastname">ชื่อผู้ใช้</label>
     <input type="text" id="lastname" name="lastname" class="input-full" value="...">
 
-    <label for="username">ชื่อผู้ใช้</label>
+    <label for="username">เปลี่ยนชื่อผู้ใช้</label>
     <input type="text" id="username" name="username" class="input-full" value="...">
 
     <label>อัปโหลดรูปโปรไฟล์ / แก้ไขรหัสผ่าน</label>
@@ -230,3 +228,154 @@
 
 </body>
 </html>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script>
+    const supabaseUrl = 'https://ntdzzbkplgjipkbykzmb.supabase.co'; // ใส่ Project URL ของคุณ
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50ZHp6YmtwbGdqaXBrYnlrem1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxMTQxMDAsImV4cCI6MjA2MTY5MDEwMH0.yrvXGzujPa5MYi7pK-Cnu3HO_NoPWI92hBJnTqr23_4'; // ใส่ anon key ของคุณ
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+</script>
+<script>
+  async function changePassword() {
+    const current = document.getElementById('currentPassword').value;
+    const newPass = document.getElementById('newPassword').value;
+    const confirm = document.getElementById('confirmPassword').value;
+
+    if (newPass.length < 7) {
+      alert("รหัสผ่านใหม่ต้องมีอย่างน้อย 7 ตัวอักษร");
+      return;
+    }
+
+    if (newPass !== confirm) {
+      alert("รหัสใหม่และยืนยันไม่ตรงกัน");
+      return;
+    }
+
+    const user = supabase.auth.getUser(); // รับ user ปัจจุบัน
+    const session = await supabase.auth.getSession(); // รับ session (ต้องใช้ token)
+
+    if (!session.data.session) {
+      alert("กรุณาเข้าสู่ระบบก่อนเปลี่ยนรหัสผ่าน");
+      return;
+    }
+
+    // เปลี่ยนรหัสผ่านผ่าน Supabase Auth
+    const { error } = await supabase.auth.updateUser({
+      password: newPass
+    });
+
+    if (error) {
+      alert("เปลี่ยนรหัสผ่านล้มเหลว: " + error.message);
+    } else {
+      alert("เปลี่ยนรหัสผ่านสำเร็จ");
+      closePasswordModal();
+    }
+  }
+</script>
+ 
+
+<script>
+
+  fileInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.src = '#';
+      preview.style.display = 'none';
+    }
+  });
+
+  // ฟังก์ชันอัปโหลดรูปภาพไปยัง Supabase
+  async function uploadImage() {
+    const file = fileInput.files[0];
+    if (!file) {
+      alert('กรุณาเลือกไฟล์รูปภาพ');
+      return;
+    }
+
+    const filePath = `avatars/${file.name}`;
+    const { data, error } = await supabase
+      .storage
+      .from('avatars')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+        contentType: file.type,
+      });
+
+    if (error) {
+      alert('อัปโหลดรูปภาพล้มเหลว: ' + error.message);
+    } else {
+      alert('อัปโหลดรูปภาพสำเร็จ');
+      // แสดง URL ของรูปภาพ
+      const publicURL = supabase
+        .storage
+        .from('avatars')
+        .getPublicUrl(filePath).publicURL;
+      console.log('URL ของรูปภาพ:', publicURL);
+    }
+  }
+</script>
+
+<script>
+  document.querySelector('form').addEventListener('submit', async function (e) {
+    e.preventDefault(); // หยุดการส่งฟอร์มแบบดั้งเดิม
+
+    const file = fileInput.files[0];
+    const lastname = document.getElementById('lastname').value;
+    const username = document.getElementById('username').value;
+
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    const user = userData?.user;
+
+    if (!user) {
+      alert("กรุณาเข้าสู่ระบบก่อนอัปเดตข้อมูล");
+      return;
+    }
+
+    let imageUrl = null;
+
+    // อัปโหลดรูปหากมีการเลือก
+    if (file) {
+      const filePath = `avatars/${user.id}-${Date.now()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) {
+        alert("อัปโหลดรูปไม่สำเร็จ: " + uploadError.message);
+        return;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      imageUrl = urlData.publicURL;
+    }
+
+    // อัปเดตข้อมูลผู้ใช้ในตาราง profiles (หรือเปลี่ยนตามตารางของคุณ)
+    const updates = {
+      id: user.id,
+      lastname: lastname,
+      username: username,
+      ...(imageUrl && { avatar_url: imageUrl })
+    };
+
+    const { error: updateError } = await supabase
+      .from('profiles') // เปลี่ยนเป็นชื่อตารางจริงของคุณถ้าไม่ใช่ profiles
+      .upsert(updates);
+
+    if (updateError) {
+      alert("อัปเดตข้อมูลไม่สำเร็จ: " + updateError.message);
+    } else {
+      alert("บันทึกข้อมูลสำเร็จ!");
+    }
+  });
+</script>
