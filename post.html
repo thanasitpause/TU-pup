@@ -166,8 +166,7 @@
                 <p class="text-sm font-medium text-gray-900" id="dropdown-user-name"></p>
                 <p class="text-xs text-gray-500 truncate" id="dropdown-user-email"></p>
               </div>
-              <a href="my_posts.html"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-tu-red-50 hover:text-tu-red-500">
+              <a href="my_posts.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-tu-red-50 hover:text-tu-red-500">
                 <div class="flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
@@ -301,7 +300,6 @@
               </div>
             </div>
           </div>
-
           <div class="flex items-start md:items-center mb-6">
             <div class="flex-shrink-0 mr-3 relative">
               <div class="w-12 h-12 rounded-full bg-gradient-to-br from-tu-red-100 to-tu-yellow-100 p-0.5">
@@ -617,7 +615,6 @@
           </div>
         </div>
       </div>
-
       <!-- Edit Comment Modal -->
       <div id="edit-comment-modal"
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto hidden">
@@ -808,6 +805,7 @@
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11l7-7 7 7M5 19l7-7 7 7" />
     </svg>
   </button>
+
   <!-- Footer -->
   <footer class="bg-white border-t mt-8 py-8">
     <div class="container mx-auto px-4">
@@ -837,6 +835,26 @@
     let removeCommentImage = false; // ใช้ตรวจสอบว่าต้องการลบรูปภาพความคิดเห็นหรือไม่
     let newCommentImage = null; // ไฟล์รูปภาพใหม่ที่จะอัปโหลดสำหรับความคิดเห็น
 
+    // เพิ่มโค้ดการดีบั๊กเพื่อช่วยระบุปัญหา
+    document.addEventListener("DOMContentLoaded", function() {
+      console.log("DOM fully loaded - Debugging post.html");
+      
+      // ตรวจสอบว่าโมดัลต่างๆ ถูกโหลดแล้วหรือไม่
+      const editCommentModal = document.getElementById("edit-comment-modal");
+      const deleteCommentModal = document.getElementById("delete-comment-modal");
+      
+      if (!editCommentModal) {
+        console.error("Edit comment modal element not found!");
+      } else {
+        console.log("Edit comment modal found:", editCommentModal);
+      }
+      
+      if (!deleteCommentModal) {
+        console.error("Delete comment modal element not found!");
+      } else {
+        console.log("Delete comment modal found:", deleteCommentModal);
+      }
+    });
     document.addEventListener("DOMContentLoaded", async function () {
       // ดึง Post ID จาก URL
       const urlParams = new URLSearchParams(window.location.search);
@@ -1059,19 +1077,24 @@
       // Modal แก้ไขความคิดเห็น
       const editCommentModal = document.getElementById("edit-comment-modal");
       const editCommentModalContent = document.getElementById("edit-comment-modal-content");
+      
+      // ตรวจสอบการมีอยู่ของโมดัลแก้ไขความคิดเห็น
       if (!editCommentModal || !editCommentModalContent) {
-        console.error("Modal elements for editing comments not found!");
+        console.error("Edit comment modal elements not found!");
       }
+      
       const closeEditCommentBtn = document.getElementById("close-edit-comment-btn");
       const cancelEditCommentBtn = document.getElementById("cancel-edit-comment-btn");
 
       // Modal ลบความคิดเห็น
       const deleteCommentModal = document.getElementById("delete-comment-modal");
       const deleteCommentModalContent = document.getElementById("delete-comment-modal-content");
-      // ตรวจสอบว่า elements เหล่านี้มีอยู่จริง
+      
+      // ตรวจสอบการมีอยู่ของโมดัลลบความคิดเห็น
       if (!deleteCommentModal || !deleteCommentModalContent) {
-        console.error("Modal elements for deleting comments not found!");
+        console.error("Delete comment modal elements not found!");
       }
+      
       const cancelDeleteCommentBtn = document.getElementById("cancel-delete-comment-btn");
       const confirmDeleteCommentBtn = document.getElementById("confirm-delete-comment-btn");
 
@@ -1134,17 +1157,24 @@
       cancelEditBtn.addEventListener("click", closeEditModal);
 
       // เปิดปิด Modal แก้ไขความคิดเห็น
-      closeEditCommentBtn.addEventListener("click", closeEditCommentModal);
-      cancelEditCommentBtn.addEventListener("click", closeEditCommentModal);
+      if (closeEditCommentBtn) {
+        closeEditCommentBtn.addEventListener("click", closeEditCommentModal);
+      }
+      
+      if (cancelEditCommentBtn) {
+        cancelEditCommentBtn.addEventListener("click", closeEditCommentModal);
+      }
 
       // เปิดปิด Modal ลบความคิดเห็น
-      cancelDeleteCommentBtn.addEventListener("click", () => {
-        deleteCommentModalContent.classList.remove("scale-100", "opacity-100");
-        deleteCommentModalContent.classList.add("scale-95", "opacity-0");
-        setTimeout(() => {
-          deleteCommentModal.classList.add("hidden");
-        }, 200);
-      });
+      if (cancelDeleteCommentBtn) {
+        cancelDeleteCommentBtn.addEventListener("click", () => {
+          deleteCommentModalContent.classList.remove("scale-100", "opacity-100");
+          deleteCommentModalContent.classList.add("scale-95", "opacity-0");
+          setTimeout(() => {
+            deleteCommentModal.classList.add("hidden");
+          }, 200);
+        });
+      }
 
       // ปิดเมนูเมื่อคลิกที่อื่น
       document.addEventListener("click", function (e) {
@@ -1172,28 +1202,43 @@
       document.getElementById("edit-post-form").addEventListener("submit", handleEditFormSubmit);
 
       // ส่งฟอร์มแก้ไขความคิดเห็น
-      document.getElementById("edit-comment-form").addEventListener("submit", handleEditCommentFormSubmit);
+      const editCommentForm = document.getElementById("edit-comment-form");
+      if (editCommentForm) {
+        editCommentForm.addEventListener("submit", handleEditCommentFormSubmit);
+      } else {
+        console.error("Edit comment form element not found!");
+      }
 
       // จัดการอัปโหลดรูปภาพใหม่
       document.getElementById("edit-image-upload").addEventListener("change", handleEditImageUpload);
 
       // จัดการการแสดงตัวอย่างรูปภาพใหม่สำหรับความคิดเห็น
-      document.getElementById("edit-comment-image-upload").addEventListener("change", handleEditCommentImageUpload);
+      const editCommentImageUpload = document.getElementById("edit-comment-image-upload");
+      if (editCommentImageUpload) {
+        editCommentImageUpload.addEventListener("change", handleEditCommentImageUpload);
+      }
 
       // ลบรูปภาพความคิดเห็นปัจจุบัน
-      document.getElementById("remove-comment-image-btn").addEventListener("click", function () {
-        removeCommentImage = true;
-        document.getElementById("current-comment-image").classList.add("hidden");
-        document.getElementById("add-comment-image-section").classList.remove("hidden");
-      });
+      const removeCommentImageBtn = document.getElementById("remove-comment-image-btn");
+      if (removeCommentImageBtn) {
+        removeCommentImageBtn.addEventListener("click", function () {
+          console.log("Remove current comment image button clicked");
+          removeCommentImage = true;
+          document.getElementById("current-comment-image").classList.add("hidden");
+          document.getElementById("add-comment-image-section").classList.remove("hidden");
+        });
+      }
 
       // ลบรูปภาพความคิดเห็นใหม่ที่เลือก
-      document.getElementById("remove-edit-comment-image-btn").addEventListener("click", function () {
-        newCommentImage = null;
-        document.getElementById("edit-comment-image-upload").value = "";
-        document.getElementById("selected-comment-image-name").textContent = "";
-        document.getElementById("edit-comment-image-preview-container").classList.add("hidden");
-      });
+      const removeEditCommentImageBtn = document.getElementById("remove-edit-comment-image-btn");
+      if (removeEditCommentImageBtn) {
+        removeEditCommentImageBtn.addEventListener("click", function () {
+          newCommentImage = null;
+          document.getElementById("edit-comment-image-upload").value = "";
+          document.getElementById("selected-comment-image-name").textContent = "";
+          document.getElementById("edit-comment-image-preview-container").classList.add("hidden");
+        });
+      }
 
       // ยืนยันการลบกระทู้
       confirmDeleteBtn.addEventListener("click", async () => {
@@ -1242,67 +1287,77 @@
       });
 
       // ยืนยันการลบความคิดเห็น
-      confirmDeleteCommentBtn.addEventListener("click", async () => {
-        const commentId = document.getElementById("delete-comment-id").value;
-        const urlParams = new URLSearchParams(window.location.search);
-        const postId = urlParams.get("id");
+      if (confirmDeleteCommentBtn) {
+        confirmDeleteCommentBtn.addEventListener("click", async () => {
+          const commentId = document.getElementById("delete-comment-id").value;
+          const urlParams = new URLSearchParams(window.location.search);
+          const postId = urlParams.get("id");
+          
+          console.log("Attempting to delete comment ID:", commentId);
 
-        if (!commentId || !postId) {
-          deleteCommentModal.classList.add("hidden");
-          return;
-        }
-
-        // แสดงสถานะกำลังลบ
-        confirmDeleteCommentBtn.disabled = true;
-        confirmDeleteCommentBtn.innerHTML = `
-          <svg class="animate-spin h-5 w-5 mr-2 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          กำลังลบ...
-        `;
-
-        try {
-          // ลบความคิดเห็น
-          const { error } = await supabase
-            .from("comments")
-            .delete()
-            .eq("id", commentId);
-
-          if (error) throw error;
-
-          // ลดจำนวนความคิดเห็นของกระทู้
-          await decrementCommentCount(postId);
-
-          // ปิด modal
-          deleteCommentModalContent.classList.remove("scale-100", "opacity-100");
-          deleteCommentModalContent.classList.add("scale-95", "opacity-0");
-          setTimeout(() => {
+          if (!commentId || !postId) {
             deleteCommentModal.classList.add("hidden");
-          }, 200);
-
-          // โหลดความคิดเห็นใหม่
-          const { data: { user } } = await supabase.auth.getUser();
-          await loadComments(postId, user);
-
-          // ดึงข้อมูลกระทู้ใหม่เพื่ออัปเดตจำนวนความคิดเห็นที่แสดงในหน้าเว็บ
-          const { data: post } = await supabase
-            .from("posts")
-            .select("comment_count")
-            .eq("id", postId)
-            .single();
-
-          if (post) {
-            document.getElementById("post-comments-count").textContent = `${post.comment_count || 0} ความคิดเห็น`;
-            document.getElementById("comments-counter").textContent = `(${post.comment_count || 0})`;
+            return;
           }
-        } catch (error) {
-          console.error("Error deleting comment:", error);
-          alert("เกิดข้อผิดพลาดในการลบความคิดเห็น โปรดลองอีกครั้ง");
-          confirmDeleteCommentBtn.disabled = false;
-          confirmDeleteCommentBtn.textContent = "ลบความคิดเห็น";
-        }
-      });
+
+          // แสดงสถานะกำลังลบ
+          confirmDeleteCommentBtn.disabled = true;
+          confirmDeleteCommentBtn.innerHTML = `
+            <svg class="animate-spin h-5 w-5 mr-2 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            กำลังลบ...
+          `;
+
+          try {
+            // ลบความคิดเห็น
+            const { error } = await supabase
+              .from("comments")
+              .delete()
+              .eq("id", commentId);
+
+            if (error) {
+              console.error("Error in delete comment query:", error);
+              throw error;
+            }
+
+            console.log("Comment deleted successfully");
+
+            // ลดจำนวนความคิดเห็นของกระทู้
+            await decrementCommentCount(postId);
+
+            // ปิด modal
+            deleteCommentModalContent.classList.remove("scale-100", "opacity-100");
+            deleteCommentModalContent.classList.add("scale-95", "opacity-0");
+            setTimeout(() => {
+              deleteCommentModal.classList.add("hidden");
+            }, 200);
+
+            // โหลดความคิดเห็นใหม่
+            const { data: { user } } = await supabase.auth.getUser();
+            await loadComments(postId, user);
+
+            // ดึงข้อมูลกระทู้ใหม่เพื่ออัปเดตจำนวนความคิดเห็นที่แสดงในหน้าเว็บ
+            const { data: post } = await supabase
+              .from("posts")
+              .select("comment_count")
+              .eq("id", postId)
+              .single();
+
+            if (post) {
+              document.getElementById("post-comments-count").textContent = `${post.comment_count || 0} ความคิดเห็น`;
+              document.getElementById("comments-counter").textContent = `(${post.comment_count || 0})`;
+            }
+          } catch (error) {
+            console.error("Error deleting comment:", error);
+            alert("เกิดข้อผิดพลาดในการลบความคิดเห็น โปรดลองอีกครั้ง: " + error.message);
+          } finally {
+            confirmDeleteCommentBtn.disabled = false;
+            confirmDeleteCommentBtn.textContent = "ลบความคิดเห็น";
+          }
+        });
+      }
     }
 
     // โหลดข้อมูลกระทู้
@@ -1499,52 +1554,12 @@
           commentEl.innerHTML = commentHtml;
           commentsContent.appendChild(commentEl);
 
-          // เพิ่ม event listener สำหรับปุ่มแก้ไขความคิดเห็น
-          const editButtons = commentEl.querySelectorAll(".edit-comment-btn");
-          editButtons.forEach((button) => {
-            button.addEventListener("click", () => {
-              // หาความคิดเห็นที่ต้องการแก้ไข
-              const commentId = button.getAttribute("data-id");
-              const targetComment = comments.find(c => c.id === parseInt(commentId));
-
-              if (targetComment) {
-                initEditCommentForm(targetComment);
-
-                // เปิด modal แก้ไขความคิดเห็น
-                const editCommentModal = document.getElementById("edit-comment-modal");
-                const editCommentModalContent = document.getElementById("edit-comment-modal-content");
-                editCommentModal.classList.remove("hidden");
-                setTimeout(() => {
-                  editCommentModalContent.classList.remove("scale-95", "opacity-0");
-                  editCommentModalContent.classList.add("scale-100", "opacity-100");
-                }, 10);
-              }
-            });
-          });
-
-          // เพิ่ม event listener สำหรับปุ่มลบความคิดเห็น
-          const deleteButtons = commentEl.querySelectorAll(".delete-comment-btn");
-          deleteButtons.forEach((button) => {
-            button.addEventListener("click", () => {
-              const commentId = button.getAttribute("data-id");
-              document.getElementById("delete-comment-id").value = commentId;
-
-              // เปิด modal ยืนยันการลบความคิดเห็น
-              const deleteCommentModal = document.getElementById("delete-comment-modal");
-              const deleteCommentModalContent = document.getElementById("delete-comment-modal-content");
-              deleteCommentModal.classList.remove("hidden");
-              setTimeout(() => {
-                deleteCommentModalContent.classList.remove("scale-95", "opacity-0");
-                deleteCommentModalContent.classList.add("scale-100", "opacity-100");
-              }, 10);
-            });
-          });
-
           // เพิ่ม event listener สำหรับปุ่มเมนูความคิดเห็น
           const menuButtons = commentEl.querySelectorAll(".comment-menu-btn");
           menuButtons.forEach((button) => {
             button.addEventListener("click", function (e) {
               e.stopPropagation();
+              console.log("Comment menu button clicked for comment ID:", this.getAttribute("data-id"));
 
               // ปิดเมนูดรอปดาวน์อื่นๆ ทั้งหมดก่อน
               document.querySelectorAll(".comment-dropdown").forEach((dropdown) => {
@@ -1572,6 +1587,71 @@
               }
             });
           });
+
+          // เพิ่ม event listener สำหรับปุ่มแก้ไขความคิดเห็น
+          const editButtons = commentEl.querySelectorAll(".edit-comment-btn");
+          editButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+              // หาความคิดเห็นที่ต้องการแก้ไข
+              const commentId = this.getAttribute("data-id");
+              console.log("Edit button clicked for comment ID:", commentId);
+              const targetComment = comments.find(c => c.id === parseInt(commentId));
+
+              if (targetComment) {
+                console.log("Found comment to edit:", targetComment);
+                initEditCommentForm(targetComment);
+
+                // เปิด modal แก้ไขความคิดเห็น
+                const editCommentModal = document.getElementById("edit-comment-modal");
+                const editCommentModalContent = document.getElementById("edit-comment-modal-content");
+                
+                if (!editCommentModal || !editCommentModalContent) {
+                  console.error("Modal elements for editing comments not found when trying to open modal!");
+                  return;
+                }
+                
+                editCommentModal.classList.remove("hidden");
+                setTimeout(() => {
+                  editCommentModalContent.classList.remove("scale-95", "opacity-0");
+                  editCommentModalContent.classList.add("scale-100", "opacity-100");
+                }, 10);
+              } else {
+                console.error("Comment not found for ID:", commentId);
+              }
+            });
+          });
+
+          // เพิ่ม event listener สำหรับปุ่มลบความคิดเห็น
+          const deleteButtons = commentEl.querySelectorAll(".delete-comment-btn");
+          deleteButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+              const commentId = this.getAttribute("data-id");
+              console.log("Delete button clicked for comment ID:", commentId);
+              
+              // ตั้งค่า ID ความคิดเห็นที่จะลบ
+              const deleteCommentIdInput = document.getElementById("delete-comment-id");
+              if (deleteCommentIdInput) {
+                deleteCommentIdInput.value = commentId;
+              } else {
+                console.error("Delete comment ID input not found!");
+              }
+
+              // เปิด modal ยืนยันการลบความคิดเห็น
+              const deleteCommentModal = document.getElementById("delete-comment-modal");
+              const deleteCommentModalContent = document.getElementById("delete-comment-modal-content");
+              
+              if (!deleteCommentModal || !deleteCommentModalContent) {
+                console.error("Modal elements for deleting comments not found when trying to open modal!");
+                return;
+              }
+              
+              deleteCommentModal.classList.remove("hidden");
+              setTimeout(() => {
+                deleteCommentModalContent.classList.remove("scale-95", "opacity-0");
+                deleteCommentModalContent.classList.add("scale-100", "opacity-100");
+              }, 10);
+            });
+          });
         });
       } catch (error) {
         console.error("Error loading comments:", error);
@@ -1591,6 +1671,7 @@
         commentsContent.classList.remove("hidden");
       }
     }
+
     // สร้างความคิดเห็นใหม่
     async function createComment(postId, content, imageUrl = null) {
       try {
@@ -1640,6 +1721,8 @@
         // ตรวจสอบและอัปเดตจำนวนความคิดเห็น
         const currentCount = post.comment_count || 0;
         const newCount = Math.max(0, currentCount - 1); // ไม่ให้ต่ำกว่า 0
+
+        console.log(`Decrementing comment count from ${currentCount} to ${newCount}`);
 
         // อัปเดตจำนวนความคิดเห็น
         const { error: updateError } = await supabase
@@ -1786,7 +1869,7 @@
 
     // ฟังก์ชันเตรียมฟอร์มแก้ไขความคิดเห็น 
     function initEditCommentForm(comment) {
-      console.log("Initializing edit comment form with:", comment); // เพิ่ม log เพื่อตรวจสอบ
+      console.log("Initializing edit comment form with:", comment);
 
       // เก็บข้อมูลความคิดเห็นที่กำลังแก้ไข
       currentComment = comment;
@@ -1795,9 +1878,18 @@
       removeCommentImage = false;
       newCommentImage = null;
 
+      // ตรวจสอบและเติมข้อมูลเข้าฟอร์ม
+      const editCommentIdInput = document.getElementById("edit-comment-id");
+      const editCommentContentInput = document.getElementById("edit-comment-content");
+      
+      if (!editCommentIdInput || !editCommentContentInput) {
+        console.error("Edit comment form elements not found!");
+        return;
+      }
+
       // ใส่ข้อมูลความคิดเห็นปัจจุบันในฟอร์ม
-      document.getElementById("edit-comment-id").value = comment.id;
-      document.getElementById("edit-comment-content").value = comment.content || "";
+      editCommentIdInput.value = comment.id;
+      editCommentContentInput.value = comment.content || "";
 
       // ซ่อนข้อความแจ้งเตือน
       document.getElementById("edit-comment-error-message").classList.add("hidden");
@@ -1811,7 +1903,10 @@
       // แสดงรูปภาพปัจจุบัน (ถ้ามี)
       const currentImageContainer = document.getElementById("current-comment-image");
       if (comment.image_url) {
-        document.getElementById("edit-comment-current-image").src = comment.image_url;
+        const currentImage = document.getElementById("edit-comment-current-image");
+        if (currentImage) {
+          currentImage.src = comment.image_url;
+        }
         currentImageContainer.classList.remove("hidden");
         document.getElementById("add-comment-image-section").classList.add("hidden");
       } else {
@@ -1836,6 +1931,11 @@
     function closeEditCommentModal() {
       const editCommentModal = document.getElementById("edit-comment-modal");
       const editCommentModalContent = document.getElementById("edit-comment-modal-content");
+
+      if (!editCommentModal || !editCommentModalContent) {
+        console.error("Edit comment modal elements not found in closeEditCommentModal!");
+        return;
+      }
 
       editCommentModalContent.classList.remove("scale-100", "opacity-100");
       editCommentModalContent.classList.add("scale-95", "opacity-0");
@@ -1927,18 +2027,23 @@
       newCommentImage = file;
 
       // แสดงชื่อไฟล์
-      document.getElementById("selected-comment-image-name").textContent = file.name;
+      const selectedNameElement = document.getElementById("selected-comment-image-name");
+      if (selectedNameElement) {
+        selectedNameElement.textContent = file.name;
+      }
 
       // แสดงตัวอย่างรูปภาพ
       const previewContainer = document.getElementById("edit-comment-image-preview-container");
       const preview = document.getElementById("edit-comment-image-preview");
 
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        preview.src = e.target.result;
-        previewContainer.classList.remove("hidden");
-      };
-      reader.readAsDataURL(file);
+      if (previewContainer && preview) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          previewContainer.classList.remove("hidden");
+        };
+        reader.readAsDataURL(file);
+      }
     }
 
     // ฟังก์ชันจัดการการส่งฟอร์มแก้ไขกระทู้
@@ -2055,6 +2160,11 @@
       const successMessage = document.getElementById("edit-comment-success-message");
       const saveButton = document.getElementById("save-edit-comment-btn");
 
+      if (!commentId) {
+        console.error("Edit comment ID is missing!");
+        return;
+      }
+
       // ซ่อนข้อความแจ้งเตือนเก่า
       errorMessage.classList.add("hidden");
       successMessage.classList.add("hidden");
@@ -2088,9 +2198,11 @@
         if (removeCommentImage) {
           // ลบรูปภาพ
           updateData.image_url = null;
+          console.log("Removing comment image");
         } else if (newCommentImage) {
           // อัปโหลดรูปภาพใหม่
           try {
+            console.log("Uploading new comment image");
             const imageUrl = await uploadImage(newCommentImage, "comments");
             updateData.image_url = imageUrl;
           } catch (uploadError) {
@@ -2099,13 +2211,20 @@
           }
         }
 
+        console.log("Updating comment with data:", updateData);
+
         // อัปเดตข้อมูลความคิดเห็น
         const { error } = await supabase
           .from("comments")
           .update(updateData)
           .eq("id", commentId);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Error in update comment query:", error);
+          throw error;
+        }
+
+        console.log("Comment updated successfully");
 
         // แสดงข้อความสำเร็จ
         successMessage.innerHTML = `
