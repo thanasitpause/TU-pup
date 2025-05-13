@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>TU-PUP - หน้าหลัก</title>
+        <title>TU-PUP - กระทู้ของฉัน</title>
         <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
         <!-- Supabase JS -->
@@ -102,45 +102,76 @@
         </div>
       </nav>
       <script>
-        document.addEventListener("DOMContentLoaded", async () => {
-          const { data: { user } } = await supabase.auth.getUser();
-      
+        document.addEventListener("DOMContentLoaded", async function () {
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+
           if (user) {
-            document.getElementById("login-menu").style.display = "none";
-            document.getElementById("user-menu").style.display = "flex";
-            document.getElementById("user-name").textContent = user.email;
-      
-            loadUserPosts(user.id);
+            document.getElementById("login-menu").classList.add("hidden");
+            document.getElementById("user-menu").classList.remove("hidden");
+            document.getElementById("new-post-btn").classList.remove("hidden");
+
+            const displayName = user.user_metadata?.display_name || user.email;
+            document.getElementById("user-name").textContent = displayName;
+
+            if (user.user_metadata?.avatar_url) {
+              document.getElementById("user-avatar").src = user.user_metadata.avatar_url;
+            }
+
+            document.getElementById("logout-btn").addEventListener("click", async () => {
+              const { error } = await supabase.auth.signOut();
+              if (!error) {
+                window.location.reload();
+              }
+            });
+
+            // ✅ เรียกใช้แบบส่ง user.id เข้าไป
+            await loadPosts(user.id);
           }
         });
       
-        async function loadUserPosts(userId) {
-          const { data: posts, error } = await supabase
-            .from('id') // แทน 'posts' ด้วยชื่อ table จริงใน Supabase ของคุณ
-            .select('*')
-            .eq('author_id', userId)
-            .order('created_at', { ascending: false });
-      
-          if (error) {
+        async function loadPosts(userId) {
+          try {
+            const postsContainer = document.getElementById("posts-container");
+            const noPostsMessage = document.getElementById("no-posts-message");
+            const loadMoreBtn = document.getElementById("load-more-btn");
+
+            let query = supabase
+              .from("posts")
+              .select("*")
+              .eq("author_id", userId)
+              .order("created_at", { ascending: false })
+              .limit(postsPerPage);
+
+            const { data: posts, error } = await query;
+
+            postsContainer.innerHTML = "";
+
+            if (error) {
+              throw error;
+            }
+
+            if (!posts || posts.length === 0) {
+              loadMoreBtn.classList.add("hidden");
+              noPostsMessage.classList.remove("hidden");
+              return;
+            }
+
+            noPostsMessage.classList.add("hidden");
+            lastPostId = posts[posts.length - 1].id;
+            renderPosts(posts);
+
+            if (posts.length < postsPerPage) {
+              loadMoreBtn.classList.add("hidden");
+            } else {
+              loadMoreBtn.classList.remove("hidden");
+            }
+          } catch (error) {
             console.error("Error loading posts:", error);
-            return;
           }
-      
-          const postContainer = document.createElement("div");
-          postContainer.className = "container mx-auto px-4 py-6 grid gap-4";
-      
-          posts.forEach(post => {
-            const postEl = document.createElement("div");
-            postEl.className = "p-4 bg-white rounded shadow";
-            postEl.innerHTML = `
-              <h2 class="text-xl font-semibold">${post.title}</h2>
-              <p class="text-gray-700 mt-2">${post.content}</p>
-            `;
-            postContainer.appendChild(postEl);
-          });
-      
-          document.body.appendChild(postContainer);
         }
+
       </script>    
     </body>
     <main class="container mx-auto px-4 py-8">
@@ -204,5 +235,56 @@
           โหลดเพิ่มเติม
         </button>
       </div>
-    </main>    
+    </main> 
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        document.getElementById("login-menu").style.display = "none";
+        document.getElementById("user-menu").style.display = "flex";
+        document.getElementById("user-name").textContent = user.email;
+
+        loadUserPosts(user.id);
+      }
+    });
+
+    async function loadUserPosts(userId) {
+      const { data: posts, error } = await supabase
+        .from('id') // ❗ชื่อ table ไม่เปลี่ยนตามคำขอ
+        .select('*')
+        .eq('author_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error("Error loading posts:", error);
+        return;
+      }
+
+      const container = document.getElementById("posts-container");
+      const noPostsMsg = document.getElementById("no-posts-message");
+
+      // ล้างโพสต์เก่า
+      container.innerHTML = "";
+
+      if (posts.length === 0) {
+        noPostsMsg.style.display = "block";
+        return;
+      } else {
+        noPostsMsg.style.display = "none";
+      }
+
+      posts.forEach(post => {
+        const postEl = document.createElement("div");
+        postEl.className = "p-4 bg-white rounded shadow";
+        postEl.innerHTML = `
+          <h2 class="text-xl font-semibold">${post.title}</h2>
+          <p class="text-gray-700 mt-2">${post.content}</p>
+        `;
+        container.appendChild(postEl);
+      });
+    }
+</script>
+   
 </html>
