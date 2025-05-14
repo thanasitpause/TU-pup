@@ -1595,7 +1595,7 @@
               // หาความคิดเห็นที่ต้องการแก้ไข
               const commentId = this.getAttribute("data-id");
               console.log("Edit button clicked for comment ID:", commentId);
-              const targetComment = comments.find(c => c.id === parseInt(commentId));
+              const targetComment = comments.find(c => c.id === commentId);
 
               if (targetComment) {
                 console.log("Found comment to edit:", targetComment);
