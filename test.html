@@ -136,6 +136,7 @@
     }
   </style>
 </head>
+
 <body>
 
 <div class="edit-form">
@@ -143,10 +144,10 @@
   <form action="/update-account" method="POST" enctype="multipart/form-data">
 
     <label for="lastname">ชื่อผู้ใช้</label>
-    <input type="text" id="lastname" name="lastname" class="input-full" value="...">
+    <input type="text" id="lastname" name="lastname" class="input-full" placeholder="ผู้ใช้เดิม">
 
     <label for="username">เปลี่ยนชื่อผู้ใช้</label>
-    <input type="text" id="username" name="username" class="input-full" value="...">
+    <input type="text" id="username" name="username" class="input-full" placeholder="ผู้ใช้ใหม่">
 
     <label>อัปโหลดรูปโปรไฟล์ / แก้ไขรหัสผ่าน</label>
     <div class="form-row">
@@ -339,13 +340,18 @@
       return;
     }
 
-    let imageUrl = null;
-
     // อัปโหลดรูปหากมีการเลือก
     if (file) {
-      const filePath = `avatars/${user.id}-${Date.now()}-${file.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
+      let oldFilePath = null;
+
+      if (user.user_metadata.avatar_url) {
+        oldFilePath = user.user_metadata.avatar_url.split('/storage/v1/object/public/images/')[1];
+        console.log('ไฟล์เก่าที่จะลบ:', oldFilePath);
+      }
+
+      const filePath = `avatars/${user.id}-${Date.now()}-${file.name.split('.').pop()}`;
+      const { data, error: uploadError } = await supabase.storage
+        .from('images')
         .upload(filePath, file, { upsert: true });
 
       if (uploadError) {
@@ -354,28 +360,57 @@
       }
 
       const { data: urlData } = supabase.storage
-        .from('avatars')
+        .from('images')
         .getPublicUrl(filePath);
 
-      imageUrl = urlData.publicURL;
+      const imageUrl = urlData.publicUrl;
+      console.log('✅ URL หลัง upload:', imageUrl);
+      if (!imageUrl) {
+      console.error('❌ URL ว่างหรือผิด path ตรวจสอบ filePath:', filePath);
     }
+    
 
     // อัปเดตข้อมูลผู้ใช้ในตาราง profiles (หรือเปลี่ยนตามตารางของคุณ)
-    const updates = {
-      id: user.id,
-      lastname: lastname,
-      username: username,
-      ...(imageUrl && { avatar_url: imageUrl })
-    };
+    const updates = {};
+    // ถ้ามีชื่อใหม่
+    if (username) {
+      updates.display_name = username;
+    }
 
-    const { error: updateError } = await supabase
-      .from('profiles') // เปลี่ยนเป็นชื่อตารางจริงของคุณถ้าไม่ใช่ profiles
-      .upsert(updates);
+    // ถ้ามี avatar url ใหม่
+    if (imageUrl) {
+      updates.avatar_url = imageUrl;
+    }
+
+    const { error: updateError } = await supabase.auth.updateUser({
+    data: updates
+    });
 
     if (updateError) {
       alert("อัปเดตข้อมูลไม่สำเร็จ: " + updateError.message);
     } else {
       alert("บันทึกข้อมูลสำเร็จ!");
+      console.log('✅ ส่ง URL นี้ไปที่ metadata:', imageUrl);
     }
-  });
+    
+    // ลบไฟล์เก่า (ถ้ามี)
+    if (oldFilePath) {
+      const { error: deleteError } = await supabase.storage.from('images').remove([oldFilePath]);
+      if (deleteError) {
+        console.error('❌ ลบไฟล์เก่าไม่สำเร็จ:', deleteError);
+      } else {
+        console.log('✅ ลบไฟล์เก่าเรียบร้อย');
+      }
+    }
+
+
+    await supabase.auth.refreshSession();
+    const { data: { user: refreshedUser } } = await supabase.auth.getUser();
+
+    console.log('avatar_url ใหม่:', refreshedUser.user_metadata.avatar_url);
+  }
+})
+  
+
+  
 </script>
