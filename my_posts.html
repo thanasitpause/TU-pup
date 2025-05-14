@@ -1,78 +1,215 @@
 <!DOCTYPE html>
 <html lang="th">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TU-PUP - กระทู้ของฉัน</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Supabase Config -->
-    <script src="js/supabase-config.js"></script>
-    <!-- Sidebar CSS -->
-    <link rel="stylesheet" href="css/sidebar.css">
-    <!-- Sidebar JS -->
-    <script src="js/sidebar.js"></script>
-  </head>
-  <body>
-    <!-- Navbar -->
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>TU-PUP - กระทู้ของฉัน</title>
+        <!-- Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- Supabase JS -->
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <!-- Supabase Config -->
+        <script src="js/supabase-config.js"></script>
+        <!-- Sidebar CSS -->
+        <link rel="stylesheet" href="css/sidebar.css">
+        <!-- Sidebar JS -->
+        <script src="js/sidebar.js"></script>
+    </head>
+    <body>
+        <!-- Navbar -->
     <nav class="bg-white shadow-md sticky top-0 z-10">
-      <div class="container mx-auto px-4 py-3">
-        <div class="flex justify-between items-center">
-          <a href="index.html" class="font-bold text-2xl text-blue-600">TU-PUP</a>
-
-          <div class="hidden md:block flex-1 mx-8">
-            <div class="relative">
-              <input
-                type="text"
-                id="search-input"
-                class="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="ค้นหากระทู้..."
-              />
+        <div class="container mx-auto px-4 py-3">
+          <div class="flex justify-between items-center">
+            <!-- Logo -->
+            <a href="index.html" class="font-bold text-2xl text-blue-600"
+              >TU-PUP
+            </a>
+  
+            <!-- Search Bar -->
+            <div class="hidden md:block flex-1 mx-8">
+              <div class="relative">
+                <input
+                  type="text"
+                  id="search-input"
+                  class="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="ค้นหากระทู้..."
+                />
+                <button
+                  id="search-btn"
+                  class="absolute right-3 top-2 text-gray-500"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+  
+            <!-- User Menu -->
+            <div class="flex items-center space-x-4">
               <button
-                id="search-btn"
-                class="absolute right-3 top-2 text-gray-500"
+                id="new-post-btn"
+                class="hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition duration-300"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+                สร้างกระทู้ใหม่
               </button>
-            </div>
-          </div>
-
-          <div class="flex items-center space-x-4">
-            <button id="new-post-btn" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition duration-300">
-              สร้างกระทู้ใหม่
-            </button>
-
-            <div id="user-menu" class="hidden flex items-center space-x-2">
-              <img id="user-avatar" src="img/default-avatar.png" alt="User" class="w-8 h-8 rounded-full" />
-              <span id="user-name" class="hidden md:inline text-sm font-medium"></span>
-              <button id="logout-btn" class="text-sm text-gray-600 hover:text-gray-800">ออกจากระบบ</button>
-            </div>
-
-            <div id="login-menu">
-              <a href="login.html" class="text-blue-600 hover:text-blue-800 font-medium">เข้าสู่ระบบ</a>
-              <span class="text-gray-400 mx-2">|</span>
-              <a href="register.html" class="text-blue-600 hover:text-blue-800 font-medium">สมัครสมาชิก</a>
+  
+              <div id="user-menu" class="hidden flex items-center space-x-2">
+                <img
+                  id="user-avatar"
+                  src="img/default-avatar.png"
+                  alt="User"
+                  class="w-8 h-8 rounded-full"
+                />
+                <span
+                  id="user-name"
+                  class="hidden md:inline text-sm font-medium"
+                ></span>
+                <button
+                  id="logout-btn"
+                  class="text-sm text-gray-600 hover:text-gray-800"
+                >
+                  ออกจากระบบ
+                </button>
+              </div>
+  
+              <div id="login-menu">
+                <a
+                  href="login.html"
+                  class="text-blue-600 hover:text-blue-800 font-medium"
+                  >เข้าสู่ระบบ</a
+                >
+                <span class="text-gray-400 mx-2">|</span>
+                <a
+                  href="register.html"
+                  class="text-blue-600 hover:text-blue-800 font-medium"
+                  >สมัครสมาชิก</a
+                >
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+      <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
 
-    <!-- Main Content -->
+          if (user) {
+            document.getElementById("login-menu").classList.add("hidden");
+            document.getElementById("user-menu").classList.remove("hidden");
+            document.getElementById("new-post-btn").classList.remove("hidden");
+
+            const displayName = user.user_metadata?.display_name || user.email;
+            document.getElementById("user-name").textContent = displayName;
+
+            if (user.user_metadata?.avatar_url) {
+              document.getElementById("user-avatar").src = user.user_metadata.avatar_url;
+            }
+
+            document.getElementById("logout-btn").addEventListener("click", async () => {
+              const { error } = await supabase.auth.signOut();
+              if (!error) {
+                window.location.reload();
+              }
+            });
+
+            // ✅ เรียกใช้แบบส่ง user.id เข้าไป
+            await loadPosts(user.id);
+          }
+        });
+      
+        async function loadPosts(userId) {
+          try {
+            const postsContainer = document.getElementById("posts-container");
+            const noPostsMessage = document.getElementById("no-posts-message");
+            const loadMoreBtn = document.getElementById("load-more-btn");
+
+            let query = supabase
+              .from("posts")
+              .select("*")
+              .eq("author_id", userId)
+              .order("created_at", { ascending: false })
+              .limit(postsPerPage);
+
+            const { data: posts, error } = await query;
+
+            postsContainer.innerHTML = "";
+
+            if (error) {
+              throw error;
+            }
+
+            if (!posts || posts.length === 0) {
+              loadMoreBtn.classList.add("hidden");
+              noPostsMessage.classList.remove("hidden");
+              return;
+            }
+
+            noPostsMessage.classList.add("hidden");
+            lastPostId = posts[posts.length - 1].id;
+            renderPosts(posts);
+
+            if (posts.length < postsPerPage) {
+              loadMoreBtn.classList.add("hidden");
+            } else {
+              loadMoreBtn.classList.remove("hidden");
+            }
+          } catch (error) {
+            console.error("Error loading posts:", error);
+          }
+        }
+
+      </script>    
+    </body>
     <main class="container mx-auto px-4 py-8">
+      <!-- Header -->
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-2xl font-bold text-gray-800">กระทู้ของฉัน</h1>
-        <button id="mobile-new-post-btn" class="md:hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition duration-300">
+        <button
+          id="mobile-new-post-btn"
+          class="md:hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition duration-300"
+        >
           สร้างกระทู้
         </button>
       </div>
 
-      <div id="posts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Placeholder while loading -->
+      <!-- Posts List -->
+      <div
+        id="posts-container"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        <!-- Posts will be dynamically inserted here -->
+        <div class="animate-pulse bg-white rounded-lg shadow-md p-4">
+          <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+          <div class="flex justify-between">
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+          </div>
+        </div>
+        <div class="animate-pulse bg-white rounded-lg shadow-md p-4">
+          <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+          <div class="flex justify-between">
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+          </div>
+        </div>
         <div class="animate-pulse bg-white rounded-lg shadow-md p-4">
           <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
           <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
@@ -84,86 +221,70 @@
         </div>
       </div>
 
+      <!-- No Posts Message -->
       <div id="no-posts-message" class="hidden text-center py-8 text-gray-500">
         ยังไม่มีกระทู้ เริ่มสร้างกระทู้แรกของคุณเลย!
       </div>
 
+      <!-- Load More Button -->
       <div class="mt-8 text-center">
-        <button id="load-more-btn" class="bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 font-medium px-6 py-2 rounded-full transition duration-300 hidden">
+        <button
+          id="load-more-btn"
+          class="bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 font-medium px-6 py-2 rounded-full transition duration-300"
+        >
           โหลดเพิ่มเติม
         </button>
       </div>
-    </main>
-
+    </main> 
+    
     <script>
-      const postsPerPage = 6;
-      let lastPostId = null;
+    document.addEventListener("DOMContentLoaded", async () => {
+      const { data: { user } } = await supabase.auth.getUser();
 
-      document.addEventListener("DOMContentLoaded", async () => {
-        const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        document.getElementById("login-menu").style.display = "none";
+        document.getElementById("user-menu").style.display = "flex";
+        document.getElementById("user-name").textContent = user.email;
 
-        if (user) {
-          document.getElementById("login-menu").classList.add("hidden");
-          document.getElementById("user-menu").classList.remove("hidden");
-          document.getElementById("new-post-btn").classList.remove("hidden");
-
-          const displayName = user.user_metadata?.display_name || user.email;
-          document.getElementById("user-name").textContent = displayName;
-
-          if (user.user_metadata?.avatar_url) {
-            document.getElementById("user-avatar").src = user.user_metadata.avatar_url;
-          }
-
-          document.getElementById("logout-btn").addEventListener("click", async () => {
-            const { error } = await supabase.auth.signOut();
-            if (!error) window.location.reload();
-          });
-
-          await loadPosts(user.id);
-        }
-      });
-
-      async function loadPosts(userId) {
-        const postsContainer = document.getElementById("posts-container");
-        const noPostsMessage = document.getElementById("no-posts-message");
-        const loadMoreBtn = document.getElementById("load-more-btn");
-
-        try {
-          const { data: posts, error } = await supabase
-            .from("posts")
-            .select("*")
-            .eq("author_id", userId)
-            .order("created_at", { ascending: false })
-            .limit(postsPerPage);
-
-          postsContainer.innerHTML = "";
-
-          if (error) throw error;
-
-          if (!posts || posts.length === 0) {
-            noPostsMessage.classList.remove("hidden");
-            loadMoreBtn.classList.add("hidden");
-            return;
-          }
-
-          noPostsMessage.classList.add("hidden");
-          lastPostId = posts[posts.length - 1].id;
-
-          posts.forEach(post => {
-            const postEl = document.createElement("div");
-            postEl.className = "p-4 bg-white rounded shadow";
-            postEl.innerHTML = `
-              <h2 class="text-xl font-semibold">${post.title}</h2>
-              <p class="text-gray-700 mt-2">${post.content}</p>
-            `;
-            postsContainer.appendChild(postEl);
-          });
-
-          loadMoreBtn.classList.toggle("hidden", posts.length < postsPerPage);
-        } catch (err) {
-          console.error("Error loading posts:", err);
-        }
+        loadUserPosts(user.id);
       }
-    </script>
-  </body>
+    });
+
+    async function loadUserPosts(userId) {
+      const { data: posts, error } = await supabase
+        .from('id') // ❗ชื่อ table ไม่เปลี่ยนตามคำขอ
+        .select('*')
+        .eq('author_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error("Error loading posts:", error);
+        return;
+      }
+
+      const container = document.getElementById("posts-container");
+      const noPostsMsg = document.getElementById("no-posts-message");
+
+      // ล้างโพสต์เก่า
+      container.innerHTML = "";
+
+      if (posts.length === 0) {
+        noPostsMsg.style.display = "block";
+        return;
+      } else {
+        noPostsMsg.style.display = "none";
+      }
+
+      posts.forEach(post => {
+        const postEl = document.createElement("div");
+        postEl.className = "p-4 bg-white rounded shadow";
+        postEl.innerHTML = `
+          <h2 class="text-xl font-semibold">${post.title}</h2>
+          <p class="text-gray-700 mt-2">${post.content}</p>
+        `;
+        container.appendChild(postEl);
+      });
+    }
+</script>
+   
 </html>
