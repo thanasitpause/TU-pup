@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แก้ไขโปรไฟล์ - TU-PUP</title>
+  <!-- ตั้งค่าการโหลดทรัพยากร -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Custom styles -->
+  <link href="css/tu-common.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <!-- Tailwind Config & CDN -->
+  <script src="js/tailwind-config.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // ใช้คอนฟิกจากไฟล์ภายนอก
+    tailwind.config = window.tailwindConfig;
+  </script>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase Config -->
+  <script src="js/supabase-config.js"></script>
+  <!-- Sidebar JS -->
+  <script src="js/sidebar.js"></script>
+  <style>
+    /* เพิ่มเติม CSS เฉพาะหน้านี้ */
+    .form-control-focus:focus-within {
+      box-shadow: 0 0 0 3px rgba(230, 0, 0, 0.2);
+      border-color: #E60000;
+    }
+
+    .tu-shadow {
+      box-shadow: 0 10px 25px -5px rgba(230, 0, 0, 0.1), 0 10px 10px -5px rgba(255, 204, 0, 0.04);
+    }
+
+    .tu-input-icon {
+      color: #cccccc;
+      transition: color 0.3s ease;
+    }
+
+    .form-control-focus:focus-within .tu-input-icon {
+      color: #E60000;
+    }
+
+    /* Animation for upload */
+    @keyframes pulse-border {
+      0% {
+        border-color: #E60000;
+      }
+
+      50% {
+        border-color: #FFCC00;
+      }
+
+      100% {
+        border-color: #E60000;
+      }
+    }
+
+    .uploading {
+      animation: pulse-border 2s infinite;
+    }
+
+    /* Avatar container */
+    .avatar-container {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      margin: 0 auto;
+    }
+
+    .avatar-overlay {
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background-color: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .avatar-container:hover .avatar-overlay {
+      opacity: 1;
+    }
+
+    /* Password strength indicator */
+    .password-strength-meter {
+      height: 5px;
+      border-radius: 5px;
+      transition: width 0.3s ease;
+    }
+
+    /* Profile section transitions */
+    .profile-section {
+      transition: all 0.3s ease;
+    }
+
+    .profile-section:hover {
+      transform: translateY(-5px);
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-white to-gray-100 min-h-screen">
+  <!-- Decorative Elements -->
+  <div class="fixed top-0 left-0 w-full h-1 tu-gradient opacity-80 z-50"></div>
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md sticky top-0 z-40">
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex justify-between items-center">
+        <!-- Logo & Hamburger Menu -->
+        <div class="flex items-center space-x-4">
+          <button id="sidebar-toggle" class="text-gray-500 hover:text-tu-red-500 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <a href="index.html" class="flex items-center space-x-2">
+            <div
+              class="h-8 w-8 rounded-full tu-gradient flex items-center justify-center text-white font-bold text-xs shadow-md">
+              TU</div>
+            <span class="font-bold text-2xl tu-gradient-text">TU-PUP</span>
+          </a>
+        </div>
+
+        <!-- User Menu -->
+        <div class="flex items-center space-x-4">
+          <button id="new-post-btn"
+            class="hidden bg-gradient-to-r from-tu-red to-tu-yellow hover:from-tu-red-600 hover:to-tu-yellow-600 text-white font-medium px-4 py-2 rounded-full transition duration-300 transform hover:scale-105 shadow-md">
+            <span class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              สร้างกระทู้ใหม่
+            </span>
+          </button>
+
+          <div id="user-menu" class="hidden relative group">
+            <button class="flex items-center space-x-2 focus:outline-none">
+              <div class="relative">
+                <img id="user-avatar" src="img/default-avatar.png" alt="User"
+                  class="w-8 h-8 rounded-full border-2 border-tu-red-200 transition-transform duration-300 group-hover:scale-110">
+                <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-white"></div>
+              </div>
+              <span id="user-name" class="hidden md:inline text-sm font-medium"></span>
+              <svg xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 text-gray-400 group-hover:text-tu-red-500 transition-transform duration-300 group-hover:rotate-180"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <!-- Dropdown menu -->
+            <div
+              class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+              <div class="px-4 py-2 border-b border-gray-100">
+                <p class="text-sm font-medium text-gray-900" id="dropdown-user-name"></p>
+                <p class="text-xs text-gray-500 truncate" id="dropdown-user-email"></p>
+              </div>
+              <a href="my_posts.html"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-tu-red-50 hover:text-tu-red-500">
+                <div class="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                  กระทู้ของฉัน
+                </div>
+              </a>
+              <a href="edit-profile.html"
+                class="block px-4 py-2 text-sm text-tu-red-500 hover:bg-tu-red-50 font-medium">
+                <div class="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-tu-red-400" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  แก้ไขโปรไฟล์
+                </div>
+              </a>
+              <hr class="my-1 border-gray-100">
+              <button id="logout-btn"
+                class="w-full text-left block px-4 py-2 text-sm text-tu-red-500 hover:bg-tu-red-50">
+                <div class="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  ออกจากระบบ
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div id="login-menu" class="flex items-center space-x-3">
+            <a href="login.html"
+              class="text-tu-red-500 hover:text-tu-red-600 font-medium transition-colors">เข้าสู่ระบบ</a>
+            <div class="w-px h-5 bg-gray-300"></div>
+            <a href="register.html"
+              class="text-tu-red-500 hover:text-tu-red-600 font-medium transition-colors">สมัครสมาชิก</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8">
+    <div class="max-w-3xl mx-auto">
+      <!-- Page Header -->
+      <div class="mb-8 relative">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="flex items-center space-x-3 mb-2">
+              <a href="index.html" class="flex items-center text-tu-red-500 hover:text-tu-red-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span>กลับไปหน้าหลัก</span>
+              </a>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 relative inline-block">
+              แก้ไขโปรไฟล์
+              <div class="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-tu-red to-tu-yellow rounded-full"></div>
+            </h1>
+            <p class="text-gray-500 mt-2">แก้ไขข้อมูลส่วนตัวและการตั้งค่าบัญชีของคุณ</p>
+          </div>
+          <img src="img/cat-edit-profile.png" alt="Profile" class="hidden md:block w-32 h-32 opacity-80">
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="profile-loading" class="bg-white rounded-xl shadow-lg p-8 tu-shadow mb-8">
+        <div class="flex justify-center items-center h-64">
+          <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-tu-red-500"></div>
+        </div>
+      </div>
+
+      <!-- Profile Content (Hidden until loaded) -->
+      <div id="profile-content" class="hidden space-y-8">
+        <!-- Profile Picture Section -->
+        <div class="profile-section bg-white rounded-xl shadow-lg p-8 tu-shadow">
+          <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-tu-red-500" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            รูปโปรไฟล์
+          </h2>
+
+          <div class="avatar-container">
+            <img id="current-avatar" src="img/default-avatar.png" alt="Profile Picture"
+              class="w-full h-full object-cover rounded-full border-4 border-tu-red-100">
+            <div class="avatar-overlay">
+              <label for="avatar-upload"
+                class="cursor-pointer bg-white text-tu-red-500 hover:text-tu-red-600 font-medium py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 shadow-md flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                เปลี่ยน
+              </label>
+              <input type="file" id="avatar-upload" accept="image/*" class="hidden">
+            </div>
+          </div>
+
+          <div class="mt-4 text-center">
+            <p class="text-sm text-gray-500 mb-4">คลิกที่รูปภาพเพื่อเปลี่ยนรูปโปรไฟล์</p>
+            <div id="avatar-preview-container" class="hidden">
+              <p class="text-sm font-medium text-gray-700 mb-2">รูปภาพที่เลือก:</p>
+              <div class="relative inline-block">
+                <img id="avatar-preview" src="#" alt="Preview" class="h-32 w-32 object-cover rounded-full border-2 border-tu-red-300">
+                <button id="cancel-avatar" type="button"
+                  class="absolute top-0 right-0 bg-white rounded-full p-1 shadow-md hover:bg-red-50 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div id="avatar-error" class="hidden mt-3 p-3 bg-red-50 text-red-700 rounded-lg text-sm"></div>
+            <div id="avatar-success" class="hidden mt-3 p-3 bg-green-50 text-green-700 rounded-lg text-sm"></div>
+
+            <button id="save-avatar-btn"
+              class="hidden mt-4 bg-gradient-to-r from-tu-red to-tu-yellow hover:from-tu-red-600 hover:to-tu-yellow-600 text-white font-medium px-6 py-2 rounded-lg transition duration-300 transform hover:scale-105 active:scale-95 shadow-md flex items-center mx-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              บันทึกรูปโปรไฟล์
+            </button>
+          </div>
+        </div>
+
+        <!-- Profile Information Section -->
+        <div class="profile-section bg-white rounded-xl shadow-lg p-8 tu-shadow">
+          <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-tu-yellow-500" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            ข้อมูลส่วนตัว
+          </h2>
+
+          <form id="profile-form">
+            <div class="mb-5">
+              <label for="display-name" class="block text-gray-700 font-medium mb-2">ชื่อที่แสดง</label>
+              <div class="relative form-control-focus rounded-lg transition-all duration-300">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 tu-input-icon" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <input type="text" id="display-name"
+                  class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-0 bg-white"
+                  placeholder="ชื่อที่ใช้แสดงในกระทู้และความคิดเห็น" required>
+              </div>
+            </div>
+
+            <div class="mb-5">
+              <label for="email" class="block text-gray-700 font-medium mb-2">อีเมล</label>
+              <div class="relative form-control-focus rounded-lg transition-all duration-300">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 tu-input-icon" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <input type="email" id="email"
+                  class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-0 bg-gray-100"
+                  readonly disabled>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">อีเมลไม่สามารถเปลี่ยนแปลงได้</p>
+            </div>
+
+            <div id="profile-error" class="hidden p-4 bg-red-50 border-l-4 border-red-500 rounded-lg text-red-700 mb-5"></div>
+            <div id="profile-success" class="hidden p-4 bg-green-50 border-l-4 border-green-500 rounded-lg text-green-700 mb-5">
+            </div>
+
+            <button type="submit" id="save-profile-btn"
+              class="bg-gradient-to-r from-tu-red to-tu-yellow hover:from-tu-red-600 hover:to-tu-yellow-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 active:scale-95 shadow-md flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              บันทึกข้อมูล
+            </button>
+          </form>
+        </div>
+
+        <!-- Password Section -->
+        <div class="profile-section bg-white rounded-xl shadow-lg p-8 tu-shadow">
+          <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-tu-red-500" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            รหัสผ่าน
+          </h2>
+
+          <p class="text-gray-700 mb-6">รหัสผ่านของคุณจะถูกเข้ารหัสและไม่สามารถดูได้ในภายหลัง
+            คุณสามารถเปลี่ยนรหัสผ่านได้ทุกเมื่อ</p>
+
+          <button id="change-password-btn"
+            class="bg-white border-2 border-tu-red hover:bg-tu-red-50 text-tu-red-500 font-medium py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 active:scale-95 shadow-sm flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            เปลี่ยนรหัสผ่าน
+          </button>
+        </div>
+
+        <!-- Account Actions Section -->
+        <div class="profile-section bg-white rounded-xl shadow-lg p-8 tu-shadow">
+          <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            การจัดการบัญชี
+          </h2>
+
+          <div>
+            <button id="logout-account-btn"
+              class="mb-4 w-full sm:w-auto bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 active:scale-95 shadow-sm flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              ออกจากระบบทุกอุปกรณ์
+            </button>
+
+            <button id="delete-account-btn"
+              class="w-full sm:w-auto bg-white border border-red-300 text-red-600 hover:bg-red-50 font-medium py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 active:scale-95 shadow-sm flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-red-500" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              ลบบัญชี
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Change Password Modal -->
+  <div id="password-modal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden overflow-y-auto">
+    <div
+      class="bg-white rounded-xl p-6 max-w-md w-full mx-4 transform transition-all duration-300 scale-95 opacity-0"
+      id="password-modal-content">
+      <div class="text-center mb-5">
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-tu-red-50 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-tu-red-500" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">เปลี่ยนรหัสผ่าน</h3>
+        <p class="text-gray-600 mb-6">
+          สร้างรหัสผ่านใหม่ที่ปลอดภัยและไม่ซ้ำกับรหัสผ่านเดิม
+        </p>
+      </div>
+
+      <form id="password-form" class="space-y-4">
+        <!-- Current Password -->
+        <div>
+          <label for="current-password" class="block text-gray-700 font-medium mb-2">รหัสผ่านปัจจุบัน</label>
+          <div class="relative form-control-focus rounded-lg transition-all duration-300">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 tu-input-icon" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <input type="password" id="current-password"
+              class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-0 bg-white"
+              placeholder="ใส่รหัสผ่านปัจจุบัน" required>
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <button type="button" class="toggle-password text-gray-400 hover:text-gray-600 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- New Password -->
+        <div>
+          <label for="new-password" class="block text-gray-700 font-medium mb-2">รหัสผ่านใหม่</label>
+          <div class="relative form-control-focus rounded-lg transition-all duration-300">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 tu-input-icon" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <input type="password" id="new-password"
+              class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-0 bg-white"
+              placeholder="ใส่รหัสผ่านใหม่" required minlength="6">
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <button type="button" class="toggle-password text-gray-400 hover:text-gray-600 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="mt-2">
+            <div class="w-full bg-gray-200 rounded-full h-1">
+              <div id="password-strength" class="password-strength-meter bg-gray-400 w-0"></div>
+            </div>
+            <p id="password-feedback" class="text-xs text-gray-500 mt-1">รหัสผ่านควรมีอย่างน้อย 6 ตัวอักษร</p>
+          </div>
+        </div>
+
+        <!-- Confirm New Password -->
+        <div>
+          <label for="confirm-password" class="block text-gray-700 font-medium mb-2">ยืนยันรหัสผ่านใหม่</label>
+          <div class="relative form-control-focus rounded-lg transition-all duration-300">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 tu-input-icon" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <input type="password" id="confirm-password"
+              class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-0 bg-white"
+              placeholder="ยืนยันรหัสผ่านใหม่" required minlength="6">
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <button type="button" class="toggle-password text-gray-400 hover:text-gray-600 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <p id="password-match" class="text-xs text-gray-500 mt-1">รหัสผ่านต้องตรงกัน</p>
+        </div>
+
+        <div id="password-error" class="hidden p-3 bg-red-50 text-red-700 rounded-lg"></div>
+        <div id="password-success" class="hidden p-3 bg-green-50 text-green-700 rounded-lg"></div>
+
+        <div class="flex justify-end space-x-3 pt-4">
+          <button type="button" id="cancel-password-btn"
+            class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-6 rounded-lg transition duration-300 transform hover:scale-105 active:scale-95">
+            ยกเลิก
+          </button>
+          <button type="submit" id="save-password-btn"
+            class="bg-gradient-to-r from-tu-red to-tu-yellow hover:from-tu-red-600 hover:to-tu-yellow-600 text-white font-medium py-2 px-6 rounded-lg transition duration-300 transform hover:scale-105 active:scale-95 shadow-md">
+            บันทึกรหัสผ่าน
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Account Confirmation Modal -->
+  <div id="delete-account-modal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden overflow-y-auto">
+    <div
+      class="bg-white rounded-xl p-6 max-w-md w-full mx-4 transform transition-all duration-300 scale-95 opacity-0"
+      id="delete-account-modal-content">
+      <div class="text-center mb-5">
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-50 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">ยืนยันการลบบัญชี</h3>
+        <p class="text-gray-600 mb-6">
+          คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีนี้? การกระทำนี้ไม่สามารถย้อนกลับได้
+          และข้อมูลทั้งหมดของคุณจะถูกลบออกจากระบบอย่างถาวร
+        </p>
+      </div>
+
+      <div id="delete-account-confirm-section">
+        <label for="delete-confirm-password" class="block text-gray-700 font-medium mb-2">ยืนยันรหัสผ่านของคุณ</label>
+        <div class="relative form-control-focus rounded-lg transition-all duration-300 mb-4">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 tu-input-icon" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <input type="password" id="delete-confirm-password"
+            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-0 bg-white"
+            placeholder="ใส่รหัสผ่านเพื่อยืนยัน" required>
+        </div>
+
+        <div id="delete-account-error" class="hidden p-3 bg-red-50 text-red-700 rounded-lg mb-4"></div>
+
+        <div class="flex justify-center space-x-3">
+          <button type="button" id="cancel-delete-account-btn"
+            class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-6 rounded-lg transition duration-300 transform hover:scale-105 active:scale-95">
+            ยกเลิก
+          </button>
+          <button type="button" id="confirm-delete-account-btn"
+            class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-lg transition duration-300 transform hover:scale-105 active:scale-95 shadow-md">
+            ลบบัญชี
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t mt-12 py-8">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-6 md:mb-0">
+          <div class="flex items-center space-x-2 mb-3">
+            <div class="h-8 w-8 rounded-full tu-gradient flex items-center justify-center text-white font-bold text-xs">
+              TU</div>
+            <span class="font-bold text-2xl tu-gradient-text">TU-PUP</span>
+          </div>
+          <p class="text-gray-600 max-w-md">ระบบกระดานสนทนาเกี่ยวกับสัตว์เลี้ยงสำหรับประชาคมธรรมศาสตร์
+            แลกเปลี่ยนความคิดเห็น ถาม-ตอบปัญหา แชร์ประสบการณ์</p>
+        </div>
+        <p class="text-gray-600 text-sm">&copy; 2025 TU-PUP. สงวนลิขสิทธิ์.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async function () {
+      // ตรวจสอบสถานะการล็อกอิน
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        // ถ้าไม่ได้ล็อกอิน ให้ไปหน้าล็อกอิน
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // แสดงหรือซ่อนเมนูตามสถานะล็อกอิน
+      document.getElementById("login-menu").classList.add("hidden");
+      document.getElementById("user-menu").classList.remove("hidden");
+      document.getElementById("new-post-btn").classList.remove("hidden");
+
+      const displayName = user.user_metadata?.display_name || user.email;
+      document.getElementById("user-name").textContent = displayName;
+      document.getElementById("dropdown-user-name").textContent = displayName;
+      document.getElementById("dropdown-user-email").textContent = user.email;
+
+      // ตรวจสอบรูปโปรไฟล์
+      if (user.user_metadata?.avatar_url) {
+        document.getElementById("user-avatar").src = user.user_metadata.avatar_url;
+      }
+
+      // โหลดข้อมูลผู้ใช้
+      await loadUserProfile(user);
+
+      // Event listeners สำหรับการจัดการโปรไฟล์
+      setupEventListeners(user);
+
+      // Event listener สำหรับปุ่มล็อกเอาต์
+      document.getElementById("logout-btn").addEventListener("click", async () => {
+        await handleLogout();
+      });
+
+      // Event listeners สำหรับปุ่มสร้างกระทู้ใหม่
+      document.getElementById("new-post-btn").addEventListener("click", () => {
+        window.location.href = "new-post.html";
+      });
+    });
+
+    // ฟังก์ชันโหลดข้อมูลผู้ใช้
+    async function loadUserProfile(user) {
+      try {
+        // แสดง loading
+        document.getElementById("profile-loading").classList.remove("hidden");
+        document.getElementById("profile-content").classList.add("hidden");
+
+        // กำหนดค่าเริ่มต้นให้กับฟอร์ม
+        document.getElementById("display-name").value = user.user_metadata?.display_name || "";
+        document.getElementById("email").value = user.email || "";
+
+        // แสดงรูปโปรไฟล์
+        if (user.user_metadata?.avatar_url) {
+          document.getElementById("current-avatar").src = user.user_metadata.avatar_url;
+        }
+
+        // ซ่อน loading และแสดงเนื้อหา
+        document.getElementById("profile-loading").classList.add("hidden");
+        document.getElementById("profile-content").classList.remove("hidden");
+      } catch (error) {
+        console.error("Error loading user profile:", error);
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูล โปรดลองใหม่อีกครั้ง");
+      }
+    }
+
+    // ฟังก์ชัน setup event listeners
+    function setupEventListeners(user) {
+      // ============ Profile Form ============
+      const profileForm = document.getElementById("profile-form");
+      profileForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        await updateProfile(user);
+      });
+
+      // ============ Avatar Upload ============
+      const avatarUpload = document.getElementById("avatar-upload");
+      const currentAvatar = document.getElementById("current-avatar");
+      const avatarPreview = document.getElementById("avatar-preview");
+      const avatarPreviewContainer = document.getElementById("avatar-preview-container");
+      const saveAvatarBtn = document.getElementById("save-avatar-btn");
+      const cancelAvatarBtn = document.getElementById("cancel-avatar");
+
+      // Event listener สำหรับการเลือกรูปภาพ
+      avatarUpload.addEventListener("change", function () {
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            avatarPreview.src = e.target.result;
+            avatarPreviewContainer.classList.remove("hidden");
+            saveAvatarBtn.classList.remove("hidden");
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Event listener สำหรับการยกเลิกการเลือกรูปภาพ
+      cancelAvatarBtn.addEventListener("click", function () {
+        avatarUpload.value = "";
+        avatarPreviewContainer.classList.add("hidden");
+        saveAvatarBtn.classList.add("hidden");
+      });
+
+      // Event listener สำหรับการบันทึกรูปภาพ
+      saveAvatarBtn.addEventListener("click", async function () {
+        await updateAvatar(user);
+      });
+
+      // ============ Password Modal ============
+      const passwordModal = document.getElementById("password-modal");
+      const passwordModalContent = document.getElementById("password-modal-content");
+      const changePasswordBtn = document.getElementById("change-password-btn");
+      const cancelPasswordBtn = document.getElementById("cancel-password-btn");
+      const passwordForm = document.getElementById("password-form");
+
+      // เปิด Modal เปลี่ยนรหัสผ่าน
+      changePasswordBtn.addEventListener("click", function () {
+        openModal(passwordModal, passwordModalContent);
+      });
+
+      // ปิด Modal เปลี่ยนรหัสผ่าน
+      cancelPasswordBtn.addEventListener("click", function () {
+        closeModal(passwordModal, passwordModalContent);
+        passwordForm.reset();
+        document.getElementById("password-error").classList.add("hidden");
+        document.getElementById("password-success").classList.add("hidden");
+      });
+
+      // บันทึกรหัสผ่านใหม่
+      passwordForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        await updatePassword(user);
+      });
+
+      // ============ Password Strength ============
+      const newPassword = document.getElementById("new-password");
+      const confirmPassword = document.getElementById("confirm-password");
+      const passwordStrength = document.getElementById("password-strength");
+      const passwordFeedback = document.getElementById("password-feedback");
+      const passwordMatch = document.getElementById("password-match");
+
+      // ตรวจสอบความแข็งแรงของรหัสผ่าน
+      newPassword.addEventListener("input", function () {
+        checkPasswordStrength(this.value);
+      });
+
+      // ตรวจสอบการยืนยันรหัสผ่าน
+      confirmPassword.addEventListener("input", function () {
+        const match = this.value === newPassword.value;
+        if (this.value.length > 0) {
+          passwordMatch.className = match ? "text-xs text-green-500 mt-1" : "text-xs text-red-500 mt-1";
+          passwordMatch.textContent = match ? "รหัสผ่านตรงกัน" : "รหัสผ่านไม่ตรงกัน";
+        } else {
+          passwordMatch.className = "text-xs text-gray-500 mt-1";
+          passwordMatch.textContent = "รหัสผ่านต้องตรงกัน";
+        }
+      });
+
+      // ============ Toggle Password Visibility ============
+      const toggleButtons = document.querySelectorAll(".toggle-password");
+      toggleButtons.forEach(button => {
+        button.addEventListener("click", function () {
+          const input = this.parentElement.previousElementSibling;
+          if (input.type === "password") {
+            input.type = "text";
+            this.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+              </svg>
+            `;
+          } else {
+            input.type = "password";
+            this.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            `;
+          }
+        });
+      });
+
+      // ============ Delete Account Modal ============
+      const deleteAccountModal = document.getElementById("delete-account-modal");
+      const deleteAccountModalContent = document.getElementById("delete-account-modal-content");
+      const deleteAccountBtn = document.getElementById("delete-account-btn");
+      const cancelDeleteAccountBtn = document.getElementById("cancel-delete-account-btn");
+      const confirmDeleteAccountBtn = document.getElementById("confirm-delete-account-btn");
+
+      // เปิด Modal ลบบัญชี
+      deleteAccountBtn.addEventListener("click", function () {
+        openModal(deleteAccountModal, deleteAccountModalContent);
+      });
+
+      // ปิด Modal ลบบัญชี
+      cancelDeleteAccountBtn.addEventListener("click", function () {
+        closeModal(deleteAccountModal, deleteAccountModalContent);
+        document.getElementById("delete-confirm-password").value = "";
+        document.getElementById("delete-account-error").classList.add("hidden");
+      });
+
+      // ยืนยันการลบบัญชี
+      confirmDeleteAccountBtn.addEventListener("click", async function () {
+        await deleteAccount(user);
+      });
+
+      // ============ Logout from all devices ============
+      const logoutAccountBtn = document.getElementById("logout-account-btn");
+      logoutAccountBtn.addEventListener("click", async function () {
+        await logoutFromAllDevices();
+      });
+    }
+
+    // ฟังก์ชันอัปเดตโปรไฟล์
+    async function updateProfile(user) {
+      const displayName = document.getElementById("display-name").value.trim();
+      const profileError = document.getElementById("profile-error");
+      const profileSuccess = document.getElementById("profile-success");
+      const saveProfileBtn = document.getElementById("save-profile-btn");
+
+      // ซ่อนข้อความแจ้งเตือนเก่า
+      profileError.classList.add("hidden");
+      profileSuccess.classList.add("hidden");
+
+      // ตรวจสอบข้อมูล
+      if (!displayName) {
+        profileError.textContent = "โปรดกรอกชื่อที่แสดง";
+        profileError.classList.remove("hidden");
+        return;
+      }
+
+      if (displayName.length < 3) {
+        profileError.textContent = "ชื่อที่แสดงต้องมีความยาวอย่างน้อย 3 ตัวอักษร";
+        profileError.classList.remove("hidden");
+        return;
+      }
+
+      // แสดงสถานะกำลังบันทึก
+      const originalBtnContent = saveProfileBtn.innerHTML;
+      saveProfileBtn.disabled = true;
+      saveProfileBtn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        กำลังบันทึก...
+      `;
+
+      try {
+        // อัปเดตข้อมูล metadata ของผู้ใช้
+        const { data, error } = await supabase.auth.updateUser({
+          data: { display_name: displayName }
+        });
+
+        if (error) throw error;
+
+        // แสดงข้อความสำเร็จ
+        profileSuccess.textContent = "บันทึกข้อมูลเรียบร้อยแล้ว";
+        profileSuccess.classList.remove("hidden");
+
+        // อัปเดตชื่อที่แสดงในส่วนอื่น ๆ ของหน้าเว็บ
+        document.getElementById("user-name").textContent = displayName;
+        document.getElementById("dropdown-user-name").textContent = displayName;
+
+        // ซ่อนข้อความสำเร็จหลังจาก 3 วินาที
+        setTimeout(() => {
+          profileSuccess.classList.add("hidden");
+        }, 3000);
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        profileError.textContent = "เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + error.message;
+        profileError.classList.remove("hidden");
+      } finally {
+        // คืนสถานะปุ่ม
+        saveProfileBtn.disabled = false;
+        saveProfileBtn.innerHTML = originalBtnContent;
+      }
+    }
+
+    // ฟังก์ชันอัปเดตรูปโปรไฟล์
+    async function updateAvatar(user) {
+      const avatarUpload = document.getElementById("avatar-upload");
+      const avatarError = document.getElementById("avatar-error");
+      const avatarSuccess = document.getElementById("avatar-success");
+      const saveAvatarBtn = document.getElementById("save-avatar-btn");
+      const avatarPreviewContainer = document.getElementById("avatar-preview-container");
+
+      // ซ่อนข้อความแจ้งเตือนเก่า
+      avatarError.classList.add("hidden");
+      avatarSuccess.classList.add("hidden");
+
+      // ตรวจสอบว่ามีไฟล์หรือไม่
+      if (!avatarUpload.files || avatarUpload.files.length === 0) {
+        avatarError.textContent = "โปรดเลือกรูปภาพ";
+        avatarError.classList.remove("hidden");
+        return;
+      }
+
+      const file = avatarUpload.files[0];
+
+      // ตรวจสอบประเภทไฟล์
+      if (!file.type.match('image.*')) {
+        avatarError.textContent = "กรุณาอัปโหลดไฟล์รูปภาพเท่านั้น";
+        avatarError.classList.remove("hidden");
+        return;
+      }
+
+      // ตรวจสอบขนาดไฟล์ (ไม่เกิน 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        avatarError.textContent = "ขนาดไฟล์ต้องไม่เกิน 5MB";
+        avatarError.classList.remove("hidden");
+        return;
+      }
+
+      // แสดงสถานะกำลังอัปโหลด
+      const originalBtnContent = saveAvatarBtn.innerHTML;
+      saveAvatarBtn.disabled = true;
+      saveAvatarBtn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        กำลังอัปโหลด...
+      `;
+
+      try {
+        // อัปโหลดรูปภาพไปยัง Supabase Storage
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const filePath = `avatars/${user.id}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('images')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        // ดึง URL สำหรับไฟล์ที่อัปโหลด
+        const { data } = supabase.storage
+          .from('images')
+          .getPublicUrl(filePath);
+
+        const avatarUrl = data.publicUrl;
+
+        // อัปเดตข้อมูล metadata ของผู้ใช้
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: { avatar_url: avatarUrl }
+        });
+
+        if (updateError) throw updateError;
+
+        // อัปเดตรูปโปรไฟล์ในหน้าเว็บ
+        document.getElementById("current-avatar").src = avatarUrl;
+        document.getElementById("user-avatar").src = avatarUrl;
+
+        // แสดงข้อความสำเร็จ
+        avatarSuccess.textContent = "อัปโหลดรูปโปรไฟล์เรียบร้อยแล้ว";
+        avatarSuccess.classList.remove("hidden");
+
+        // รีเซ็ตฟอร์ม
+        avatarUpload.value = "";
+        avatarPreviewContainer.classList.add("hidden");
+        saveAvatarBtn.classList.add("hidden");
+
+        // ซ่อนข้อความสำเร็จหลังจาก 3 วินาที
+        setTimeout(() => {
+          avatarSuccess.classList.add("hidden");
+        }, 3000);
+      } catch (error) {
+        console.error("Error uploading avatar:", error);
+        avatarError.textContent = "เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ: " + error.message;
+        avatarError.classList.remove("hidden");
+      } finally {
+        // คืนสถานะปุ่ม
+        saveAvatarBtn.disabled = false;
+        saveAvatarBtn.innerHTML = originalBtnContent;
+      }
+    }
+
+    // ฟังก์ชันอัปเดตรหัสผ่าน
+    async function updatePassword(user) {
+      const currentPassword = document.getElementById("current-password").value;
+      const newPassword = document.getElementById("new-password").value;
+      const confirmPassword = document.getElementById("confirm-password").value;
+      const passwordError = document.getElementById("password-error");
+      const passwordSuccess = document.getElementById("password-success");
+      const savePasswordBtn = document.getElementById("save-password-btn");
+      const passwordModal = document.getElementById("password-modal");
+      const passwordModalContent = document.getElementById("password-modal-content");
+
+      // ซ่อนข้อความแจ้งเตือนเก่า
+      passwordError.classList.add("hidden");
+      passwordSuccess.classList.add("hidden");
+
+      // ตรวจสอบข้อมูล
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        passwordError.textContent = "กรุณากรอกข้อมูลให้ครบทุกช่อง";
+        passwordError.classList.remove("hidden");
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        passwordError.textContent = "รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 6 ตัวอักษร";
+        passwordError.classList.remove("hidden");
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        passwordError.textContent = "รหัสผ่านใหม่และการยืนยันรหัสผ่านไม่ตรงกัน";
+        passwordError.classList.remove("hidden");
+        return;
+      }
+
+      if (newPassword === currentPassword) {
+        passwordError.textContent = "รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านปัจจุบัน";
+        passwordError.classList.remove("hidden");
+        return;
+      }
+
+      // แสดงสถานะกำลังบันทึก
+      const originalBtnContent = savePasswordBtn.innerHTML;
+      savePasswordBtn.disabled = true;
+      savePasswordBtn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        กำลังบันทึก...
+      `;
+
+      try {
+        // ตรวจสอบรหัสผ่านปัจจุบัน
+        const { error: loginError } = await supabase.auth.signInWithPassword({
+          email: user.email,
+          password: currentPassword
+        });
+
+        // ถ้าเข้าสู่ระบบไม่สำเร็จ แสดงว่ารหัสผ่านปัจจุบันไม่ถูกต้อง
+        if (loginError) {
+          passwordError.textContent = "รหัสผ่านปัจจุบันไม่ถูกต้อง";
+          passwordError.classList.remove("hidden");
+          return;
+        }
+
+        // อัปเดตรหัสผ่าน
+        const { error } = await supabase.auth.updateUser({
+          password: newPassword
+        });
+
+        if (error) throw error;
+
+        // แสดงข้อความสำเร็จ
+        passwordSuccess.textContent = "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว";
+        passwordSuccess.classList.remove("hidden");
+
+        // รีเซ็ตฟอร์ม
+        document.getElementById("password-form").reset();
+
+        // ซ่อนข้อความสำเร็จและปิด modal หลังจาก 2 วินาที
+        setTimeout(() => {
+          closeModal(passwordModal, passwordModalContent);
+          passwordSuccess.classList.add("hidden");
+        }, 2000);
+      } catch (error) {
+        console.error("Error updating password:", error);
+        passwordError.textContent = "เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน: " + error.message;
+        passwordError.classList.remove("hidden");
+      } finally {
+        // คืนสถานะปุ่ม
+        savePasswordBtn.disabled = false;
+        savePasswordBtn.innerHTML = originalBtnContent;
+      }
+    }
+
+    // ฟังก์ชันลบบัญชี
+    async function deleteAccount(user) {
+      const confirmPassword = document.getElementById("delete-confirm-password").value;
+      const deleteAccountError = document.getElementById("delete-account-error");
+      const confirmDeleteAccountBtn = document.getElementById("confirm-delete-account-btn");
+      const deleteAccountModal = document.getElementById("delete-account-modal");
+      const deleteAccountModalContent = document.getElementById("delete-account-modal-content");
+
+      // ซ่อนข้อความแจ้งเตือนเก่า
+      deleteAccountError.classList.add("hidden");
+
+      // ตรวจสอบข้อมูล
+      if (!confirmPassword) {
+        deleteAccountError.textContent = "กรุณากรอกรหัสผ่านเพื่อยืนยัน";
+        deleteAccountError.classList.remove("hidden");
+        return;
+      }
+
+      // แสดงสถานะกำลังลบ
+      const originalBtnContent = confirmDeleteAccountBtn.innerHTML;
+      confirmDeleteAccountBtn.disabled = true;
+      confirmDeleteAccountBtn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        กำลังลบบัญชี...
+      `;
+
+      try {
+        // ตรวจสอบรหัสผ่าน
+        const { error: loginError } = await supabase.auth.signInWithPassword({
+          email: user.email,
+          password: confirmPassword
+        });
+
+        // ถ้าเข้าสู่ระบบไม่สำเร็จ แสดงว่ารหัสผ่านไม่ถูกต้อง
+        if (loginError) {
+          deleteAccountError.textContent = "รหัสผ่านไม่ถูกต้อง";
+          deleteAccountError.classList.remove("hidden");
+          return;
+        }
+
+        // ลบบัญชี (ในกรณีนี้ต้องเรียก API หรือฟังก์ชันสำหรับการลบบัญชี)
+        // ตัวอย่าง: อาจต้องสร้าง Admin Function ใน Supabase
+        const { error } = await supabase.functions.invoke('delete-user');
+
+        if (error) throw error;
+
+        // ออกจากระบบหลังจากลบบัญชี
+        await supabase.auth.signOut();
+
+        // แสดง alert และไปหน้าหลัก
+        alert("ลบบัญชีเรียบร้อยแล้ว");
+        window.location.href = "index.html";
+      } catch (error) {
+        console.error("Error deleting account:", error);
+        deleteAccountError.textContent = "เกิดข้อผิดพลาดในการลบบัญชี: " + error.message;
+        deleteAccountError.classList.remove("hidden");
+      } finally {
+        // คืนสถานะปุ่ม
+        confirmDeleteAccountBtn.disabled = false;
+        confirmDeleteAccountBtn.innerHTML = originalBtnContent;
+      }
+    }
+
+    // ฟังก์ชันออกจากระบบทุกอุปกรณ์
+    async function logoutFromAllDevices() {
+      if (confirm("คุณต้องการออกจากระบบทุกอุปกรณ์หรือไม่?")) {
+        try {
+          // ออกจากระบบทุกอุปกรณ์
+          const { error } = await supabase.auth.signOut({ scope: 'global' });
+
+          if (error) throw error;
+
+          // ไปหน้าล็อกอิน
+          window.location.href = "login.html";
+        } catch (error) {
+          console.error("Error logging out from all devices:", error);
+          alert("เกิดข้อผิดพลาดในการออกจากระบบ: " + error.message);
+        }
+      }
+    }
+
+    // ฟังก์ชันออกจากระบบ
+    async function handleLogout() {
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (!error) {
+          window.location.href = "index.html";
+        }
+      } catch (error) {
+        console.error("Error signing out:", error);
+        alert("เกิดข้อผิดพลาดในการออกจากระบบ");
+      }
+    }
+
+    // ฟังก์ชันเปิด Modal
+    function openModal(modal, modalContent) {
+      modal.classList.remove("hidden");
+      setTimeout(() => {
+        modalContent.classList.remove("scale-95", "opacity-0");
+        modalContent.classList.add("scale-100", "opacity-100");
+      }, 10);
+    }
+
+    // ฟังก์ชันปิด Modal
+    function closeModal(modal, modalContent) {
+      modalContent.classList.remove("scale-100", "opacity-100");
+      modalContent.classList.add("scale-95", "opacity-0");
+      setTimeout(() => {
+        modal.classList.add("hidden");
+      }, 300);
+    }
+
+    // ฟังก์ชันตรวจสอบความแข็งแรงของรหัสผ่าน
+    function checkPasswordStrength(password) {
+      const passwordStrength = document.getElementById("password-strength");
+      const passwordFeedback = document.getElementById("password-feedback");
+
+      // รีเซ็ตสถานะ
+      passwordStrength.className = "password-strength-meter bg-gray-400 w-0";
+      passwordFeedback.className = "text-xs text-gray-500 mt-1";
+      passwordFeedback.textContent = "รหัสผ่านควรมีอย่างน้อย 6 ตัวอักษร";
+
+      if (password.length === 0) {
+        return;
+      }
+
+      // คะแนนความแข็งแรง (0-4)
+      let score = 0;
+
+      // ตรวจสอบความยาว
+      if (password.length >= 8) {
+        score += 1;
+      }
+
+      // ตรวจสอบตัวอักษรผสม (ตัวพิมพ์ใหญ่และเล็ก)
+      if (password.match(/[a-z]/) && password.match(/[A-Z]/)) {
+        score += 1;
+      }
+
+      // ตรวจสอบตัวเลข
+      if (password.match(/\d/)) {
+        score += 1;
+      }
+
+      // ตรวจสอบอักขระพิเศษ
+      if (password.match(/[^a-zA-Z\d]/)) {
+        score += 1;
+      }
+
+      // อัปเดตแถบแสดงความแข็งแรง
+      const strengthWidth = ["w-0", "w-1/4", "w-2/4", "w-3/4", "w-full"];
+      const strengthColor = ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-green-400", "bg-green-500"];
+      const strengthText = ["ต่ำมาก", "ต่ำ", "ปานกลาง", "ดี", "ดีมาก"];
+
+      passwordStrength.className = `password-strength-meter ${strengthColor[score]} ${strengthWidth[score]}`;
+      passwordFeedback.className = `text-xs ${score < 2 ? 'text-red-500' : score < 4 ? 'text-yellow-500' : 'text-green-500'} mt-1`;
+      passwordFeedback.textContent = `ความแข็งแรง: ${strengthText[score]}`;
+    }
+  </script>
+</body>
+</html>
