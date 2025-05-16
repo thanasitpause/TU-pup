@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+
+body {
+  font-family: 'Sarabun', sans-serif;
+}
+
+.tu-gradient {
+  background: linear-gradient(135deg, #E60000 0%, #FFCC00 100%);
+}
+
+.tu-gradient-text {
+  background: linear-gradient(135deg, #E60000 0%, #FFCC00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+/* Post Card Animation */
+.post-card {
+  transition: all 0.3s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Gradient backgrounds for cards */
+.bg-gradient-red-to-white {
+  background-image: linear-gradient(to bottom right, rgba(255, 229, 229, 1), white);
+}
+
+.bg-gradient-yellow-to-white {
+  background-image: linear-gradient(to bottom right, rgba(255, 248, 229, 1), white);
+}
+
+.bg-gradient-blue-to-white {
+  background-image: linear-gradient(to bottom right, rgba(239, 246, 255, 1), white);
+}
+
+/* สไตล์สำหรับควบคุมการแสดงข้อความยาว */
+.post-card {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.post-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.post-content {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.post-author {
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ควบคุมการแสดงข้อความในหน้ารายละเอียดกระทู้ */
+.post-body, .comment-content {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.image-container img {
+  max-height: 500px;
+  object-fit: contain;
+}
+
+.comment-image img {
+  max-height: 300px;
+  object-fit: contain;
+}
+
+/* Floating animation */
+.floating {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}

@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>สถิติเว็บบอร์ด - TU-PUP</title>
+    <!-- ตั้งค่าการโหลดทรัพยากร -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Custom styles -->
+    <link href="css/tu-common.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <!-- Tailwind Config & CDN -->
+    <script src="js/tailwind-config.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // ใช้คอนฟิกจากไฟล์ภายนอก
+        tailwind.config = window.tailwindConfig;
+    </script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase Config -->
+    <script src="js/supabase-config.js"></script>
+    <!-- Sidebar JS -->
+    <script src="js/sidebar.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* เพิ่มเติม CSS เฉพาะหน้านี้ */
+        .dashboard-card {
+            transition: all 0.3s ease;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card {
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card-posts {
+            border-left-color: #E60000;
+        }
+
+        .stat-card-comments {
+            border-left-color: #FFCC00;
+        }
+
+        .stat-card-views {
+            border-left-color: #4F46E5;
+        }
+
+        .stat-card-users {
+            border-left-color: #10B981;
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0.6) 50%,
+                    rgba(255, 255, 255, 0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .custom-tooltip {
+            position: absolute;
+            background: white;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 10;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-white to-gray-100 min-h-screen">
+    <!-- Decorative Elements -->
+    <div class="fixed top-0 left-0 w-full h-1 tu-gradient opacity-80 z-50"></div>
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo & Hamburger Menu -->
+                <div class="flex items-center space-x-4">
+                    <button id="sidebar-toggle" class="text-gray-500 hover:text-tu-red-500 focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <a href="index.html" class="flex items-center space-x-2">
+                        <div
+                            class="h-8 w-8 rounded-full tu-gradient flex items-center justify-center text-white font-bold text-xs shadow-md">
+                            TU</div>
+                        <span class="font-bold text-2xl tu-gradient-text">TU-PUP</span>
+                    </a>
+                </div>
+
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
+                    <button id="new-post-btn"
+                        class="hidden bg-gradient-to-r from-tu-red to-tu-yellow hover:from-tu-red-600 hover:to-tu-yellow-600 text-white font-medium px-4 py-2 rounded-full transition duration-300 transform hover:scale-105 shadow-md">
+                        <span class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            สร้างกระทู้ใหม่
+                        </span>
+                    </button>
+
+                    <div id="user-menu" class="hidden relative group">
+                        <button class="flex items-center space-x-2 focus:outline-none">
+                            <div class="relative">
+                                <img id="user-avatar" src="img/default-avatar.png" alt="User"
+                                    class="w-8 h-8 rounded-full border-2 border-tu-red-200 transition-transform duration-300 group-hover:scale-110">
+                                <div
+                                    class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-white">
+                                </div>
+                            </div>
+                            <span id="user-name" class="hidden md:inline text-sm font-medium"></span>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4 text-gray-400 group-hover:text-tu-red-500 transition-transform duration-300 group-hover:rotate-180"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown menu -->
+                        <div
+                            class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                            <div class="px-4 py-2 border-b border-gray-100">
+                                <p class="text-sm font-medium text-gray-900" id="dropdown-user-name"></p>
+                                <p class="text-xs text-gray-500 truncate" id="dropdown-user-email"></p>
+                            </div>
+                            <a href="my_posts.html"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-tu-red-50 hover:text-tu-red-500">
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    </svg>
+                                    กระทู้ของฉัน
+                                </div>
+                            </a>
+                            <a href="edit-profile.html"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-tu-red-50 hover:text-tu-red-500">
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    แก้ไขโปรไฟล์
+                                </div>
+                            </a>
+                            <hr class="my-1 border-gray-100">
+                            <button id="logout-btn"
+                                class="w-full text-left block px-4 py-2 text-sm text-tu-red-500 hover:bg-tu-red-50">
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                    ออกจากระบบ
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="login-menu" class="flex items-center space-x-3">
+                        <a href="login.html"
+                            class="text-tu-red-500 hover:text-tu-red-600 font-medium transition-colors">เข้าสู่ระบบ</a>
+                        <div class="w-px h-5 bg-gray-300"></div>
+                        <a href="register.html"
+                            class="text-tu-red-500 hover:text-tu-red-600 font-medium transition-colors">สมัครสมาชิก</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div class="mb-4 md:mb-0">
+                        <h1 class="text-3xl font-bold text-gray-800 relative inline-block mr-3">
+                            สถิติเว็บบอร์ด
+                            <div
+                                class="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-tu-red to-tu-yellow rounded-full">
+                            </div>
+                        </h1>
+                        <p class="text-gray-500 mt-2">ข้อมูลและสถิติโดยรวมของระบบ TU-PUP</p>
+                    </div>
+                    <div>
+                        <!-- เปลี่ยนจาก SVG เป็นรูปภาพ -->
+                        <img src="img/rabit-dashboard.png" alt="Dashboard" class="hidden md:block w-32 h-32 opacity-80">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Total Posts Stat -->
+                <div id="stat-total-posts" class="stat-card stat-card-posts bg-white rounded-xl shadow-md p-5">
+                    <div class="animate-pulse">
+                        <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
+                        <div class="h-8 bg-gray-200 rounded w-1/3 mb-3"></div>
+                        <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                </div>
+
+                <!-- Total Comments Stat -->
+                <div id="stat-total-comments" class="stat-card stat-card-comments bg-white rounded-xl shadow-md p-5">
+                    <div class="animate-pulse">
+                        <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
+                        <div class="h-8 bg-gray-200 rounded w-1/3 mb-3"></div>
+                        <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                </div>
+
+                <!-- Total Views Stat -->
+                <div id="stat-total-views" class="stat-card stat-card-views bg-white rounded-xl shadow-md p-5">
+                    <div class="animate-pulse">
+                        <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
+                        <div class="h-8 bg-gray-200 rounded w-1/3 mb-3"></div>
+                        <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                </div>
+
+                <!-- Total Users Stat -->
+                <div id="stat-total-users" class="stat-card stat-card-users bg-white rounded-xl shadow-md p-5">
+                    <div class="animate-pulse">
+                        <div class="h-5 bg-gray-200 rounded w-3/4 mb-4"></div>
+                        <div class="h-8 bg-gray-200 rounded w-1/3 mb-3"></div>
+                        <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- User Type Distribution Chart -->
+                <div class="dashboard-card bg-white rounded-xl shadow-md p-5">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">สัดส่วนการเข้าชมของผู้ใช้</h3>
+                    <div id="viewer-type-chart-container" class="chart-container">
+                        <div id="viewer-type-loading"
+                            class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80">
+                            <div class="w-12 h-12 rounded-full border-t-2 border-b-2 border-tu-red-500 animate-spin">
+                            </div>
+                        </div>
+                        <canvas id="viewer-type-chart"></canvas>
+                    </div>
+                    <div class="mt-4 grid grid-cols-2 gap-4">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded-full bg-tu-red-500 mr-2"></div>
+                            <span class="text-sm text-gray-600">ผู้ใช้ที่ลงทะเบียน</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded-full bg-tu-yellow-400 mr-2"></div>
+                            <span class="text-sm text-gray-600">ผู้เยี่ยมชมทั่วไป</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post Activity by Time Chart -->
+                <div class="dashboard-card bg-white rounded-xl shadow-md p-5">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">กิจกรรมรายวัน (กระทู้และความคิดเห็น)</h3>
+                    <div id="activity-chart-container" class="chart-container">
+                        <div id="activity-chart-loading"
+                            class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80">
+                            <div class="w-12 h-12 rounded-full border-t-2 border-b-2 border-tu-red-500 animate-spin">
+                            </div>
+                        </div>
+                        <canvas id="activity-chart"></canvas>
+                    </div>
+                    <div class="mt-4 grid grid-cols-2 gap-4">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded-full bg-tu-red-500 mr-2"></div>
+                            <span class="text-sm text-gray-600">กระทู้ใหม่</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded-full bg-tu-yellow-400 mr-2"></div>
+                            <span class="text-sm text-gray-600">ความคิดเห็นใหม่</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tables Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Top Posts Table -->
+                <div class="dashboard-card bg-white rounded-xl shadow-md p-5">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">กระทู้ยอดนิยม (จำนวนการเข้าชม)</h3>
+                    <div id="top-posts-loading" class="animate-pulse space-y-4">
+                        <div class="h-6 bg-gray-200 rounded w-full"></div>
+                        <div class="h-6 bg-gray-200 rounded w-full"></div>
+                        <div class="h-6 bg-gray-200 rounded w-full"></div>
+                        <div class="h-6 bg-gray-200 rounded w-full"></div>
+                        <div class="h-6 bg-gray-200 rounded w-full"></div>
+                    </div>
+                    <div id="top-posts-table" class="hidden overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        หัวข้อกระทู้</th>
+                                    <th
+                                        class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        จำนวนการเข้าชม</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200" id="top-posts-tbody">
+                                <!-- Top posts will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <a href="top_posts.html"
+                            class="text-tu-red-500 text-sm hover:underline flex items-center justify-center">
+                            ดูกระทู้ยอดนิยมทั้งหมด
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Most Active Users Table -->
+                <div class="dashboard-card bg-white rounded-xl shadow-md p-5">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">ผู้ใช้งานที่มีส่วนร่วมมากที่สุด</h3>
+                    <div id="active-users-loading" class="animate-pulse space-y-4">
+                        <div class="h-6 bg-gray-200 rounded w-full"></div>
+                        <div class="h-6 bg-gray-200 rounded w-full"></div>
+                        <div class="h-6 bg-gray-200 rounded w-full"></div>
+                        <div class="h-6 bg-gray-200 rounded w-full"></div>
+                        <div class="h-6 bg-gray-200 rounded w-full"></div>
+                    </div>
+                    <div id="active-users-table" class="hidden overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        ชื่อผู้ใช้</th>
+                                    <th
+                                        class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        จำนวนกระทู้</th>
+                                    <th
+                                        class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        จำนวนความคิดเห็น</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200" id="active-users-tbody">
+                                <!-- Active users will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12 py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <div
+                            class="h-8 w-8 rounded-full tu-gradient flex items-center justify-center text-white font-bold text-xs">
+                            TU</div>
+                        <span class="font-bold text-2xl tu-gradient-text">TU-PUP</span>
+                    </div>
+                    <p class="text-gray-600 max-w-md">ระบบกระดานสนทนาเกี่ยวกับสัตว์เลี้ยงสำหรับประชาคมธรรมศาสตร์
+                        แลกเปลี่ยนความคิดเห็น ถาม-ตอบปัญหา แชร์ประสบการณ์</p>
+                </div>
+                <p class="text-gray-600 text-sm">&copy; 2025 TU-PUP. สงวนลิขสิทธิ์.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            // ตรวจสอบสถานะการล็อกอิน
+            const { data: { user } } = await supabase.auth.getUser();
+
+            // แสดงหรือซ่อนเมนูตามสถานะล็อกอิน
+            if (user) {
+                document.getElementById("login-menu").classList.add("hidden");
+                document.getElementById("user-menu").classList.remove("hidden");
+                document.getElementById("new-post-btn").classList.remove("hidden");
+
+                const displayName = user.user_metadata?.display_name || user.email;
+                document.getElementById("user-name").textContent = displayName;
+                document.getElementById("dropdown-user-name").textContent = displayName;
+                document.getElementById("dropdown-user-email").textContent = user.email;
+
+                // ตรวจสอบรูปโปรไฟล์
+                if (user.user_metadata?.avatar_url) {
+                    document.getElementById("user-avatar").src = user.user_metadata.avatar_url;
+                }
+
+                // Event listener สำหรับปุ่มล็อกเอาต์
+                document.getElementById("logout-btn").addEventListener("click", async () => {
+                    const { error } = await supabase.auth.signOut();
+                    if (!error) {
+                        window.location.reload();
+                    }
+                });
+            }
+
+            // Event listeners สำหรับปุ่มสร้างกระทู้ใหม่
+            document.getElementById("new-post-btn").addEventListener("click", () => {
+                window.location.href = "new-post.html";
+            });
+
+            // โหลดข้อมูลสถิติและแสดงผล
+            await loadDashboardData();
+        });
+
+        // ฟังก์ชันโหลดข้อมูลสำหรับแผงควบคุม
+        async function loadDashboardData() {
+            try {
+                // โหลดข้อมูลสถิติพื้นฐาน
+                await loadBasicStats();
+
+                // โหลดข้อมูลสำหรับแผนภูมิวงกลมของประเภทผู้ชม
+                await loadViewerTypeChart();
+
+                // โหลดข้อมูลสำหรับแผนภูมิกิจกรรมรายวัน
+                await loadActivityChart();
+
+                // โหลดข้อมูลกระทู้ยอดนิยม
+                await loadTopPostsTable();
+
+                // โหลดข้อมูลผู้ใช้ที่มีส่วนร่วมมากที่สุด
+                await loadActiveUsersTable();
+
+            } catch (error) {
+                console.error("Error loading dashboard data:", error);
+            }
+        }
+
+        // ฟังก์ชันโหลดข้อมูลสถิติพื้นฐาน
+        async function loadBasicStats() {
+            try {
+                // 1. จำนวนกระทู้ทั้งหมด
+                const { count: totalPosts, error: postsError } = await supabase
+                    .from("posts")
+                    .select("*", { count: "exact", head: true });
+
+                if (postsError) throw postsError;
+
+                // 2. จำนวนความคิดเห็นทั้งหมด
+                const { count: totalComments, error: commentsError } = await supabase
+                    .from("comments")
+                    .select("*", { count: "exact", head: true });
+
+                if (commentsError) throw commentsError;
+
+                // 3. จำนวนการเข้าชมทั้งหมด
+                const { count: totalViews, error: viewsError } = await supabase
+                    .from("posts_view")
+                    .select("*", { count: "exact", head: true });
+
+                if (viewsError) throw viewsError;
+
+                // 4. จำนวนผู้ใช้ที่ลงทะเบียน (ต้องได้รับสิทธิ์เข้าถึงตาราง auth.users จาก Admin ก่อน)
+                // ในที่นี้เราจะใช้ข้อมูลจากตาราง posts แทน (นับจำนวน author_id ที่ไม่ซ้ำกัน)
+                const { data: uniqueAuthors, error: authorsError } = await supabase
+                    .from("posts")
+                    .select("author_id")
+                    .not("author_id", "is", null);
+
+                if (authorsError) throw authorsError;
+
+                // สร้าง Set เพื่อนับจำนวน author_id ที่ไม่ซ้ำกัน
+                const uniqueAuthorIds = new Set();
+                uniqueAuthors.forEach(post => {
+                    if (post.author_id) {
+                        uniqueAuthorIds.add(post.author_id);
+                    }
+                });
+
+                const totalUsers = uniqueAuthorIds.size;
+
+                // อัปเดตการแสดงผลสถิติในหน้าเว็บ
+                updateStatCard("stat-total-posts", "กระทู้ทั้งหมด", totalPosts, "กระทู้");
+                updateStatCard("stat-total-comments", "ความคิดเห็นทั้งหมด", totalComments, "ความคิดเห็น");
+                updateStatCard("stat-total-views", "การเข้าชมทั้งหมด", totalViews, "ครั้ง");
+                updateStatCard("stat-total-users", "สมาชิกที่ลงทะเบียน", totalUsers, "คน");
+
+            } catch (error) {
+                console.error("Error loading basic stats:", error);
+            }
+        }
+
+        // ฟังก์ชันอัปเดตการแสดงผลสถิติพื้นฐาน
+        function updateStatCard(elementId, title, value, unit) {
+            const statCard = document.getElementById(elementId);
+
+            // เคลียร์ placeholder
+            statCard.innerHTML = "";
+
+            // สร้างเนื้อหาสถิติใหม่
+            statCard.innerHTML = `
+        <h4 class="text-gray-500 font-medium">${title}</h4>
+        <div class="flex items-end space-x-2 mt-1">
+          <p class="text-2xl font-bold">${value.toLocaleString()}</p>
+          <p class="text-sm text-gray-400 mb-1">${unit}</p>
+        </div>
+        <div class="text-xs text-gray-400 mt-1 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+          อัปเดตล่าสุด: ${new Date().toLocaleDateString('th-TH')}
+        </div>
+      `;
+        }
+
+        // ฟังก์ชันโหลดข้อมูลสำหรับแผนภูมิวงกลมของประเภทผู้ชม
+        async function loadViewerTypeChart() {
+            try {
+                // ดึงข้อมูลการเข้าชมแยกตามประเภทผู้ชม
+                const { data: viewerTypes, error } = await supabase
+                    .from("posts_view")
+                    .select("viewer_type")
+                    .not("viewer_type", "is", null);
+
+                if (error) throw error;
+
+                // นับจำนวนการเข้าชมแยกตามประเภท
+                let authenticatedCount = 0;
+                let anonymousCount = 0;
+
+                viewerTypes.forEach(view => {
+                    if (view.viewer_type === 'authenticated') {
+                        authenticatedCount++;
+                    } else if (view.viewer_type === 'anonymous') {
+                        anonymousCount++;
+                    }
+                });
+
+                // สร้างแผนภูมิวงกลม
+                const ctx = document.getElementById('viewer-type-chart').getContext('2d');
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['ผู้ใช้ที่ลงทะเบียน', 'ผู้เยี่ยมชมทั่วไป'],
+                        datasets: [{
+                            data: [authenticatedCount, anonymousCount],
+                            backgroundColor: [
+                                '#E60000', // tu-red
+                                '#FFCC00'  // tu-yellow
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${label}: ${value} ครั้ง (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // ซ่อน loading indicator
+                document.getElementById('viewer-type-loading').classList.add('hidden');
+
+            } catch (error) {
+                console.error("Error loading viewer type chart:", error);
+            }
+        }
+
+        // ฟังก์ชันโหลดข้อมูลสำหรับแผนภูมิกิจกรรมรายวัน
+        async function loadActivityChart() {
+            try {
+                // ดึงวันที่ 7 วันล่าสุด
+                const dates = [];
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    dates.push(date.toISOString().split('T')[0]); // เก็บในรูปแบบ 'YYYY-MM-DD'
+                }
+
+                // ดึงข้อมูลกระทู้และความคิดเห็นตามวันที่
+                const postsByDate = await getPostsByDates(dates);
+                const commentsByDate = await getCommentsByDates(dates);
+
+                // สร้างแผนภูมิแท่ง
+                const ctx = document.getElementById('activity-chart').getContext('2d');
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: dates.map(date => formatThaiDate(date)),
+                        datasets: [
+                            {
+                                label: 'กระทู้ใหม่',
+                                data: dates.map(date => postsByDate[date] || 0),
+                                backgroundColor: '#E60000',
+                                borderWidth: 0,
+                                borderRadius: 4
+                            },
+                            {
+                                label: 'ความคิดเห็นใหม่',
+                                data: dates.map(date => commentsByDate[date] || 0),
+                                backgroundColor: '#FFCC00',
+                                borderWidth: 0,
+                                borderRadius: 4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function (context) {
+                                        return formatThaiDate(dates[context[0].dataIndex]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // ซ่อน loading indicator
+                document.getElementById('activity-chart-loading').classList.add('hidden');
+
+            } catch (error) {
+                console.error("Error loading activity chart:", error);
+            }
+        }
+
+        // ฟังก์ชันดึงข้อมูลกระทู้ตามวันที่
+        async function getPostsByDates(dates) {
+            try {
+                const { data, error } = await supabase
+                    .from("posts")
+                    .select("created_at");
+
+                if (error) throw error;
+
+                // นับจำนวนกระทู้ตามวันที่
+                const postsByDate = {};
+                dates.forEach(date => { postsByDate[date] = 0; });
+
+                data.forEach(post => {
+                    const postDate = new Date(post.created_at).toISOString().split('T')[0];
+                    if (postsByDate[postDate] !== undefined) {
+                        postsByDate[postDate]++;
+                    }
+                });
+
+                return postsByDate;
+            } catch (error) {
+                console.error("Error getting posts by dates:", error);
+                return {};
+            }
+        }
+
+        // ฟังก์ชันดึงข้อมูลความคิดเห็นตามวันที่
+        async function getCommentsByDates(dates) {
+            try {
+                const { data, error } = await supabase
+                    .from("comments")
+                    .select("created_at");
+
+                if (error) throw error;
+
+                // นับจำนวนความคิดเห็นตามวันที่
+                const commentsByDate = {};
+                dates.forEach(date => { commentsByDate[date] = 0; });
+
+                data.forEach(comment => {
+                    const commentDate = new Date(comment.created_at).toISOString().split('T')[0];
+                    if (commentsByDate[commentDate] !== undefined) {
+                        commentsByDate[commentDate]++;
+                    }
+                });
+
+                return commentsByDate;
+            } catch (error) {
+                console.error("Error getting comments by dates:", error);
+                return {};
+            }
+        }
+
+        // ฟังก์ชันแปลงวันที่เป็นรูปแบบไทย
+        function formatThaiDate(dateStr) {
+            const date = new Date(dateStr);
+            const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+            return `${date.getDate()} ${thaiMonths[date.getMonth()]}`;
+        }
+
+        // ฟังก์ชันโหลดข้อมูลกระทู้ยอดนิยม
+        async function loadTopPostsTable() {
+            try {
+                // ดึงจำนวนการเข้าชมของแต่ละกระทู้
+                const postViewCounts = await getPostViewCounts();
+
+                // ดึงข้อมูลกระทู้ทั้งหมด
+                const { data: posts, error } = await supabase
+                    .from("posts")
+                    .select("id, title");
+
+                if (error) throw error;
+
+                // เพิ่มจำนวนการเข้าชมให้กับกระทู้
+                const postsWithViews = posts.map(post => ({
+                    ...post,
+                    view_count: postViewCounts[post.id] || 0
+                }));
+
+                // เรียงลำดับตามจำนวนการเข้าชมมากไปน้อย และเลือก 5 อันดับแรก
+                const topPosts = postsWithViews
+                    .sort((a, b) => b.view_count - a.view_count)
+                    .slice(0, 5);
+
+                // สร้างแถวของตาราง
+                const tbody = document.getElementById('top-posts-tbody');
+                tbody.innerHTML = '';
+
+                topPosts.forEach(post => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+
+                    row.innerHTML = `
+            <td class="px-4 py-3 text-sm font-medium text-gray-900 truncate max-w-xs">
+              <a href="post.html?id=${post.id}" class="hover:text-tu-red-500 transition-colors">
+                ${post.title}
+              </a>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-500 text-right">
+              <span class="bg-tu-red-50 text-tu-red-500 py-1 px-2 rounded-full text-xs font-medium">
+                ${post.view_count.toLocaleString()} ครั้ง
+              </span>
+            </td>
+          `;
+
+                    tbody.appendChild(row);
+                });
+
+                // ซ่อน loading และแสดงตาราง
+                document.getElementById('top-posts-loading').classList.add('hidden');
+                document.getElementById('top-posts-table').classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Error loading top posts table:", error);
+            }
+        }
+
+        // ฟังก์ชันดึงจำนวนการเข้าชมของแต่ละกระทู้
+        async function getPostViewCounts() {
+            try {
+                const { data, error } = await supabase
+                    .from("posts_view")
+                    .select("post_id");
+
+                if (error) throw error;
+
+                // นับจำนวนการเข้าชมของแต่ละกระทู้
+                const viewCounts = {};
+                data.forEach(view => {
+                    if (viewCounts[view.post_id]) {
+                        viewCounts[view.post_id]++;
+                    } else {
+                        viewCounts[view.post_id] = 1;
+                    }
+                });
+
+                return viewCounts;
+            } catch (error) {
+                console.error("Error getting post view counts:", error);
+                return {};
+            }
+        }
+
+        // ฟังก์ชันโหลดข้อมูลผู้ใช้ที่มีส่วนร่วมมากที่สุด
+        async function loadActiveUsersTable() {
+            try {
+                // ดึงข้อมูลกระทู้ทั้งหมด
+                const { data: posts, error: postsError } = await supabase
+                    .from("posts")
+                    .select("author_id, author_name");
+
+                if (postsError) throw postsError;
+
+                // ดึงข้อมูลความคิดเห็นทั้งหมด
+                const { data: comments, error: commentsError } = await supabase
+                    .from("comments")
+                    .select("author_id, author_name");
+
+                if (commentsError) throw commentsError;
+
+                // นับจำนวนกระทู้และความคิดเห็นของแต่ละผู้ใช้
+                const userActivity = {};
+
+                posts.forEach(post => {
+                    if (!post.author_id) return;
+
+                    if (!userActivity[post.author_id]) {
+                        userActivity[post.author_id] = {
+                            author_id: post.author_id,
+                            author_name: post.author_name,
+                            post_count: 0,
+                            comment_count: 0
+                        };
+                    }
+
+                    userActivity[post.author_id].post_count++;
+                });
+
+                comments.forEach(comment => {
+                    if (!comment.author_id) return;
+
+                    if (!userActivity[comment.author_id]) {
+                        userActivity[comment.author_id] = {
+                            author_id: comment.author_id,
+                            author_name: comment.author_name,
+                            post_count: 0,
+                            comment_count: 0
+                        };
+                    }
+
+                    userActivity[comment.author_id].comment_count++;
+                });
+
+                // เรียงลำดับตามผลรวมของจำนวนกระทู้และความคิดเห็น
+                const activeUsers = Object.values(userActivity)
+                    .sort((a, b) => {
+                        const totalA = a.post_count + a.comment_count;
+                        const totalB = b.post_count + b.comment_count;
+                        return totalB - totalA;
+                    })
+                    .slice(0, 5);
+
+                // สร้างแถวของตาราง
+                const tbody = document.getElementById('active-users-tbody');
+                tbody.innerHTML = '';
+
+                activeUsers.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+
+                    row.innerHTML = `
+            <td class="px-4 py-3 text-sm font-medium text-gray-900">
+              ${user.author_name}
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-500 text-right">
+              <span class="bg-tu-red-50 text-tu-red-500 py-1 px-2 rounded-full text-xs font-medium">
+                ${user.post_count}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-500 text-right">
+              <span class="bg-tu-yellow-50 text-tu-yellow-700 py-1 px-2 rounded-full text-xs font-medium">
+                ${user.comment_count}
+              </span>
+            </td>
+          `;
+
+                    tbody.appendChild(row);
+                });
+
+                // ซ่อน loading และแสดงตาราง
+                document.getElementById('active-users-loading').classList.add('hidden');
+                document.getElementById('active-users-table').classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Error loading active users table:", error);
+            }
+        }
+    </script>
+
+</html>
