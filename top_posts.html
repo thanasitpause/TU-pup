@@ -488,8 +488,7 @@
               TU</div>
             <span class="font-bold text-2xl tu-gradient-text">TU-PUP</span>
           </div>
-          <p class="text-gray-600 max-w-md">ระบบกระดานสนทนาเกี่ยวกับสัตว์เลี้ยงสำหรับประชาคมธรรมศาสตร์
-            แลกเปลี่ยนความคิดเห็น ถาม-ตอบปัญหา
+          <p class="text-gray-600 max-w-md">ระบบกระดานสนทนาเกี่ยวกับสัตว์เลี้ยงสำหรับประชาคมธรรมศาสตร์ แลกเปลี่ยนความคิดเห็น ถาม-ตอบปัญหา
             แชร์ประสบการณ์</p>
         </div>
         <p class="text-gray-600 text-sm">&copy; 2025 TU-PUP. สงวนลิขสิทธิ์.</p>
@@ -592,6 +591,7 @@
       // Event listener สำหรับปุ่ม Back to Top
       const backToTopButton = document.getElementById('back-to-top');
 
+      // แสดงหรือซ่อนปุ่ม Back to Top เมื่อเลื่อนหน้า
       window.addEventListener('scroll', function () {
         if (window.scrollY > 500) {
           backToTopButton.classList.remove('opacity-0', 'invisible');
@@ -602,6 +602,7 @@
         }
       });
 
+      // เลื่อนขึ้นด้านบนเมื่อกดปุ่ม
       backToTopButton.addEventListener('click', function () {
         window.scrollTo({
           top: 0,
@@ -685,7 +686,7 @@
         // ตั้ง timeout เพื่อไม่ให้ค้นหาทุกครั้งที่พิมพ์
         searchTimeout = setTimeout(() => {
           performSearch(query);
-        }, 500); // รอ 0.5 วินาทีหลังจากหยุดพิมพ์แล้วค่อยค้นหา
+        }, 500); // รอ 500ms หลังจากหยุดพิมพ์แล้วค่อยค้นหา
       } else {
         clearButton.classList.add("hidden");
 
@@ -708,40 +709,14 @@
       isSearchMode = false;
       currentSearchQuery = '';
       document.getElementById("page-title").innerHTML = `
-    กระทู้ยอดนิยม
-    <div class="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-tu-red to-tu-yellow rounded-full"></div>
-  `;
-      document.getElementById("search-loading").classList.add("hidden");
-
-      // คืนค่าข้อมูลกระทู้จากข้อมูลเดิมก่อนการค้นหา
-      if (originalPostsData.length > 0) {
-        postsData = [...originalPostsData];
-
-        // รีเซ็ต container และแสดงกระทู้
-        const postsContainer = document.getElementById("posts-container");
-        postsContainer.innerHTML = "";
-        postsContainer.classList.remove("hidden");
-
-        // แสดงกระทู้
-        const postsToShow = postsData.slice(0, postsPerPage);
-        renderTopPosts(postsToShow);
-
-        // ถ้ามีกระทู้มากกว่าจำนวนที่แสดง ให้แสดงปุ่มโหลดเพิ่มเติม
-        const loadMoreBtn = document.getElementById("load-more-btn");
-        if (postsData.length > postsPerPage) {
-          loadMoreBtn.classList.remove("hidden");
-          lastPostId = postsPerPage;
-        } else {
-          loadMoreBtn.classList.add("hidden");
-        }
-      } else {
-        // ถ้าไม่มีข้อมูลเดิม โหลดใหม่
-        await loadTopPosts();
-      }
+        กระทู้ยอดนิยม
+        <div class="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-tu-red to-tu-yellow rounded-full"></div>
+      `;
+      await loadTopPosts();
     }
 
     // ทำการค้นหา
-    function performSearch(query) {
+    async function performSearch(query) {
       if (query === currentSearchQuery) {
         // ถ้าคำค้นหาเหมือนเดิม ไม่ต้องค้นหาใหม่
         document.getElementById("search-loading").classList.add("hidden");
@@ -753,12 +728,13 @@
 
       if (!query) {
         // ถ้าไม่มีคำค้นหา กลับไปแสดงกระทู้ทั้งหมด
-        resetSearch();
+        await resetSearch();
         return;
       }
 
-      searchPosts(query);
+      await searchPosts(query);
     }
+
     // โหลดกระทู้ยอดนิยม
     async function loadTopPosts() {
       try {
@@ -862,21 +838,108 @@
         }
       }
 
-      // กรองกระทู้ตามช่วงเวลาโดยใช้ created_at ของกระทู้
-      let filteredPosts = posts;
-
-      if (currentPeriod !== "all" && startDate) {
-        filteredPosts = posts.filter(post => {
-          const postDate = new Date(post.created_at);
-          return postDate >= startDate;
-        });
+      // ถ้าเลือก 'ทั้งหมด' ไม่ต้องกรองตามวันที่
+      if (currentPeriod === "all") {
+        return posts.map((post) => ({
+          ...post,
+          viewCount: viewCounts[post.id] || 0,
+        }));
       }
 
-      // เพิ่มข้อมูลจำนวนการเข้าชมให้กับกระทู้ที่กรองแล้ว
-      return filteredPosts.map(post => ({
-        ...post,
-        viewCount: viewCounts[post.id] || 0
-      }));
+      // กรองตามช่วงเวลาโดยตรวจสอบกับตาราง posts_view
+      const filteredPosts = [];
+
+      for (const post of posts) {
+        // ดึงข้อมูลการเข้าชมในช่วงเวลาที่กำหนด
+        const { data: views, error } = await supabase
+          .from("posts_view")
+          .select("*")
+          .eq("post_id", post.id)
+          .gte("view_timestamp", startDate.toISOString());
+
+        if (!error && views && views.length > 0) {
+          filteredPosts.push({
+            ...post,
+            viewCount: views.length,
+          });
+        }
+      }
+
+      return filteredPosts;
+    }
+
+    // ฟังก์ชันสำหรับโหลดกระทู้ยอดนิยมเพิ่มเติม
+    async function loadMoreTopPosts() {
+      if (!lastPostId || lastPostId >= postsData.length) return;
+
+      const loadMoreBtn = document.getElementById("load-more-btn");
+      loadMoreBtn.disabled = true;
+      loadMoreBtn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        กำลังโหลด...
+      `;
+
+      try {
+        // คำนวณกระทู้ที่จะแสดงในหน้าถัดไป
+        const endIndex = Math.min(
+          lastPostId + postsPerPage,
+          postsData.length
+        );
+        const nextPosts = postsData.slice(lastPostId, endIndex);
+
+        // แสดงกระทู้เพิ่มเติม
+        renderTopPosts(nextPosts);
+
+        // อัปเดต lastPostId
+        lastPostId = endIndex;
+
+        // ถ้าแสดงกระทู้ครบแล้ว ซ่อนปุ่มโหลดเพิ่มเติม
+        if (lastPostId >= postsData.length) {
+          loadMoreBtn.classList.add("hidden");
+        }
+
+        // ปรับปุ่มโหลดเพิ่มเติม
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+          โหลดเพิ่มเติม
+        `;
+      } catch (error) {
+        console.error("Error loading more top posts:", error);
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+          โหลดเพิ่มเติม
+        `;
+      }
+    }
+
+    // ฟังก์ชันสำหรับดึงจำนวนการเข้าชมของกระทู้
+    async function getPostsViewCounts(posts) {
+      if (!posts || posts.length === 0) return {};
+
+      const viewCounts = {};
+
+      // ดึงจำนวนการเข้าชมทีละกระทู้
+      for (const post of posts) {
+        const { count, error } = await supabase
+          .from("posts_view")
+          .select("*", { count: "exact", head: true })
+          .eq("post_id", post.id);
+
+        if (!error) {
+          viewCounts[post.id] = count || 0;
+        }
+      }
+
+      return viewCounts;
     }
 
     // ฟังก์ชันสำหรับค้นหากระทู้
@@ -896,17 +959,16 @@
 
         // อัปเดตชื่อหน้า
         pageTitle.innerHTML = `
-      ผลการค้นหา: <span class="text-tu-red-500">"${query}"</span>
-      <div class="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-tu-red to-tu-yellow rounded-full"></div>
-    `;
+          ผลการค้นหา: <span class="text-tu-red-500">"${query}"</span>
+          <div class="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-tu-red to-tu-yellow rounded-full"></div>
+        `;
 
         // ดึงกระทู้ที่มีคำค้นหาในชื่อหรือเนื้อหา
-        const { data: searchResults, error } = await supabase
+        const { data: posts, error } = await supabase
           .from("posts")
           .select("*")
-          .or(`title.ilike.%${query}%,content.ilike.%${query}%`);
-
-        if (error) throw error;
+          .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
+          .order("created_at", { ascending: false });
 
         // ล้างคอนเทนเนอร์
         postsContainer.innerHTML = "";
@@ -915,30 +977,34 @@
         // ซ่อน loading indicator
         searchLoading.classList.add("hidden");
 
-        if (!searchResults || searchResults.length === 0) {
+        if (error) {
+          throw error;
+        }
+
+        if (!posts || posts.length === 0) {
           // ซ่อนปุ่มโหลดเพิ่มเติม
           loadMoreBtn.classList.add("hidden");
 
           // แสดงข้อความไม่มีกระทู้
           noPostsMessage.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <h3 class="text-xl font-semibold text-gray-700 mb-2">ไม่พบกระทู้ที่เกี่ยวข้องกับ "${query}"</h3>
-        <p class="text-gray-500 mb-6">ลองค้นหาด้วยคำที่แตกต่างหรือตรวจสอบการสะกดคำ</p>
-      `;
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">ไม่พบกระทู้ที่เกี่ยวข้องกับ "${query}"</h3>
+            <p class="text-gray-500 mb-6">ลองค้นหาด้วยคำที่แตกต่างหรือตรวจสอบการสะกดคำ</p>
+          `;
           noPostsMessage.classList.remove("hidden");
           return;
         }
 
         // ดึงข้อมูลจำนวนการเข้าชม
-        const viewCounts = await getPostsViewCounts(searchResults);
-
-        // กรองตามช่วงเวลาที่เลือก โดยยังคงใช้ตัวกรองช่วงเวลาเดิม
-        const filteredPosts = await filterPostsByPeriod(searchResults, viewCounts);
+        const viewCounts = await getPostsViewCounts(posts);
 
         // เพิ่มข้อมูลจำนวนการเข้าชม
-        postsData = filteredPosts;
+        postsData = posts.map(post => ({
+          ...post,
+          viewCount: viewCounts[post.id] || 0
+        }));
 
         // เรียงลำดับตามจำนวนการเข้าชม
         postsData.sort((a, b) => b.viewCount - a.viewCount);
@@ -966,15 +1032,16 @@
         // แสดงข้อความผิดพลาด
         const noPostsMessage = document.getElementById("no-posts-message");
         noPostsMessage.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
-      <h3 class="text-xl font-semibold text-gray-700 mb-2">เกิดข้อผิดพลาดในการค้นหา</h3>
-      <p class="text-gray-500 mb-6">โปรดลองอีกครั้งในภายหลัง</p>
-    `;
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <h3 class="text-xl font-semibold text-gray-700 mb-2">เกิดข้อผิดพลาดในการค้นหา</h3>
+          <p class="text-gray-500 mb-6">โปรดลองอีกครั้งในภายหลัง</p>
+        `;
         noPostsMessage.classList.remove("hidden");
       }
     }
+
     // โหลดผลการค้นหาเพิ่มเติม
     async function loadMoreSearchResults() {
       if (!lastPostId || lastPostId >= postsData.length) return;
@@ -982,12 +1049,12 @@
       const loadMoreBtn = document.getElementById("load-more-btn");
       loadMoreBtn.disabled = true;
       loadMoreBtn.innerHTML = `
-    <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-    </svg>
-    กำลังโหลด...
-  `;
+        <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        กำลังโหลด...
+      `;
 
       try {
         // คำนวณกระทู้ที่จะแสดงในหน้าถัดไป
@@ -1013,18 +1080,17 @@
         // คืนค่าปุ่มโหลดเพิ่มเติม
         loadMoreBtn.disabled = false;
         loadMoreBtn.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-      </svg>
-      โหลดเพิ่มเติม
-    `;
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+          โหลดเพิ่มเติม
+        `;
       }
     }
 
     // ฟังก์ชันสำหรับแสดงกระทู้ยอดนิยม
     function renderTopPosts(posts) {
       const postsContainer = document.getElementById("posts-container");
-
       posts.forEach((post, index) => {
         // คำนวณลำดับรวม (index + จำนวนกระทู้ที่แสดงไปแล้ว)
         const rank = (lastPostId === null ? 0 : lastPostId) + index + 1;
