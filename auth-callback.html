@@ -1,33 +1,214 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>กำลังเข้าสู่ระบบ - TU-PUP</title>
-  <!-- Tailwind CSS -->
+  
+  <!-- ตั้งค่าการโหลดทรัพยากร -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Custom styles -->
+  <link href="css/tu-common.css" rel="stylesheet">
+  
+  <!-- Tailwind Config & CDN -->
+  <script src="js/tailwind-config.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // ใช้คอนฟิกจากไฟล์ภายนอก
+    tailwind.config = window.tailwindConfig;
+  </script>
+  
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <!-- Supabase Config -->
   <script src="js/supabase-config.js"></script>
-  <!-- Auth Callback Handler -->
-  <script src="js/auth-callback.js"></script>
+  
+  <style>
+    /* Animation effects */
+    @keyframes pulse-border {
+      0% {
+        border-color: #E60000;
+      }
+
+      50% {
+        border-color: #FFCC00;
+      }
+
+      100% {
+        border-color: #E60000;
+      }
+    }
+
+    .pulse-border {
+      animation: pulse-border 2s infinite;
+    }
+
+    .floating {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-15px);
+      }
+
+      100% {
+        transform: translateY(0px);
+      }
+    }
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center">
-  <div class="container mx-auto px-4 py-8 max-w-md">
-    <div class="text-center mb-8">
-      <a href="index.html" class="inline-block">
-        <h1 class="text-3xl font-bold text-blue-600">TU-PUP</h1>
-      </a>
-    </div>
-    
-    <div class="bg-white rounded-lg shadow-md p-6 text-center">
-      <div class="flex justify-center mb-6">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+
+<body class="bg-gradient-to-br from-white to-gray-100 min-h-screen flex items-center justify-center">
+  <!-- Decorative Elements -->
+  <div class="fixed top-0 left-0 w-full h-1 tu-gradient opacity-80 z-50"></div>
+  <div class="fixed bottom-0 left-0 w-full h-1 tu-gradient opacity-80 z-50"></div>
+  
+  <!-- Background Decorations -->
+  <div class="fixed top-0 right-0 w-64 h-64 bg-tu-red-100 rounded-full filter blur-3xl opacity-20 -mr-32 -mt-32"></div>
+  <div class="fixed bottom-0 left-0 w-64 h-64 bg-tu-yellow-100 rounded-full filter blur-3xl opacity-20 -ml-32 -mb-32"></div>
+
+  <div class="container mx-auto px-4 py-8 max-w-md relative z-10">
+    <div class="flex flex-col items-center justify-center mb-8">
+      <div class="w-20 h-20 rounded-full bg-white shadow-lg mb-4 p-4 flex items-center justify-center relative">
+        <div class="absolute inset-0 rounded-full bg-gradient-to-r from-tu-red to-tu-yellow opacity-20 blur-xl transform scale-110"></div>
+        <div class="tu-gradient w-full h-full rounded-full flex items-center justify-center">
+          <span class="text-white font-bold text-xl">TU</span>
+        </div>
       </div>
       
-      <p id="message-container" class="text-gray-700 text-lg">กำลังประมวลผลการเข้าสู่ระบบ...</p>
+      <h1 class="text-3xl font-bold tu-gradient-text mb-2">TU-PUP</h1>
+      <p class="text-gray-600 mb-6">ระบบกระดานสนทนาสำหรับประชาคมธรรมศาสตร์</p>
+    </div>
+
+    <!-- Loading Card -->
+    <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 transition-all duration-300 hover:shadow-2xl">
+      <div class="text-center mb-6">
+        <div class="inline-block rounded-full p-3 bg-tu-red-50 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-tu-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+          </svg>
+        </div>
+        <h2 class="text-xl font-bold text-gray-800 mb-1">กำลังเข้าสู่ระบบ</h2>
+        <p id="message-container" class="text-gray-600">กำลังตรวจสอบข้อมูลการเข้าสู่ระบบ...</p>
+      </div>
+
+      <div class="flex justify-center mb-6">
+        <div class="w-16 h-16 rounded-full border-4 pulse-border flex items-center justify-center">
+          <div class="w-10 h-10 rounded-full border-t-4 border-b-4 border-tu-red-500 animate-spin"></div>
+        </div>
+      </div>
+
+      <div class="mx-auto w-full bg-gray-200 rounded-full h-1 mb-8">
+        <div id="progress-bar" class="tu-gradient h-1 rounded-full w-0 transition-all duration-1000"></div>
+      </div>
+
+      <div class="text-center text-sm text-gray-500">
+        <p>ระบบจะนำคุณไปยังหน้าหลักโดยอัตโนมัติ</p>
+        <p class="mt-2">หากไม่มีการเปลี่ยนหน้า <a href="index.html" class="text-tu-red-500 hover:underline">คลิกที่นี่</a></p>
+      </div>
+    </div>
+
+    <!-- Mascot Image (Optional) -->
+    <div class="mt-8 flex justify-center">
+      <img src="img/cat-logging.png" alt="Mascot" class="h-24 opacity-70 floating">
     </div>
   </div>
+
+  <script>
+    // ตั้งค่า Progress Bar Animation
+    setTimeout(() => {
+      const progressBar = document.getElementById('progress-bar');
+      progressBar.classList.add('w-1/4');
+      
+      setTimeout(() => {
+        progressBar.classList.remove('w-1/4');
+        progressBar.classList.add('w-1/2');
+        
+        setTimeout(() => {
+          progressBar.classList.remove('w-1/2');
+          progressBar.classList.add('w-3/4');
+          
+          setTimeout(() => {
+            progressBar.classList.remove('w-3/4');
+            progressBar.classList.add('w-full');
+          }, 700);
+        }, 700);
+      }, 700);
+    }, 300);
+
+    // ฟังก์ชันเมื่อหน้าเว็บโหลด
+    document.addEventListener('DOMContentLoaded', async function() {
+      // แสดงข้อความกำลังตรวจสอบ
+      const messageContainer = document.getElementById('message-container');
+      
+      try {
+        // ตรวจสอบว่ามีการล็อกอินด้วย OAuth หรือไม่
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) throw error;
+        
+        // ถ้าผู้ใช้ล็อกอินแล้ว
+        if (data?.session?.user) {
+          const user = data.session.user;
+          
+          // เก็บข้อมูลชื่อที่แสดงใน user_metadata ถ้ายังไม่มี
+          if (!user.user_metadata?.display_name) {
+            // ใช้ชื่อจาก Google หรือส่วนแรกของอีเมล
+            const displayName = user.user_metadata?.full_name || 
+                              user.user_metadata?.name || 
+                              user.email.split('@')[0];
+            
+            messageContainer.textContent = 'กำลังตั้งค่าข้อมูลผู้ใช้...';
+            
+            // อัปเดต metadata ให้มี display_name
+            const { error: updateError } = await supabase.auth.updateUser({
+              data: {
+                display_name: displayName
+              }
+            });
+            
+            if (updateError) {
+              console.error('Error updating user metadata:', updateError);
+            }
+          }
+          
+          // แสดงข้อความสำเร็จ
+          messageContainer.textContent = 'เข้าสู่ระบบสำเร็จ! กำลังเปลี่ยนเส้นทาง...';
+          
+          // รอสักครู่แล้วเปลี่ยนเส้นทางไปหน้าหลัก
+          setTimeout(() => {
+            window.location.href = window.location.origin + '/index.html';
+          }, 2500);
+        } else {
+          // ถ้าไม่มี session ให้กลับไปหน้าล็อกอิน
+          messageContainer.textContent = 'ไม่พบข้อมูลการเข้าสู่ระบบ กำลังเปลี่ยนเส้นทาง...';
+          setTimeout(() => {
+            window.location.href = window.location.origin + '/login.html';
+          }, 2000);
+        }
+      } catch (error) {
+        console.error('Error handling auth callback:', error);
+        
+        // แสดงข้อความผิดพลาด
+        messageContainer.textContent = 'เกิดข้อผิดพลาดในการตรวจสอบการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง';
+        
+        // รอสักครู่แล้วกลับไปหน้าล็อกอิน
+        setTimeout(() => {
+          window.location.href = window.location.origin + '/login.html';
+        }, 3000);
+      }
+    });
+  </script>
 </body>
+
 </html>
